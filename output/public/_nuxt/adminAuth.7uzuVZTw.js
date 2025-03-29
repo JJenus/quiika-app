@@ -1,0 +1,1 @@
+import{bM as a}from"./entry.ZJT264aI.js";import{u as r}from"./cookie.Zha-GOsP.js";import{u as o}from"./authStates.XIq1_6L-.js";const d=a((i,s)=>{var e;const u=r("auth");if(u.value==null||u.value==null)return o().logout();const t=o();if(!t.isAuthenticated()||((e=t.userData.value)==null?void 0:e.user.userType)!=="admin")return t.logout()});export{d as default};

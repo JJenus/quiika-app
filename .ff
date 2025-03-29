@@ -1,1 +1,8 @@
 --preset=vercel_edge
+
+##W@123sw! : kocari7083@barodis.com temp: adata
+
+scp output.zip qka@ssh-qka.alwaysdata.net: -*
+
+Note: npm i is required on server to restart app.
+ssh qka@ssh-qka.alwaysdata.net

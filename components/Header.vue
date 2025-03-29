@@ -1,13 +1,6 @@
 <script setup>
-	import currency from "currency.js";
-
+	
 	const appSettings = useAppSettings();
-	const auth = useAuth();
-	const user = userData().data;
-
-	const balance = () => {
-		return currency(user.value.balance, { symbol: "", precision: 2 });
-	};
 
 	const toggleTheme = (themeMode) => {
 		appSettings.themeMode.value = themeMode;
@@ -25,7 +18,7 @@
 	>
 		<!--begin::Header container-->
 		<div
-			class="app-container container-fluid d-flex align-items-stretch justify-content-between"
+			class="app-container container-fluid d-flex align-items-center justify-content-between"
 			id="kt_app_header_container"
 		>
 			<!--begin::Logo-->
@@ -37,6 +30,8 @@
 				<QuiikaLogo :classes="'h-50px'" />
 			</div>
 			<!--end::Logo-->
+
+			<Navbar />
 
 			<!--begin::Navbar-->
 			<div class="app-navbar flex-shrink-0" id="kt_app_aside_navbar">
@@ -72,8 +67,6 @@
 					<!--end::Menu wrapper-->
 				</div>
 				<!--end::Login-->
-
-				<!--end::Quick links-->
 			</div>
 			<!--end::Navbar-->
 
@@ -94,15 +87,3 @@
 		<!--end::Header container-->
 	</div>
 </template>
-
-<style>
-	.glass-container {
-		background: rgba(
-			255,
-			255,
-			255,
-			0.2
-		); /* Adjust the alpha value for transparency */
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.9); /* Optional: Add a subtle shadow */
-	}
-</style>

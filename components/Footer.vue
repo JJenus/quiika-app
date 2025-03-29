@@ -78,22 +78,24 @@
 				class="menu menu-gray-600 menu-hover-primary fw-semibold d-flex flex-wrap justify-content-center gap-3 mt-3 mt-md-0"
 			>
 				<li class="menu-item">
-					<NuxtLink
-						to="/resources/about-us"
-						target="_blank"
-						class="menu-link px-2"
-						>About</NuxtLink
-					>
+					<NuxtLink to="/about" class="menu-link px-2">
+						About
+					</NuxtLink>
 				</li>
 				<li class="menu-item">
-					<NuxtLink to="/resources/contact-us" class="menu-link px-2"
-						>Contact Us</NuxtLink
-					>
+					<NuxtLink to="/contact-us" class="menu-link px-2">
+						Contact Us
+					</NuxtLink>
 				</li>
 				<li class="menu-item">
-					<a href="#" target="_blank" class="menu-link px-2"
-						>Terms and Conditions</a
-					>
+					<NuxtLink to="/faqs" class="menu-link px-2">
+						FAQs
+					</NuxtLink>
+				</li>
+				<li class="menu-item">
+					<NuxtLink to="/terms" class="menu-link px-2">
+						Terms and Conditions
+					</NuxtLink>
 				</li>
 			</ul>
 			<!--end::Footer Links-->

@@ -1,1 +1,0 @@
-import{u as o}from"./cookie.8m-Mddp_.js";import{M as t,aE as s,u as r,aQ as l}from"./entry.7yR6AC1W.js";const d=t({__name:"auth",setup(n){const e=o("reload",{maxAge:86400});return e.value=!1,(a,u)=>(s(),r("div",null,[l(a.$slots,"default")]))}});export{d as default};

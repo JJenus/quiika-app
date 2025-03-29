@@ -22,7 +22,7 @@
 				id="kt_app_page"
 			>
 				<!--begin::Header-->
-				<Header />
+				<Header class="mb-5" />
 				<!--end::Header-->
 				<!--begin::Wrapper-->
 				<div

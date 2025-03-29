@@ -1,51 +1,48 @@
-<script setup>
-	const myCollections = useCollections();
-
-	const navs = ref([
-		{
-			name: "Send",
-			path: "/",
-		},
-		{
-			name: "Redeem",
-			path: "/redeem",
-		},
-	]);
+<script setup lang="ts">
 	const route = useRoute();
-	const active = ref("all");
+	const activePath = ref(route.path);
 
-	onMounted(() => {
-		const paths = route.path.split("/");
-		if (paths[2]) {
-			active.value = paths[2];
-		} else if (!paths[1]) {
-			active.value = "send";
+	watch(
+		() => route.path,
+		(newPath) => {
+			activePath.value = newPath;
+			console.log("Path changed:", newPath);
 		}
-	});
+	);
 </script>
 
 <template>
-	<div class="d-nonei">
-		<div class="hover-scroll-x hide-scrollbar">
-			<ul
-				class="nav nav-tabs nav-pills d-flex flex-nowrap align-items-center justify-content-center border-0 fs-6 min-w-lg-200px"
+	<div class="d-none d-md-block">
+		<ul
+			class="nav nav-stretch nav-pills nav-pills-custom d-flex mt-4 align-items-center fs-5 fw-bold"
+		>
+			<!--begin::Nav item-->
+			<li
+				v-for="nav in navs"
+				class="nav-item p-0 ms-0"
+				role="presentation"
 			>
-				<li
-					v-for="nav in navs"
-					class="nav-item me-08 mb-md-2"
-					@click="active = nav.name"
+				<NuxtLink
+					class="nav-link btn btn-color-gray-500 flex-center px-3"
+					:class="{
+						active: activePath === nav.path,
+					}"
+					:to="nav.path"
+					:aria-selected="activePath === nav.path"
+					tabindex="-1"
 				>
-					<NuxtLink
-						class="nav-link text-center w-100px btn-light-primary btn-sm"
-						:class="
-							active == nav.name.toLowerCase() ? 'active' : ''
-						"
-						:to="nav.path"
-					>
-						<span class="fs-4 fw-bold">{{ nav.name }}</span>
-					</NuxtLink>
-				</li>
-			</ul>
-		</div>
+					<!--begin::Title-->
+					<span class="nav-text mb-3">{{ nav.name }}</span>
+					<!--end::Title-->
+
+					<!--begin::Bullet-->
+					<span
+						class="bullet-custom position-absolute z-index-2 w-100 h-3px top-100 bottom-n100 bg-primary rounded"
+					></span>
+					<!--end::Bullet-->
+				</NuxtLink>
+			</li>
+			<!--end::Nav item-->
+		</ul>
 	</div>
 </template>

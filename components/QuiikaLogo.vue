@@ -1,16 +1,11 @@
 <script setup lang="ts">
 	defineProps<{
-		classes: string;
-		appClass: string;
-		textClass: string;
+		classes?: string;
+		appClass?: string;
+		textClass?: string;
 	}>();
 
 	const { APP } = useRuntimeConfig().public;
-	console.log(APP);
-	// const currentPage = "App";
-	// useSeoMeta({
-	// 	title: `${currentPage} - ${config.APP}`,
-	// });
 </script>
 
 <template>
