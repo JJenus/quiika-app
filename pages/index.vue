@@ -1,21 +1,25 @@
-<!-- pages/index.vue -->
-<script setup>
+<script setup lang="ts">
 	import { ref, watch } from "vue";
 	import { useRoute } from "vue-router";
 
 	const route = useRoute();
 	const activeTab = ref("send"); // Default tab
+	const options = ref([
+		{ name: "Send", path: "send" },
+		{ name: "Rules", path: "rules" },
+		{ name: "Claim", path: "claim" },
+	]);
 
 	// Watch for hash changes
 	watch(
 		() => route.hash, // Watch the hash value in the route
 		(newHash) => {
-			const hash = newHash.replace("#", ""); // Remove the '#' from the hash
-			if (hash === "send" || hash === "claim") {
-				activeTab.value = hash; // Update the active tab
+			const hash = newHash.replace("#", "");
+			if (options.value.find((e) => e.path === hash)) {
+				activeTab.value = hash; 
 			}
 		},
-		{ immediate: true } // Trigger the watcher immediately on mount
+		{ immediate: true } 
 	);
 </script>
 
@@ -33,46 +37,25 @@
 				>
 					<!--begin::Nav-->
 					<ul
-						class="nav nav-pills nav-pills-custom d-flex position-relative w-100"
+						class="nav nav-pills nav-pills-custom d-flex position-relative justify-content-between flex-fill"
 						role="tablist"
 					>
 						<!--begin::Item-->
-						<li class="nav-item mx-0 p-0 w-50" role="presentation">
+						<li
+							v-for="option in options"
+							class="nav-item mx-0 flex-fill"
+							role="presentation"
+						>
 							<!--begin::Link-->
 							<NuxtLink
 								class="nav-link btn btn-color-muted border-0 h-100 px-0"
-								:class="{ active: activeTab === 'send' }"
-								to="#send"
+								:class="{ active: activeTab === option.path }"
+								:to="`/#${option.path}`"
 								role="tab"
 							>
 								<!--begin::Subtitle-->
 								<span class="nav-text fw-bold fs-4 mb-3">
-									Send
-								</span>
-								<!--end::Subtitle-->
-
-								<!--begin::Bullet-->
-								<span
-									class="bullet-custom position-absolute z-index-2 w-100 h-2px top-100 bottom-n100 bg-primary rounded"
-								></span>
-								<!--end::Bullet-->
-							</NuxtLink>
-							<!--end::Link-->
-						</li>
-						<!--end::Item-->
-
-						<!--begin::Item-->
-						<li class="nav-item mx-0 px-0 w-50" role="presentation">
-							<!--begin::Link-->
-							<NuxtLink
-								class="nav-link btn btn-color-muted border-0 h-100 px-0"
-								:class="{ active: activeTab === 'claim' }"
-								to="#claim"
-								role="tab"
-							>
-								<!--begin::Subtitle-->
-								<span class="nav-text fw-bold fs-4 mb-3">
-									Claim
+									{{ option.name }}
 								</span>
 								<!--end::Subtitle-->
 
@@ -101,7 +84,7 @@
 							role="tabpanel"
 							bis_skin_checked="1"
 						>
-							<MakePayment />
+							<Send />
 						</div>
 						<!--end::Tap pane-->
 
@@ -112,7 +95,18 @@
 							role="tabpanel"
 							bis_skin_checked="1"
 						>
-							<Withdraw />
+							<Claim />
+						</div>
+						<!--end::Tap pane-->
+
+						<!--begin::Tap pane-->
+						<div
+							class="tab-pane fade"
+							:class="{ 'active show': activeTab === 'rules' }"
+							role="tabpanel"
+							bis_skin_checked="1"
+						>
+							<QuiikaRules quid="" />
 						</div>
 						<!--end::Tap pane-->
 					</div>

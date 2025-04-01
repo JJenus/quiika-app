@@ -1,8 +1,14 @@
 --preset=vercel_edge
 
 ##W@123sw! : kocari7083@barodis.com temp: adata
+##W@123sw!
 
-scp output.zip qka@ssh-qka.alwaysdata.net: -*
+mv .output output
+zip -r output.zip output
+scp output.zip qka@ssh-qka.alwaysdata.net: 
 
 Note: npm i is required on server to restart app.
 ssh qka@ssh-qka.alwaysdata.net
+
+
+i want to add rules to quiika to access monetary gifts etc. first in my mind is to at nth person to get it. 2nd is spilt into n places and in optional percentages min allowed amount is N100. to reduce human error max allowed split in percentage should be limited to 5. Also time, time range don't have a full picture on how that will work yet so I leave it to you. the task is to make a form in a nuxt compnent to allow users to adjust to desired and submit none is required but one quid can have multiple rules. 

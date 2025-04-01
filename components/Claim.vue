@@ -13,6 +13,7 @@
 
 	const CONFIG = useRuntimeConfig().public;
 	const API = CONFIG.BE_API;
+	console.log(API);
 
 	const { getFractionalCurrency, getMoney, formatFractionalCurrency } =
 		useAppSettings();
@@ -25,6 +26,33 @@
 		amount: "",
 		bankCode: "",
 		bankName: "",
+	});
+
+	const inputErrors = ref({
+		quid: {
+			isValid: true,
+			errorMessage: "Invalid QUID",
+		},
+		accountName: {
+			isValid: true,
+			errorMessage: "Invalid account",
+		},
+		accountNumber: {
+			isValid: true,
+			errorMessage: "Invalid account number",
+		},
+		amount: {
+			isValid: true,
+			errorMessage: "Invalid amount",
+		},
+		bankCode: {
+			isValid: true,
+			errorMessage: "Invalid bank code",
+		},
+		bankName: {
+			isValid: true,
+			errorMessage: "Bank not supported",
+		},
 	});
 
 	const showForm = ref(false);
@@ -71,10 +99,12 @@
 				quidResponse.value.amount
 			);
 
+			inputErrors.value.quid.isValid = true;
+
 			showForm.value = true; // Show withdrawal form after successful verification
 		} catch (error) {
 			console.error("Failed to verify QUID:", error);
-			// alert("Invalid or expired QUID. Please try again.");
+			inputErrors.value.quid.isValid = false;
 		} finally {
 			loader.value.verifyingQuid = false;
 		}
@@ -88,7 +118,7 @@
 			!form.value.amount ||
 			!form.value.bankCode
 		) {
-			alert("Please fill in all required fields.");
+			warningAlert("Please fill in all required fields.");
 			return;
 		}
 
@@ -111,10 +141,55 @@
 			}
 		} catch (error) {
 			console.error("Failed to submit withdrawal request:", error);
-			alert("An error occurred. Please try again.");
+			errorAlert("An error occurred. Please try again.");
 		} finally {
 			loader.value.processing = false;
 		}
+	};
+
+	const fetchAccountDetails = async () => {
+		if (!form.value.bankCode || form.value.accountNumber.length < 10) {
+			return;
+		} else {
+			console.log("Fetching data...");
+		}
+
+		try {
+			// loader.value.verifyingQuid = true;
+			const response = await axios.post<any>(
+				`${API}/transactions/banks/resolve-name`,
+				{
+					accountNumber: form.value.accountNumber,
+					bankCode: form.value.bankCode,
+				}
+			);
+			console.log(response.data);
+			form.value.accountName = response.data.accountName;
+			inputErrors.value.accountName.isValid = true;
+		} catch (error) {
+			console.error("Account verification failed:", error);
+			// errorAlert("Account verification failed");
+			inputErrors.value.accountName.isValid = false;
+			form.value.accountName = "";
+		} finally {
+			// loader.value.verifyingQuid = false;
+		}
+	};
+
+	const isValidAccount = () => {
+		fetchAccountDetails();
+		return (
+			form.value.bankCode &&
+			form.value.accountNumber.length > 9 &&
+			!form.value.accountName
+		);
+	};
+
+	const selectBank = () => {
+		form.value.bankName =
+			banks.value.find((b: Bank) => b.code === form.value.bankCode)
+				?.name || "unknown";
+		fetchAccountDetails();
 	};
 
 	// Fetch banks on component mount
@@ -132,10 +207,10 @@
 		>
 			<!--begin::Body-->
 			<div
-				class="card-body d-flex align-items-center justify-content-center flex-wrap ps-xl-15 pe-0 gap-8 gap-md-10"
+				class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10"
 			>
 				<!--begin::Wrapper-->
-				<div class="flex-grow-1 mt-2 me-auto mb-8">
+				<div class="flex-grow-1 mt-2 mx-auto mb-8">
 					<div class="text-centeri mb-10">
 						<h1 class="display-6">
 							<span class="text-success">Withdraw</span> Funds
@@ -168,11 +243,20 @@
 								id="quid"
 								name="quid"
 								v-model="form.quid"
+								:class="{
+									'is-invalid': !inputErrors.quid.isValid,
+								}"
 								class="form-control form-control-solid form-control-lg"
 								placeholder="Enter QUID"
 							/>
-							<small class="text-muted">
+							<small
+								v-if="inputErrors.quid.isValid"
+								class="text-muted"
+							>
 								Enter your QUID to verify and proceed.
+							</small>
+							<small class="invalid-feedback">
+								Invalid QUID.
 							</small>
 						</div>
 
@@ -241,24 +325,6 @@
 							/>
 						</div>
 
-						<!-- Account Name -->
-						<div class="mb-5">
-							<label
-								for="accountName"
-								class="form-label required fw-bold"
-							>
-								Account Name
-							</label>
-							<input
-								type="text"
-								id="accountName"
-								name="accountName"
-								v-model="form.accountName"
-								class="form-control form-control-solid form-control-lg"
-								placeholder="Enter account name"
-							/>
-						</div>
-
 						<!-- Account Number -->
 						<div class="mb-5">
 							<label
@@ -272,6 +338,7 @@
 								id="accountNumber"
 								name="accountNumber"
 								v-model="form.accountNumber"
+								@keyup="fetchAccountDetails()"
 								class="form-control form-control-solid form-control-lg"
 								placeholder="Enter account number"
 							/>
@@ -290,13 +357,7 @@
 								name="bank"
 								v-model="form.bankCode"
 								class="form-control form-control-solid form-control-lg"
-								@change="
-									form.bankName =
-										banks.find(
-											(b: Bank) =>
-												b.code === form.bankCode
-										)?.name || 'unknown'
-								"
+								@change="selectBank()"
 							>
 								<option value="" disabled>
 									Select your bank
@@ -311,28 +372,66 @@
 							</select>
 						</div>
 
+						<!-- Account Name -->
+						<div class="mb-5">
+							<label
+								for="accountName"
+								class="form-label required fw-bold"
+							>
+								Account Name
+							</label>
+							<input
+								:class="{
+									'is-invalid':
+										!inputErrors.accountName.isValid,
+								}"
+								disabled
+								type="text"
+								id="accountName"
+								name="accountName"
+								v-model="form.accountName"
+								class="form-control form-control-solidi form-control-lg"
+								placeholder="Enter account name"
+							/>
+							<small class="invalid-feedback">
+								{{ inputErrors.accountName.errorMessage }}
+							</small>
+						</div>
+
 						<!-- Submit Button -->
-						<button
-							:disabled="loader.processing"
-							class="btn btn-primary w-100"
-						>
-							<span v-if="!loader.processing"> Submit </span>
-							<span v-else>
-								Processing...
-								<span
-									class="spinner-border spinner-border-sm"
-								></span>
-							</span>
-						</button>
+						<div class="d-flex gap-3">
+							<button
+								type="button"
+								class="btn btn-danger"
+								@click="showForm = false"
+							>
+								Cancel
+							</button>
+
+							<button
+								:disabled="loader.processing"
+								class="btn btn-primary flex-grow-1"
+							>
+								<span v-if="!loader.processing"> Submit </span>
+								<span v-else>
+									Processing...
+									<span
+										class="spinner-border spinner-border-sm"
+									></span>
+								</span>
+							</button>
+						</div>
 					</form>
 				</div>
 				<!--end::Wrapper-->
 
 				<!--begin::Illustration-->
-		
 
-				<div class="h-175px me-auto">
-					<i class="ki-duotone ki-shield-tick text-primary" style="font-size: 13rem;">
+				<div class="h-175px mx-auto">
+					<i
+						class="ki-duotone ki-shield-tick text-primary"
+						style="font-size: 13rem"
+					>
 						<span class="path1"></span>
 						<span class="path2"></span>
 						<span class="path3"></span>
@@ -341,6 +440,16 @@
 					</i>
 				</div>
 				<!--end::Illustration-->
+
+				<!-- <div class="h-175px mx-auto">
+					<i
+						class="ki-duotone ki-gear text-success"
+						style="font-size: 13rem"
+					>
+						<i class="path1"></i>
+						<i class="path2"></i>
+					</i>
+				</div> -->
 			</div>
 			<!--end::Body-->
 		</div>

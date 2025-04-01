@@ -164,7 +164,7 @@
 			<!--begin::Body-->
 			<div
 				v-if="showForm"
-				class="card-body d-flex align-items-center justify-content-center flex-wrap ps-xl-15 pe-0 gap-8 gap-md-10"
+				class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10"
 			>
 				<!--begin::Wrapper-->
 				<div class="flex-grow-1 mt-2 me-9 me-md-6 mb-8">
