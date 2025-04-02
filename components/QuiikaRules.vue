@@ -59,6 +59,21 @@
 		{ id: 6, name: "Saturday" },
 	];
 
+	const rulesNav = ref([
+		{
+			name: "Nth Person",
+			rule: RuleType.NTH_PERSON,
+		},
+		{
+			name: "Split",
+			rule: RuleType.SPLIT,
+		},
+		{
+			name: "Time Range",
+			rule: RuleType.TIME,
+		},
+	]);
+
 	// Computed properties
 	const totalPercentage = computed(() => {
 		return ruleState.value.splitRules.reduce((sum, rule) => {
@@ -247,13 +262,11 @@
 </script>
 
 <template>
-	<div
-		class="card card-custom border-0 h-md-100 mb-5 mb-lg-10"
-	>
+	<div class="card card-custom border-0 h-md-100 mb-5 mb-lg-10">
 		<div
-			class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10"
+			class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10 p-0 p-md-10"
 		>
-			<div class="flex-grow-1 mt-2 me-9 me-md-6 mb-8">
+			<div class="flex-grow-1 mt-2 mb-8">
 				<div class="mb-5">
 					<h1 class="display-6">
 						Add<span class="text-success"> Rules</span> to Quid
@@ -269,45 +282,32 @@
 						<label class="form-label required fw-bold"
 							>Rule Type</label
 						>
-						<div class="btn-group w-100" role="group">
-							<button
-								type="button"
-								:class="[
-									'btn',
-									ruleState.ruleType === RuleType.NTH_PERSON
-										? 'btn-primary'
-										: 'btn-outline-primary',
-								]"
-								@click="
-									ruleState.ruleType = RuleType.NTH_PERSON
-								"
-							>
-								Nth Person
-							</button>
-							<button
-								type="button"
-								:class="[
-									'btn',
-									ruleState.ruleType === RuleType.SPLIT
-										? 'btn-primary'
-										: 'btn-outline-primary',
-								]"
-								@click="ruleState.ruleType = RuleType.SPLIT"
-							>
-								Split
-							</button>
-							<button
-								type="button"
-								:class="[
-									'btn',
-									ruleState.ruleType === RuleType.TIME
-										? 'btn-primary'
-										: 'btn-outline-primary',
-								]"
-								@click="ruleState.ruleType = RuleType.TIME"
-							>
-								Time Range
-							</button>
+						<div
+							class="rounded bg-gray-200i mb-9 p-2"
+						>
+							<!--begin::Nav-->
+							<ul class="nav flex-wrap">
+								<!--begin::Nav item-->
+								<li
+									v-for="rule in rulesNav"
+									class="nav-item my-1 flex-grow-1"
+								>
+									<a
+										class="btn btn-sm btn-color-gray-600 bg-state-body btn-active-color-gray-800 fw-bolder fw-bold fs-6 fs-lg-base nav-link px-3 px-lg-4 mx-1"
+										role="tab"
+										:class="[
+											ruleState.ruleType === rule.rule
+												? 'active'
+												: '',
+										]"
+										@click="ruleState.ruleType = rule.rule"
+									>
+										{{ rule.name }}
+									</a>
+								</li>
+								<!--end::Nav item-->
+							</ul>
+							<!--end::Nav-->
 						</div>
 					</div>
 
@@ -704,7 +704,7 @@
 
 			<div class="h-175px mx-auto">
 				<i
-					class="ki-duotone ki-gear text-success"
+					class="ki-duotone ki-gear text-primary"
 					style="font-size: 13rem"
 				>
 					<i class="path1"></i>

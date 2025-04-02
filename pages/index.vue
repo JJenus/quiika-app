@@ -10,17 +10,24 @@
 		{ name: "Claim", path: "claim" },
 	]);
 
+	const watchRoute = () => {
+		watch(
+			() => route.hash, // Watch the hash value in the route
+			(newHash) => {
+				const hash = newHash.replace("#", "");
+				if (options.value.find((e) => e.path === hash)) {
+					activeTab.value = hash;
+				}
+			},
+			{ immediate: true }
+		);
+	};
+
 	// Watch for hash changes
-	watch(
-		() => route.hash, // Watch the hash value in the route
-		(newHash) => {
-			const hash = newHash.replace("#", "");
-			if (options.value.find((e) => e.path === hash)) {
-				activeTab.value = hash; 
-			}
-		},
-		{ immediate: true } 
-	);
+
+	onMounted(() => {
+		watchRoute();
+	});
 </script>
 
 <template>
@@ -79,6 +86,7 @@
 					<div class="tab-content" bis_skin_checked="1">
 						<!--begin::Tap pane-->
 						<div
+							id="send"
 							class="tab-pane fade"
 							:class="{ 'active show': activeTab === 'send' }"
 							role="tabpanel"
@@ -90,6 +98,7 @@
 
 						<!--begin::Tap pane-->
 						<div
+							id="claim"
 							class="tab-pane fade"
 							:class="{ 'active show': activeTab === 'claim' }"
 							role="tabpanel"
@@ -101,6 +110,7 @@
 
 						<!--begin::Tap pane-->
 						<div
+							id="rules"
 							class="tab-pane fade"
 							:class="{ 'active show': activeTab === 'rules' }"
 							role="tabpanel"

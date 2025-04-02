@@ -207,7 +207,7 @@
 		>
 			<!--begin::Body-->
 			<div
-				class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10"
+				class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10 p-0 p-md-10"
 			>
 				<!--begin::Wrapper-->
 				<div class="flex-grow-1 mt-2 mx-auto mb-8">
@@ -440,16 +440,6 @@
 					</i>
 				</div>
 				<!--end::Illustration-->
-
-				<!-- <div class="h-175px mx-auto">
-					<i
-						class="ki-duotone ki-gear text-success"
-						style="font-size: 13rem"
-					>
-						<i class="path1"></i>
-						<i class="path2"></i>
-					</i>
-				</div> -->
 			</div>
 			<!--end::Body-->
 		</div>

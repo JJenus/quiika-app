@@ -159,7 +159,7 @@
 		<!--begin::Card-->
 		<div
 			id="tokenize-form"
-			class="card card-custom bg-light-successi border-0 h-md-100 mb-5 mb-lg-10"
+			class="card card-custom bg-light-successi border-0 h-md-100 mb-5 mb-lg-10 p-0 p-md-10"
 		>
 			<!--begin::Body-->
 			<div
@@ -250,7 +250,7 @@
 			</div>
 			<!--end::Body-->
 
-			<div v-else-if="transactionResponse" class="card-body min-w-500px">
+			<div v-else-if="transactionResponse" class="card-body min-w-md-500px p-0 p-md-10">
 				<div
 					class="d-print-none border border-dashed border-gray-300 card-rounded h-lg-100 min-w-md-350px p-9 bg-lighten"
 					bis_skin_checked="1"
