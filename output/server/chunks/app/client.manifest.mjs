@@ -6,53 +6,53 @@ const client_manifest = {
     "preload": true,
     "file": "_plugin-vue_export-helper.x3n3nnut.js"
   },
-  "_authStates.daiOIpPz.js": {
+  "_authStates.yF-cDNBY.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "authStates.daiOIpPz.js",
+    "file": "authStates.yF-cDNBY.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_cookie.xs9MonXx.js"
+      "_cookie.Ylo4-M6D.js"
     ]
   },
-  "_cookie.xs9MonXx.js": {
+  "_cookie.Ylo4-M6D.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "cookie.xs9MonXx.js",
+    "file": "cookie.Ylo4-M6D.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
     ]
   },
-  "_index.Uwgle8Dk.js": {
+  "_index.ndCKby8X.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "index.Uwgle8Dk.js",
+    "file": "index.ndCKby8X.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
     ]
   },
-  "_nuxt-link.K7IGuOPc.js": {
+  "_nuxt-link.c_dGBBUb.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "nuxt-link.K7IGuOPc.js",
+    "file": "nuxt-link.c_dGBBUb.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
     ]
   },
-  "_quiika-logo.OuOxc3mW.js": {
+  "_quiika-logo.5HqWeuEl.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "quiika-logo.OuOxc3mW.js",
+    "file": "quiika-logo.5HqWeuEl.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
     ]
@@ -69,9 +69,9 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "auth.efdmoeDE.js",
+    "file": "auth.qP0P5typ.js",
     "imports": [
-      "_cookie.xs9MonXx.js",
+      "_cookie.Ylo4-M6D.js",
       "node_modules/nuxt/dist/app/entry.js"
     ],
     "isDynamicEntry": true,
@@ -83,18 +83,18 @@ const client_manifest = {
     "prefetch": true,
     "preload": true,
     "css": [],
-    "file": "default.xJvXFvZM.js",
+    "file": "default.zgrNj5yG.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_quiika-logo.OuOxc3mW.js",
-      "_nuxt-link.K7IGuOPc.js",
+      "_quiika-logo.5HqWeuEl.js",
+      "_nuxt-link.c_dGBBUb.js",
       "__plugin-vue_export-helper.x3n3nnut.js"
     ],
     "isDynamicEntry": true,
     "src": "layouts/default.vue"
   },
-  "default.ykyRl3VW.css": {
-    "file": "default.ykyRl3VW.css",
+  "default.X7eugJjQ.css": {
+    "file": "default.X7eugJjQ.css",
     "resourceType": "style",
     "prefetch": true,
     "preload": true
@@ -104,11 +104,11 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "adminAuth.9su6z7HX.js",
+    "file": "adminAuth.R1l-i2mr.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_cookie.xs9MonXx.js",
-      "_authStates.daiOIpPz.js"
+      "_cookie.Ylo4-M6D.js",
+      "_authStates.yF-cDNBY.js"
     ],
     "isDynamicEntry": true,
     "src": "middleware/adminAuth.ts"
@@ -118,11 +118,11 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "auth.lQuC8V91.js",
+    "file": "auth.SEj5T_4d.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_cookie.xs9MonXx.js",
-      "_authStates.daiOIpPz.js"
+      "_cookie.Ylo4-M6D.js",
+      "_authStates.yF-cDNBY.js"
     ],
     "isDynamicEntry": true,
     "src": "middleware/auth.ts"
@@ -141,7 +141,7 @@ const client_manifest = {
       "layouts/auth.vue",
       "layouts/default.vue"
     ],
-    "file": "entry.ZkW-C4wP.js",
+    "file": "entry.mnh6fk8z.js",
     "isEntry": true,
     "src": "node_modules/nuxt/dist/app/entry.js",
     "_globalCSS": true
@@ -157,9 +157,9 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "about.oi2NQxJ2.js",
+    "file": "about.gD6yoVMq.js",
     "imports": [
-      "_nuxt-link.K7IGuOPc.js",
+      "_nuxt-link.c_dGBBUb.js",
       "node_modules/nuxt/dist/app/entry.js"
     ],
     "isDynamicEntry": true,
@@ -170,7 +170,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "contact-us.nAtSnbHr.js",
+    "file": "contact-us.XGdQ7vX4.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
       "__plugin-vue_export-helper.x3n3nnut.js"
@@ -183,7 +183,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "faqs._M1Jbt4y.js",
+    "file": "faqs.Wa5olRtp.js",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
       "__plugin-vue_export-helper.x3n3nnut.js"
@@ -196,11 +196,11 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "index.8GmYu5LN.js",
+    "file": "index.gXLJZlyF.js",
     "imports": [
-      "_nuxt-link.K7IGuOPc.js",
+      "_nuxt-link.c_dGBBUb.js",
       "node_modules/nuxt/dist/app/entry.js",
-      "_index.Uwgle8Dk.js"
+      "_index.ndCKby8X.js"
     ],
     "isDynamicEntry": true,
     "src": "pages/index.vue"
@@ -222,11 +222,11 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "terms.T0dg8mDI.js",
+    "file": "terms.C8ZhsX-Z.js",
     "imports": [
-      "_nuxt-link.K7IGuOPc.js",
+      "_nuxt-link.c_dGBBUb.js",
       "node_modules/nuxt/dist/app/entry.js",
-      "_quiika-logo.OuOxc3mW.js"
+      "_quiika-logo.5HqWeuEl.js"
     ],
     "isDynamicEntry": true,
     "src": "pages/terms.vue"
@@ -237,14 +237,14 @@ const client_manifest = {
     "prefetch": true,
     "preload": true,
     "css": [],
-    "file": "verify-email.gtAnWL0W.js",
+    "file": "verify-email.S1jYc28r.js",
     "imports": [
-      "_nuxt-link.K7IGuOPc.js",
+      "_nuxt-link.c_dGBBUb.js",
       "node_modules/nuxt/dist/app/entry.js",
-      "_index.Uwgle8Dk.js",
-      "_authStates.daiOIpPz.js",
+      "_index.ndCKby8X.js",
+      "_authStates.yF-cDNBY.js",
       "__plugin-vue_export-helper.x3n3nnut.js",
-      "_cookie.xs9MonXx.js"
+      "_cookie.Ylo4-M6D.js"
     ],
     "isDynamicEntry": true,
     "src": "pages/verify-email.vue"

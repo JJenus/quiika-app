@@ -1,137 +1,106 @@
+<!-- components/quid/RuleManager.vue -->
 <script setup lang="ts">
-	import { ref, computed, watch, onMounted } from "vue";
-	import Cleave from "vue-cleave-component";
-	import type { Rule, SplitRule, TimeRule } from "~/utils/interfaces/Rule";
+	import {
+		type Quid,
+		type Rule,
+		type RuleDTO,
+		type SplitRule,
+		type TimeRule,
+		RuleType,
+		SplitMode,
+	} from "~/utils/interfaces/Rule";
 
-	const props = defineProps({
-		quid: {
-			type: String,
-			required: true,
-		},
-		currentRules: {
-			type: Array as () => Rule[],
-			default: () => [],
-		},
-	});
+	const {
+		public: { BE_API },
+	} = useRuntimeConfig();
+	const alert = useAlert();
 
-	const emit = defineEmits(["submit", "cancel"]);
+	const { formatFractionalCurrency, getMoneyFromKobo } = useAppSettings();
 
-	// Rule types
-	enum RuleType {
-		NTH_PERSON = "nth_person",
-		SPLIT = "split",
-		TIME = "time",
-	}
+	// Form state
+	const quidInput = ref("");
+	const isLoading = ref(false);
+	const quidDetails: Ref<Quid | null> = ref(null);
+	const currentRule: Ref<Rule | null> = ref(null);
 
-	// Time rule frequencies
-	enum TimeFrequency {
-		ONCE = "once",
-		DAILY = "daily",
-		WEEKLY = "weekly",
-		MONTHLY = "monthly",
-	}
-
-	// Form state with local storage persistence
-	const ruleState = useState(`quid-${props.quid}-rules`, () => ({
+	const ruleState = ref({
 		ruleType: RuleType.NTH_PERSON as RuleType,
 		nthPerson: 1,
-		splitRules: [
-			{ email: "", percentage: 0, amount: 0, fixedAmount: false },
-		] as SplitRule[],
+		splitConfig: {
+			mode: SplitMode.FIXED_AMOUNT,
+			totalSplits: 1,
+			totalAmount: 0,
+			splits: [] as SplitRule[],
+		},
 		timeRule: {
 			start: "",
 			end: "",
-			frequency: TimeFrequency.ONCE,
-			weekdays: [] as number[],
 		} as TimeRule,
-	}));
+	});
 
-	// Constants
-	const MIN_AMOUNT = 100;
-	const MAX_SPLITS = 5;
-	const WEEKDAYS = [
-		{ id: 0, name: "Sunday" },
-		{ id: 1, name: "Monday" },
-		{ id: 2, name: "Tuesday" },
-		{ id: 3, name: "Wednesday" },
-		{ id: 4, name: "Thursday" },
-		{ id: 5, name: "Friday" },
-		{ id: 6, name: "Saturday" },
+	const MIN_AMOUNT = 1000;
+	const MAX_PERCENTAGE_SPLITS = 5;
+
+	const rulesNav = [
+		{ name: "Nth Person", rule: RuleType.NTH_PERSON },
+		{ name: "Split", rule: RuleType.SPLIT },
+		{ name: "Time Range", rule: RuleType.TIME },
 	];
 
-	const rulesNav = ref([
-		{
-			name: "Nth Person",
-			rule: RuleType.NTH_PERSON,
-		},
-		{
-			name: "Split",
-			rule: RuleType.SPLIT,
-		},
-		{
-			name: "Time Range",
-			rule: RuleType.TIME,
-		},
-	]);
+	const totalPercentage = computed(() =>
+		ruleState.value.splitConfig.splits.reduce(
+			(sum, rule) => sum + (rule.percentage || 0),
+			0
+		)
+	);
 
-	// Computed properties
-	const totalPercentage = computed(() => {
-		return ruleState.value.splitRules.reduce((sum, rule) => {
-			return rule.fixedAmount ? sum : sum + (rule.percentage || 0);
-		}, 0);
+	const fixedSplitAmount = computed(() => {
+		const { totalAmount, totalSplits } = ruleState.value.splitConfig;
+		if (!totalAmount || !totalSplits) return 0;
+		return Math.floor(totalAmount / totalSplits);
 	});
 
 	const isValid = computed(() => {
-		switch (ruleState.value.ruleType) {
+		const state = ruleState.value;
+		switch (state.ruleType) {
 			case RuleType.NTH_PERSON:
-				return ruleState.value.nthPerson > 0;
+				return state.nthPerson > 0;
 			case RuleType.SPLIT:
+				const { mode, totalAmount, totalSplits, splits } =
+					state.splitConfig;
+				const realTotalAmount = totalAmount;
+				if (mode === SplitMode.FIXED_AMOUNT) {
+					return (
+						totalSplits > 0 &&
+						realTotalAmount >= MIN_AMOUNT &&
+						fixedSplitAmount.value >= MIN_AMOUNT
+					);
+				}
 				return (
-					ruleState.value.splitRules.every(validateSplitRule) &&
-					(ruleState.value.splitRules[0].fixedAmount ||
-						totalPercentage.value === 100)
+					splits.length > 0 &&
+					totalPercentage.value === 100 &&
+					splits.every((split) => {
+						const amount = Math.floor(
+							realTotalAmount * (split.percentage! / 100)
+						);
+						return split.percentage! > 0 && amount >= MIN_AMOUNT;
+					})
 				);
 			case RuleType.TIME:
-				return validateTimeRule(ruleState.value.timeRule);
+				return validateTimeRule(state.timeRule);
 			default:
 				return false;
 		}
 	});
 
-	const showWeekdaySelection = computed(() => {
-		return ruleState.value.timeRule.frequency === TimeFrequency.WEEKLY;
-	});
-
-	// Methods
-	function validateSplitRule(rule: SplitRule): boolean {
-		if (!rule.email.includes("@")) return false;
-
-		if (rule.fixedAmount) {
-			return rule.amount >= MIN_AMOUNT;
-		} else {
-			return rule.percentage > 0 && rule.percentage <= 100;
-		}
-	}
-
 	function validateTimeRule(rule: TimeRule): boolean {
 		if (!rule.start || !rule.end) return false;
-
-		const start = new Date(rule.start);
-		const end = new Date(rule.end);
-
-		if (start >= end) return false;
-
-		if (rule.frequency === TimeFrequency.WEEKLY && !rule.weekdays.length) {
-			return false;
-		}
-
-		return true;
+		return new Date(rule.start) < new Date(rule.end);
 	}
 
-	function addSplit() {
-		if (ruleState.value.splitRules.length < MAX_SPLITS) {
-			ruleState.value.splitRules.push({
-				email: "",
+	function addPercentageSplit() {
+		if (ruleState.value.splitConfig.splits.length < MAX_PERCENTAGE_SPLITS) {
+			ruleState.value.splitConfig.splits.push({
 				percentage: 0,
 				amount: 0,
 				fixedAmount: false,
@@ -139,577 +108,622 @@
 		}
 	}
 
-	function removeSplit(index: number) {
-		if (ruleState.value.splitRules.length > 1) {
-			ruleState.value.splitRules.splice(index, 1);
+	function removePercentageSplit(index: number) {
+		if (ruleState.value.splitConfig.splits.length > 1) {
+			ruleState.value.splitConfig.splits.splice(index, 1);
 		}
 	}
 
-	function toggleSplitType(index: number) {
-		ruleState.value.splitRules[index].fixedAmount =
-			!ruleState.value.splitRules[index].fixedAmount;
-
-		if (ruleState.value.splitRules[index].fixedAmount) {
-			ruleState.value.splitRules[index].percentage = 0;
-		} else {
-			ruleState.value.splitRules[index].amount = 0;
+	function toggleSplitMode() {
+		const config = ruleState.value.splitConfig;
+		config.mode =
+			config.mode === SplitMode.FIXED_AMOUNT
+				? SplitMode.PERCENTAGE
+				: SplitMode.FIXED_AMOUNT;
+		if (
+			config.mode === SplitMode.PERCENTAGE &&
+			config.splits.length === 0
+		) {
+			config.splits = [{ percentage: 0, amount: 0, fixedAmount: false }];
 		}
 	}
 
-	function toggleWeekday(dayId: number) {
-		const index = ruleState.value.timeRule.weekdays.indexOf(dayId);
-		if (index === -1) {
-			ruleState.value.timeRule.weekdays.push(dayId);
-		} else {
-			ruleState.value.timeRule.weekdays.splice(index, 1);
+	function updateFixedSplits() {
+		if (ruleState.value.splitConfig.totalSplits < 1) {
+			ruleState.value.splitConfig.totalSplits = 1;
 		}
 	}
 
-	function submit() {
-		let rule: Rule;
+	async function fetchQuidDetails() {
+		if (!quidInput.value) return;
+
+		isLoading.value = true;
+		try {
+			// First fetch the Quid details
+			const quidRes = await $fetch(`${BE_API}/quid/${quidInput.value}`);
+			quidDetails.value = quidRes;
+
+			// Then try to fetch the rule
+			try {
+				const ruleRes = await $fetch(
+					`${BE_API}/rules/${quidInput.value}`
+				);
+				currentRule.value = ruleRes;
+
+				if (currentRule.value) {
+					initializeRuleForm(currentRule.value);
+				}
+			} catch (rulesError: any) {
+				// 404 is expected when no rule exists
+				if (rulesError.status !== 404) {
+					console.log("Error loading rule");
+				}
+				currentRule.value = null;
+			}
+		} catch (error: any) {
+			console.error("Failed to fetch quid details:", error);
+			quidDetails.value = null;
+			currentRule.value = null;
+
+			if (error.status === 404) {
+				alert.error("Quid not found");
+			} else {
+				alert.error("Failed to load quid details");
+			}
+		} finally {
+			isLoading.value = false;
+		}
+	}
+
+	const initializeRuleForm = (rule: Rule) => {
+		console.log("Initializing rule form with:", rule);
+
+		// Update rule type reactively
+		ruleState.value.ruleType = rule.nthPerson
+			? RuleType.NTH_PERSON
+			: rule.splits
+			? RuleType.SPLIT
+			: RuleType.TIME;
+
+		// Handle nthPerson rule
+		if (rule.nthPerson) {
+			ruleState.value.nthPerson = rule.nthPerson;
+		}
+
+		const realAmount = getMoneyFromKobo(quidDetails.value?.amount || 0);
+
+		// Handle split rule
+		if (rule.splits) {
+			toggleSplitMode();
+			console.log("Processing splits rule");
+
+			const isFixed = !rule.splits || rule.splits.length == 0;
+			const mode = isFixed
+				? SplitMode.FIXED_AMOUNT
+				: SplitMode.PERCENTAGE;
+
+			console.log("Is fixed amount split:", isFixed, mode);
+
+			// Create a new split config object
+			const newSplitConfig = {
+				mode: mode,
+				totalSplits: isFixed ? rule.totalSplits! : rule.splits?.length!,
+				totalAmount: realAmount,
+				splits: isFixed
+					? []
+					: rule.splits?.map((s) => ({
+							percentage: s.percentage || 0,
+							amount: Math.floor(
+								(realAmount || 0) * ((s.percentage || 0) / 100)
+							),
+							fixedAmount: false,
+					  })),
+			};
+			nextTick(() => {
+				// Update splitConfig reactively by assigning a new object
+				ruleState.value.splitConfig = newSplitConfig;
+			});
+		}
+
+		// Handle time rule
+		if (rule.startTime) {
+			ruleState.value.timeRule = {
+				start: rule.startTime,
+				end: rule.endTime || "",
+			};
+		}
+
+		console.log("Form initialized:", ruleState.value);
+	};
+
+	async function submit() {
+		if (!quidDetails.value || !isValid.value) return;
+
+		let payload: RuleDTO = {
+			quid: quidDetails.value.quid,
+		};
 
 		switch (ruleState.value.ruleType) {
 			case RuleType.NTH_PERSON:
-				rule = {
-					quid: props.quid,
-					type: RuleType.NTH_PERSON,
-					nthPerson: ruleState.value.nthPerson,
-				};
+				payload.nthPerson = ruleState.value.nthPerson;
 				break;
 			case RuleType.SPLIT:
-				rule = {
-					quid: props.quid,
-					type: RuleType.SPLIT,
-					splits: ruleState.value.splitRules.map((split) => ({
-						email: split.email,
-						amount: split.fixedAmount ? split.amount : undefined,
-						percentage: split.fixedAmount
-							? undefined
-							: split.percentage,
-					})),
-				};
+				const { mode, totalSplits, splits } =
+					ruleState.value.splitConfig;
+				if (mode === SplitMode.FIXED_AMOUNT) {
+					payload.totalSplits = totalSplits;
+				} else {
+					payload.splits = splits.map((s) => ({
+						percentage: s.percentage,
+					}));
+				}
 				break;
 			case RuleType.TIME:
-				rule = {
-					quid: props.quid,
-					type: RuleType.TIME,
-					startTime: ruleState.value.timeRule.start,
-					endTime: ruleState.value.timeRule.end,
-					frequency: ruleState.value.timeRule.frequency,
-					weekdays:
-						ruleState.value.timeRule.frequency ===
-						TimeFrequency.WEEKLY
-							? ruleState.value.timeRule.weekdays
-							: undefined,
-				};
+				payload.startTime = ruleState.value.timeRule.start;
+				payload.endTime = ruleState.value.timeRule.end;
 				break;
-			default:
-				throw new Error("Invalid rule type");
 		}
 
-		emit("submit", rule);
+		try {
+			const response = await $fetch(`${BE_API}/rules`, {
+				method: "POST",
+				body: payload,
+			});
+			currentRule.value = response;
+			alert.success(
+				currentRule.value
+					? "Rule updated successfully"
+					: "Rule created successfully"
+			);
+			cancel();
+		} catch (error) {
+			alert.error("Failed to save rule");
+			console.error("Rule submission failed:", error);
+		}
 	}
 
-	function cancel() {
-		emit("cancel");
-	}
+	const cancel = () => {
+		quidDetails.value = null;
+		quidInput.value = "";
+		currentRule.value = null;
+	};
 
-	// Reset form when rule type changes
+	const calEqualSplit = (splits: number) => {
+		const amount = getMoneyFromKobo(quidDetails.value?.amount || 0);
+		return Math.floor(amount / splits).toLocaleString();
+	};
+
+	watch(quidInput, (newVal) => {
+		if (newVal.length === 8) {
+			// Assuming quid is 8 characters
+			fetchQuidDetails();
+		}
+	});
+
 	watch(
 		() => ruleState.value.ruleType,
 		() => {
-			if (
-				ruleState.value.ruleType === RuleType.SPLIT &&
-				!ruleState.value.splitRules.length
-			) {
-				ruleState.value.splitRules = [
-					{
-						email: "",
-						percentage: 0,
-						amount: 0,
-						fixedAmount: false,
-					},
-				];
-			}
-		}
-	);
-
-	// Initialize with current rules if editing
-	onMounted(() => {
-		if (props.currentRules.length) {
-			const firstRule = props.currentRules[0];
-			ruleState.value.ruleType = firstRule.type;
-
-			if (firstRule.type === RuleType.NTH_PERSON) {
-				ruleState.value.nthPerson = firstRule.nthPerson || 1;
-			} else if (firstRule.type === RuleType.SPLIT && firstRule.splits) {
-				ruleState.value.splitRules = firstRule.splits.map((split) => ({
-					email: split.email,
-					percentage: split.percentage || 0,
-					amount: split.amount || 0,
-					fixedAmount: !!split.amount,
-				}));
-			} else if (firstRule.type === RuleType.TIME) {
-				ruleState.value.timeRule = {
-					start: firstRule.startTime || "",
-					end: firstRule.endTime || "",
-					frequency: firstRule.frequency || TimeFrequency.ONCE,
-					weekdays: firstRule.weekdays || [],
+			if (ruleState.value.ruleType === RuleType.SPLIT) {
+				ruleState.value.splitConfig = {
+					mode: SplitMode.FIXED_AMOUNT,
+					totalSplits: 1,
+					totalAmount: quidDetails.value?.amount || 0,
+					splits: [],
 				};
 			}
 		}
-	});
+	);
 </script>
 
 <template>
 	<div class="card card-custom border-0 h-md-100 mb-5 mb-lg-10">
-		<div
-			class="card-body d-flex align-items-center justify-content-center flex-wrap px-auto gap-8 gap-md-10 p-0 p-md-10"
-		>
-			<div class="flex-grow-1 mt-2 mb-8">
+		<div class="card-body d-flex flex-center gap-8 p-0 p-md-10">
+			<!-- Quid Input Section -->
+			<div v-if="!quidDetails" class="mb-5 flex-grow-1">
+				<h1 class="display-6 mb-8">
+					<span class="text-success">Quid</span> Rules Management
+				</h1>
+
 				<div class="mb-5">
-					<h1 class="display-6">
-						Add<span class="text-success"> Rules</span> to Quid
-					</h1>
-					<h6 class="text-muted">
-						Control how your gift is accessed and distributed.
-					</h6>
+					<div class="mb-5">
+						<input
+							v-model="quidInput"
+							type="text"
+							class="form-control form-control-lg"
+							placeholder="Enter Quid ID"
+							:disabled="isLoading"
+							@keyup.enter="fetchQuidDetails"
+							name="quid"
+							autocomplete="quid"
+						/>
+					</div>
+
+					<div>
+						<button
+							class="btn btn-primary w-100"
+							type="button"
+							@click="fetchQuidDetails"
+							:disabled="!quidInput || isLoading"
+						>
+							<span
+								v-if="isLoading"
+								class="spinner-border spinner-border-sm"
+							></span>
+							{{ isLoading ? "Loading..." : "Load" }}
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Rules Form (shown when quid is loaded) -->
+			<div v-if="quidDetails" class="flex-grow-1">
+				<!-- Quid Details Display -->
+				<div class="alerti alert-primaryi mb-5">
+					<div class="d-flex justify-content-between fs-5 fw-bold">
+						<div>
+							<strong>Amount:</strong> {{ quidDetails.currency }}
+							{{
+								formatFractionalCurrency(quidDetails.amount, "")
+							}}
+							<span class="mx-2">|</span>
+							<strong>Status:</strong> {{ quidDetails.status }}
+						</div>
+						<div>
+							<strong>Created:</strong>
+							{{
+								new Date(
+									quidDetails.createdAt
+								).toLocaleDateString()
+							}}
+						</div>
+					</div>
 				</div>
 
-				<form @submit.prevent="submit" class="h-100">
-					<!-- Rule Type Selection -->
-					<div class="mb-5">
-						<label class="form-label required fw-bold"
-							>Rule Type</label
-						>
-						<div
-							class="rounded bg-gray-200i mb-9 p-2"
-						>
-							<!--begin::Nav-->
-							<ul class="nav flex-wrap">
-								<!--begin::Nav item-->
-								<li
-									v-for="rule in rulesNav"
-									class="nav-item my-1 flex-grow-1"
-								>
-									<a
-										class="btn btn-sm btn-color-gray-600 bg-state-body btn-active-color-gray-800 fw-bolder fw-bold fs-6 fs-lg-base nav-link px-3 px-lg-4 mx-1"
-										role="tab"
-										:class="[
-											ruleState.ruleType === rule.rule
-												? 'active'
-												: '',
-										]"
-										@click="ruleState.ruleType = rule.rule"
-									>
-										{{ rule.name }}
-									</a>
-								</li>
-								<!--end::Nav item-->
-							</ul>
-							<!--end::Nav-->
-						</div>
+				<div class="mb-5">
+					<h3 class="mb-3">
+						{{
+							currentRule
+								? "Update Existing Rule"
+								: "Create New Rule"
+						}}
+					</h3>
+
+					<!-- Current Rule Indicator -->
+					<div v-if="currentRule" class="alert alert-info mb-4">
+						Current rule type:
+						<strong>{{
+							currentRule.nthPerson
+								? "Nth Person"
+								: currentRule.splits
+								? "Split"
+								: "Time Range"
+						}}</strong>
 					</div>
 
-					<!-- Nth Person Rule -->
-					<div
-						v-if="ruleState.ruleType === RuleType.NTH_PERSON"
-						class="mb-5"
-					>
-						<label
-							for="nthPerson"
-							class="form-label required fw-bold"
-						>
-							Which person can access this gift?
-						</label>
-						<div class="input-group">
-							<input
-								type="number"
-								id="nthPerson"
-								v-model.number="ruleState.nthPerson"
-								min="1"
-								class="form-control form-control-lg"
-								placeholder="e.g. 1 for first person"
-							/>
-							<span class="input-group-text">th person</span>
-						</div>
-						<div class="form-text">
-							Only the specified person in sequence will receive
-							this gift.
-						</div>
-					</div>
-
-					<!-- Split Rule -->
-					<div
-						v-if="ruleState.ruleType === RuleType.SPLIT"
-						class="mb-5"
-					>
-						<div
-							class="d-flex justify-content-between align-items-center mb-3"
-						>
+					<form @submit.prevent="submit" class="h-100">
+						<!-- Rule Type Selection -->
+						<div class="mb-5">
 							<label class="form-label required fw-bold"
-								>Split Details</label
+								>Rule Type</label
 							>
-							<div>
-								<button
-									type="button"
-									class="btn btn-sm btn-success me-2"
-									@click="addSplit"
-									:disabled="
-										ruleState.splitRules.length >=
-										MAX_SPLITS
-									"
-								>
-									Add Split
-								</button>
-								<span class="badge bg-light text-dark">
-									{{ ruleState.splitRules.length }}/{{
-										MAX_SPLITS
-									}}
-								</span>
+							<div class="rounded bg-gray-200i mb-9 p-2">
+								<ul class="nav flex-wrap">
+									<li
+										v-for="rule in rulesNav"
+										class="nav-item my-1 flex-grow-1"
+									>
+										<a
+											class="btn btn-sm btn-color-gray-600 bg-state-body btn-active-color-gray-800 fw-bolder fw-bold fs-6 fs-lg-base nav-link px-3 px-lg-4 mx-1"
+											:class="{
+												active:
+													ruleState.ruleType ===
+													rule.rule,
+											}"
+											@click="
+												ruleState.ruleType = rule.rule
+											"
+										>
+											{{ rule.name }}
+										</a>
+									</li>
+								</ul>
 							</div>
 						</div>
 
+						<!-- Nth Person Rule -->
 						<div
-							v-for="(split, index) in ruleState.splitRules"
-							:key="index"
-							class="mb-4 p-3 border rounded"
-							:class="{
-								'border-danger': !validateSplitRule(split),
-							}"
+							v-if="ruleState.ruleType === RuleType.NTH_PERSON"
+							class="mb-5"
 						>
-							<div class="d-flex justify-content-between mb-2">
-								<h6 class="fw-bold">Split #{{ index + 1 }}</h6>
-								<button
-									type="button"
-									class="btn btn-sm btn-danger"
-									@click="removeSplit(index)"
-									:disabled="ruleState.splitRules.length <= 1"
-								>
-									Remove
-								</button>
-							</div>
-
-							<div class="mb-3">
-								<label
-									:for="`email-${index}`"
-									class="form-label required"
-								>
-									Email
-								</label>
+							<label
+								for="nthPerson"
+								class="form-label required fw-bold"
+							>
+								Which person can access this gift?
+							</label>
+							<div class="input-group">
 								<input
-									type="email"
-									:id="`email-${index}`"
-									v-model="split.email"
+									type="number"
+									id="nthPerson"
+									v-model.number="ruleState.nthPerson"
+									min="1"
 									class="form-control form-control-lg"
-									placeholder="Recipient email"
-									:class="{
-										'is-invalid':
-											!split.email.includes('@'),
-									}"
+									placeholder="e.g. 1 for first person"
 								/>
-								<div
-									v-if="!split.email.includes('@')"
-									class="invalid-feedback"
-								>
-									Please enter a valid email address
-								</div>
+								<span class="input-group-text">th person</span>
 							</div>
+						</div>
 
-							<div class="form-check form-switch mb-3">
+						<!-- Split Rule -->
+						<div
+							v-if="ruleState.ruleType === RuleType.SPLIT"
+							class="mb-5"
+						>
+							<div class="form-check form-switch mb-4">
 								<input
 									class="form-check-input"
 									type="checkbox"
-									:id="`toggle-${index}`"
-									v-model="split.fixedAmount"
-									@change="toggleSplitType(index)"
+									id="splitModeToggle"
+									:checked="
+										ruleState.splitConfig.mode ===
+										SplitMode.PERCENTAGE
+									"
+									@change="toggleSplitMode"
 								/>
 								<label
 									class="form-check-label"
-									:for="`toggle-${index}`"
+									for="splitModeToggle"
 								>
 									{{
-										split.fixedAmount
-											? "Fixed Amount"
-											: "Percentage"
+										ruleState.splitConfig.mode ===
+										SplitMode.PERCENTAGE
+											? "Percentage Split"
+											: "Fixed Amount Split"
 									}}
 								</label>
 							</div>
 
-							<div v-if="split.fixedAmount" class="mb-3">
-								<label
-									:for="`amount-${index}`"
-									class="form-label required"
-								>
-									Amount (min N{{ MIN_AMOUNT }})
-								</label>
-								<div class="input-group">
-									<span class="input-group-text">₦</span>
-									<cleave
-										:id="`amount-${index}`"
-										v-model="split.amount"
-										class="form-control form-control-lg"
-										:class="{
-											'is-invalid':
-												split.amount < MIN_AMOUNT,
-										}"
-										:options="{
-											numeral: true,
-											numeralThousandsGroupStyle:
-												'thousand',
-											numeralDecimalMark: '.',
-											numeralDecimalScale: 2,
-											numeralIntegerScale: 15,
-										}"
-									/>
-								</div>
-								<div
-									v-if="split.amount < MIN_AMOUNT"
-									class="invalid-feedback"
-								>
-									Amount must be at least N{{ MIN_AMOUNT }}
-								</div>
-							</div>
-
-							<div v-else class="mb-3">
-								<label
-									:for="`percentage-${index}`"
-									class="form-label required"
-								>
-									Percentage
-								</label>
-								<div class="input-group">
+							<!-- Fixed Amount Split -->
+							<div
+								v-if="
+									ruleState.splitConfig.mode ===
+									SplitMode.FIXED_AMOUNT
+								"
+							>
+								<div class="mb-3">
+									<label
+										for="totalSplits"
+										class="form-label required fw-bold"
+									>
+										Number of Equal Splits
+									</label>
 									<input
 										type="number"
-										:id="`percentage-${index}`"
-										v-model.number="split.percentage"
+										id="totalSplits"
+										v-model.number="
+											ruleState.splitConfig.totalSplits
+										"
 										min="1"
-										max="100"
 										class="form-control form-control-lg"
-										placeholder="0-100"
-										:class="{
-											'is-invalid':
-												split.percentage <= 0 ||
-												split.percentage > 100,
-										}"
+										@change="updateFixedSplits"
 									/>
-									<span class="input-group-text">%</span>
 								</div>
-								<div
-									v-if="
-										split.percentage <= 0 ||
-										split.percentage > 100
-									"
-									class="invalid-feedback"
-								>
-									Percentage must be between 1-100
+
+								<div class="alert alert-info">
+									<div
+										v-if="
+											ruleState.splitConfig.totalSplits >
+											0
+										"
+									>
+										Each of
+										{{ ruleState.splitConfig.totalSplits }}
+										recipient(s) will receive:
+										<strong
+											>{{ quidDetails.currency }}
+											{{
+												calEqualSplit(
+													ruleState.splitConfig
+														.totalSplits
+												)
+											}}</strong
+										>
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<div
-							v-if="!ruleState.splitRules[0].fixedAmount"
-							class="alert"
-							:class="
-								totalPercentage === 100
-									? 'alert-success'
-									: 'alert-warning'
-							"
-						>
-							<div
-								class="d-flex justify-content-between align-items-center"
-							>
-								<span>
+							<!-- Percentage Split -->
+							<div v-else>
+								<div
+									class="d-flex justify-content-between align-items-center mb-3"
+								>
+									<label class="form-label required fw-bold">
+										Percentage Splits
+									</label>
+									<div>
+										<button
+											type="button"
+											class="btn btn-sm btn-success me-2"
+											@click="addPercentageSplit"
+											:disabled="
+												ruleState.splitConfig.splits
+													.length >=
+												MAX_PERCENTAGE_SPLITS
+											"
+										>
+											Add Split
+										</button>
+										<span class="badge bg-light text-dark">
+											{{
+												ruleState.splitConfig.splits
+													.length
+											}}/{{ MAX_PERCENTAGE_SPLITS }}
+										</span>
+									</div>
+								</div>
+
+								<div
+									v-for="(split, index) in ruleState
+										.splitConfig.splits"
+									:key="index"
+									class="mb-3 p-3 border rounded"
+								>
+									<div
+										class="d-flex justify-content-between mb-2"
+									>
+										<h6 class="fw-bold">
+											Split #{{ index + 1 }}
+										</h6>
+										<button
+											type="button"
+											class="btn btn-sm btn-danger"
+											@click="
+												removePercentageSplit(index)
+											"
+											:disabled="
+												ruleState.splitConfig.splits
+													.length <= 1
+											"
+										>
+											Remove
+										</button>
+									</div>
+
+									<div class="mb-3">
+										<label
+											:for="`percentage-${index}`"
+											class="form-label required"
+										>
+											Percentage
+										</label>
+										<div class="input-group">
+											<input
+												type="number"
+												:id="`percentage-${index}`"
+												v-model.number="
+													split.percentage
+												"
+												min="1"
+												max="100"
+												class="form-control form-control-lg"
+												placeholder="0-100"
+											/>
+											<span class="input-group-text"
+												>%</span
+											>
+										</div>
+										<div class="mt-2">
+											Amount: {{ quidDetails.currency }}
+											{{
+												Math.floor(
+													getMoneyFromKobo(
+														quidDetails.amount
+													) *
+														(split.percentage! /
+															100)
+												).toLocaleString()
+											}}
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="alert"
+									:class="
+										totalPercentage === 100
+											? 'alert-success'
+											: 'alert-warning'
+									"
+								>
 									Total Percentage: {{ totalPercentage }}%
 									<span v-if="totalPercentage !== 100">
 										- Must total exactly 100%
 									</span>
-								</span>
-								<span
-									v-if="totalPercentage !== 100"
-									class="badge bg-danger"
-								>
-									{{ Math.abs(100 - totalPercentage) }}%
-									{{
-										totalPercentage > 100 ? "over" : "under"
-									}}
-								</span>
-							</div>
-						</div>
-					</div>
-
-					<!-- Time Rule -->
-					<div
-						v-if="ruleState.ruleType === RuleType.TIME"
-						class="mb-5"
-					>
-						<div class="row">
-							<div class="col-md-6 mb-3">
-								<label
-									for="startTime"
-									class="form-label required fw-bold"
-								>
-									Start Time
-								</label>
-								<input
-									type="datetime-local"
-									id="startTime"
-									v-model="ruleState.timeRule.start"
-									class="form-control form-control-lg"
-									:min="new Date().toISOString().slice(0, 16)"
-								/>
-							</div>
-							<div class="col-md-6 mb-3">
-								<label
-									for="endTime"
-									class="form-label required fw-bold"
-								>
-									End Time
-								</label>
-								<input
-									type="datetime-local"
-									id="endTime"
-									v-model="ruleState.timeRule.end"
-									class="form-control form-control-lg"
-									:min="
-										ruleState.timeRule.start ||
-										new Date().toISOString().slice(0, 16)
-									"
-								/>
+								</div>
 							</div>
 						</div>
 
-						<div class="mb-3">
-							<label class="form-label required fw-bold"
-								>Frequency</label
-							>
-							<select
-								v-model="ruleState.timeRule.frequency"
-								class="form-select form-select-lg"
-							>
-								<option :value="TimeFrequency.ONCE">
-									Once
-								</option>
-								<option :value="TimeFrequency.DAILY">
-									Daily
-								</option>
-								<option :value="TimeFrequency.WEEKLY">
-									Weekly
-								</option>
-								<option :value="TimeFrequency.MONTHLY">
-									Monthly
-								</option>
-							</select>
-						</div>
-
-						<div v-if="showWeekdaySelection" class="mb-3">
-							<label class="form-label required fw-bold"
-								>Active Days</label
-							>
-							<div class="d-flex flex-wrap gap-2">
-								<button
-									v-for="day in WEEKDAYS"
-									:key="day.id"
-									type="button"
-									class="btn"
-									:class="{
-										'btn-primary':
-											ruleState.timeRule.weekdays.includes(
-												day.id
-											),
-										'btn-outline-primary':
-											!ruleState.timeRule.weekdays.includes(
-												day.id
-											),
-									}"
-									@click="toggleWeekday(day.id)"
-								>
-									{{ day.name }}
-								</button>
-							</div>
-							<div
-								v-if="
-									showWeekdaySelection &&
-									!ruleState.timeRule.weekdays.length
-								"
-								class="text-danger small"
-							>
-								Please select at least one weekday
-							</div>
-						</div>
-
-						<div class="alert alert-info">
-							<div
-								v-if="
-									ruleState.timeRule.frequency ===
-									TimeFrequency.ONCE
-								"
-							>
-								The gift will only be accessible between
-								<strong>{{
-									new Date(
-										ruleState.timeRule.start
-									).toLocaleString()
-								}}</strong>
-								and
-								<strong>{{
-									new Date(
-										ruleState.timeRule.end
-									).toLocaleString()
-								}}</strong>
-							</div>
-							<div v-else>
-								The gift will be accessible
-								<strong>{{
-									ruleState.timeRule.frequency
-								}}</strong>
-								between the specified times
-								<span v-if="showWeekdaySelection">
-									on
-									<strong>{{
-										ruleState.timeRule.weekdays
-											.map(
-												(d) =>
-													WEEKDAYS.find(
-														(w) => w.id === d
-													)?.name
-											)
-											.join(", ")
-									}}</strong>
-								</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="d-flex gap-3">
-						<button
-							type="button"
-							class="btn btn-secondary flex-grow-1"
-							@click="cancel"
+						<!-- Time Rule -->
+						<div
+							v-if="ruleState.ruleType === RuleType.TIME"
+							class="mb-5"
 						>
-							Cancel
-						</button>
-						<button
-							type="submit"
-							class="btn btn-primary flex-grow-1"
-							:disabled="!isValid"
-						>
-							{{
-								currentRules.length ? "Update Rule" : "Add Rule"
-							}}
-						</button>
-					</div>
-				</form>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label
+										for="startTime"
+										class="form-label required fw-bold"
+									>
+										Start Time
+									</label>
+									<input
+										type="datetime-local"
+										id="startTime"
+										v-model="ruleState.timeRule.start"
+										class="form-control form-control-lg"
+										:min="
+											new Date()
+												.toISOString()
+												.slice(0, 16)
+										"
+									/>
+								</div>
+								<div class="col-md-6 mb-3">
+									<label
+										for="endTime"
+										class="form-label required fw-bold"
+									>
+										End Time
+									</label>
+									<input
+										type="datetime-local"
+										id="endTime"
+										v-model="ruleState.timeRule.end"
+										class="form-control form-control-lg"
+										:min="
+											ruleState.timeRule.start ||
+											new Date()
+												.toISOString()
+												.slice(0, 16)
+										"
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div class="d-flex gap-3">
+							<button
+								type="button"
+								class="btn btn-secondary flex-grow-1"
+								@click="cancel()"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								class="btn btn-primary flex-grow-1"
+								:disabled="!isValid"
+							>
+								{{ currentRule ? "Update Rule" : "Add Rule" }}
+							</button>
+						</div>
+					</form>
+				</div>
 			</div>
 
-			<div class="h-175px mx-auto">
-				<i
-					class="ki-duotone ki-gear text-primary"
-					style="font-size: 13rem"
-				>
-					<i class="path1"></i>
-					<i class="path2"></i>
-				</i>
+			<!-- Empty State -->
+			<div v-if="!quidDetails && !isLoading" class="text-center py-10">
+				<div class="h-175px mx-auto">
+					<i
+						class="ki-duotone ki-gear text-primary"
+						style="font-size: 13rem"
+					>
+						<i class="path1"></i>
+						<i class="path2"></i>
+					</i>
+				</div>
+
+				<h4 class="text-muted mt-5">Enter a Quid ID to manage rules</h4>
 			</div>
 		</div>
 	</div>

@@ -1,1 +1,0 @@
-import{bN as o,bO as t}from"./entry.ZkW-C4wP.js";import{u as r}from"./cookie.xs9MonXx.js";import{u}from"./authStates.daiOIpPz.js";const n=o((i,a)=>{const e=r("auth");if(e.value==null||e.value==null)return t("/",{redirectCode:301});if(!u().isAuthenticated())return t("/",{redirectCode:301})});export{n as default};

@@ -21,13 +21,21 @@ export const useAppSettings = () => {
 		return value.value;
 	};
 
+	const getMoneyFromKobo = (amount: string | number) => {
+		const value = currency(amount, { fromCents: true });
+		return value.value;
+	};
+
 	const getFractionalCurrency = (amount: string | number) => {
 		const value = currency(amount);
 		return value.intValue;
 	};
-	const formatFractionalCurrency = (amount: string | number, sym = "NGN ") => {
-		const value = currency(amount, { symbol: sym });
-		return value.divide(100).format();
+	const formatFractionalCurrency = (
+		amount: string | number,
+		sym = "NGN "
+	) => {
+		const value = currency(amount, { symbol: sym, fromCents: true });
+		return value.format();
 	};
 
 	const load = () => {
@@ -61,5 +69,6 @@ export const useAppSettings = () => {
 		getMoney,
 		getFractionalCurrency,
 		formatFractionalCurrency,
+		getMoneyFromKobo
 	};
 };

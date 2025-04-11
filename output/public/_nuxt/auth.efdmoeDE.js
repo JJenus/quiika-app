@@ -1,1 +1,0 @@
-import{u as a}from"./cookie.xs9MonXx.js";import{d as t,o as s,c as r,aR as l}from"./entry.ZkW-C4wP.js";const m=t({__name:"auth",setup(n){const e=a("reload",{maxAge:86400});return e.value=!1,(o,u)=>(s(),r("div",null,[l(o.$slots,"default")]))}});export{m as default};

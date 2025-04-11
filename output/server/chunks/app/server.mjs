@@ -659,7 +659,7 @@ const _routes = [
     meta: {},
     alias: [],
     redirect: void 0 ,
-    component: () => import('./_nuxt/index-G9VtiN-W.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index-0118kInZ.mjs').then((m) => m.default || m)
   },
   {
     name: "redeem",
@@ -999,7 +999,7 @@ const plugins = [
 ];
 const layouts = {
   auth: () => import('./_nuxt/auth-OE-bU1Co.mjs').then((m) => m.default || m),
-  default: () => import('./_nuxt/default-VWUn2SYx.mjs').then((m) => m.default || m)
+  default: () => import('./_nuxt/default-BgS8vxLs.mjs').then((m) => m.default || m)
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

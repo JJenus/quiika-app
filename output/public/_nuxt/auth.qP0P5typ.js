@@ -1,0 +1,1 @@
+import{u as a}from"./cookie.Ylo4-M6D.js";import{d as t,o as s,c as r,aR as l}from"./entry.mnh6fk8z.js";const m=t({__name:"auth",setup(n){const e=a("reload",{maxAge:86400});return e.value=!1,(o,u)=>(s(),r("div",null,[l(o.$slots,"default")]))}});export{m as default};
