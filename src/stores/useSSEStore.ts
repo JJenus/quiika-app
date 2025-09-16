@@ -52,7 +52,7 @@ export const useSSEStore = create<SSEStore>((set, get) => ({
         set({ isConnected: false });
       };
 
-      newEventSource.onclose = () => {
+      newEventSource.close = () => {
         set({ isConnected: false });
         console.log('SSE connection closed');
       };
