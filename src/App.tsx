@@ -1,39 +1,82 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from './components/layout/Layout';
-import { HomePage } from './pages/HomePage';
-import { CreateGiftPage } from './pages/CreateGiftPage';
-import { ClaimGiftPage } from './pages/ClaimGiftPage';
-import { TransactionsPage } from './pages/TransactionsPage';
-import { PaymentCallbackPage } from './pages/PaymentCallbackPage';
-import { WithdrawPage } from './pages/WithdrawPage';
-import { useThemeStore } from './stores/useThemeStore';
+import React, { useEffect } from "react";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+} from "react-router-dom";
+import { Layout } from "./components/layout/Layout";
+import { HomePage } from "./pages/HomePage";
+import { CreateGiftPage } from "./pages/CreateGiftPage";
+import { ClaimGiftPage } from "./pages/ClaimGiftPage";
+import { TransactionsPage } from "./pages/TransactionsPage";
+import { PaymentCallbackPage } from "./pages/PaymentCallbackPage";
+import { WithdrawPage } from "./pages/WithdrawPage";
+import { useThemeStore } from "./stores/useThemeStore";
+import { HelpPage } from "./pages/HelpPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { initializeTheme } = useThemeStore();
+	const { initializeTheme } = useThemeStore();
 
-  useEffect(() => {
-    initializeTheme();
-  }, [initializeTheme]);
+	useEffect(() => {
+		initializeTheme();
+	}, [initializeTheme]);
 
-  return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/create" element={<CreateGiftPage />} />
-          <Route path="/claim" element={<ClaimGiftPage />} />
-          <Route path="/claim/:quid" element={<ClaimGiftPage />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/payment/callback" element={<PaymentCallbackPage />} />
-          <Route path="/withdraw" element={<WithdrawPage />} />
-          
-          {/* Redirect any unknown routes to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-    </Router>
-  );
+	return (
+		<Router>
+			<div className="App">
+				<Layout>
+					<Routes>
+						<Route path="/" element={<HomePage />} />
+						<Route path="/create" element={<CreateGiftPage />} />
+						<Route path="/claim" element={<ClaimGiftPage />} />
+						<Route
+							path="/claim/:quid"
+							element={<ClaimGiftPage />}
+						/>
+						<Route
+							path="/transactions"
+							element={<TransactionsPage />}
+						/>
+						<Route
+							path="/payment/callback"
+							element={<PaymentCallbackPage />}
+						/>
+						<Route path="/withdraw" element={<WithdrawPage />} />
+						<Route path="/help" element={<HelpPage />} />
+
+						{/* Redirect any unknown routes to home */}
+						<Route path="*" element={<Navigate to="/" replace />} />
+					</Routes>
+				</Layout>
+				<Toaster
+					position="top-right"
+					toastOptions={{
+						duration: 4000,
+						style: {
+							background: "#363636",
+							color: "#fff",
+						},
+						success: {
+							duration: 3000,
+							iconTheme: {
+								primary: "#10B981",
+								secondary: "#fff",
+							},
+						},
+						error: {
+							duration: 5000,
+							iconTheme: {
+								primary: "#EF4444",
+								secondary: "#fff",
+							},
+						},
+					}}
+				/>
+			</div>
+		</Router>
+	);
 }
 
 export default App;

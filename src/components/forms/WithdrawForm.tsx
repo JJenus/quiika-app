@@ -3,11 +3,11 @@ import { CreditCard, Building, User, CheckCircle } from 'lucide-react';
 import { useBankStore } from '../../stores/useBankStore';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { ErrorMessage } from '../ui/ErrorMessage';
-import type { WithdrawForm, Bank } from '../../types/api';
+import type { WithdrawForm as WithdrawDto, Bank } from '../../types/api';
 
 interface WithdrawFormProps {
   amount: number;
-  onSubmit: (data: WithdrawForm) => void;
+  onSubmit: (data: WithdrawDto) => void;
   isLoading?: boolean;
 }
 
@@ -16,7 +16,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
-  const [formData, setFormData] = useState<WithdrawForm>({
+  const [formData, setFormData] = useState<WithdrawDto>({
     accountNumber: '',
     bankCode: '',
     amount: amount,
@@ -80,7 +80,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
     onSubmit(formData);
   };
 
-  const handleInputChange = (field: keyof WithdrawForm, value: any) => {
+  const handleInputChange = (field: keyof WithdrawDto, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear field error when user starts typing
     if (formErrors[field]) {

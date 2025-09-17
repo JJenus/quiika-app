@@ -1,6 +1,7 @@
 import React from 'react';
 import { Gift, Menu, X } from 'lucide-react';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   isMobileMenuOpen: boolean;
@@ -29,30 +30,30 @@ export const Header: React.FC<HeaderProps> = ({ isMobileMenuOpen, setIsMobileMen
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <a 
-              href="/" 
+            <Link 
+              to="/" 
               className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
             >
               Home
-            </a>
-            <a 
-              href="/create" 
+            </Link>
+            <Link 
+              to="/create" 
               className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
             >
               Create Gift
-            </a>
-            <a 
-              href="/claim" 
+            </Link>
+            <Link 
+              to="/claim" 
               className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
             >
               Claim Gift
-            </a>
-            <a 
-              href="/transactions" 
+            </Link>
+            <Link 
+              to="/transactions" 
               className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
             >
               Transactions
-            </a>
+            </Link>
           </nav>
 
           {/* Right side actions */}
@@ -77,30 +78,30 @@ export const Header: React.FC<HeaderProps> = ({ isMobileMenuOpen, setIsMobileMen
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700 animate-slide-down">
             <nav className="flex flex-col space-y-3">
-              <a 
-                href="/" 
+              <Link 
+                to="/" 
                 className="px-3 py-2 text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
               >
                 Home
-              </a>
-              <a 
-                href="/create" 
+              </Link>
+              <Link 
+                to="/create" 
                 className="px-3 py-2 text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
               >
                 Create Gift
-              </a>
-              <a 
-                href="/claim" 
+              </Link>
+              <Link 
+                to="/claim" 
                 className="px-3 py-2 text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
               >
                 Claim Gift
-              </a>
-              <a 
-                href="/transactions" 
+              </Link>
+              <Link 
+                to="/transactions" 
                 className="px-3 py-2 text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
               >
                 Transactions
-              </a>
+              </Link>
             </nav>
           </div>
         )}

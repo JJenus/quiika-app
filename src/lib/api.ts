@@ -24,7 +24,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 20000,
 });
 
 // Request interceptor for adding auth tokens if needed
@@ -58,6 +58,9 @@ export const transactionAPI = {
 
   findTransaction: (transactionId: string): Promise<AxiosResponse<TransactionDto>> =>
     api.get(`/transactions/${transactionId}`),
+
+  verifyTransactionRef: (ref: string): Promise<AxiosResponse<TransactionDto>> =>
+    api.get(`/transactions/reference/${ref}`),
 
   verifyTransaction: (quid: string): Promise<AxiosResponse<TransactionDto>> =>
     api.get(`/transactions/verify/${quid}`),

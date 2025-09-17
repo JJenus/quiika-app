@@ -19,14 +19,14 @@ export interface Transaction {
 }
 
 export interface TransactionDto {
-  quid: string;
+  quid?: string;
   email: string;
   amount: number;
-  sessionId: string;
-  authorizationUrl: string;
-  transactionId: string;
-  status: TransactionStatus;
-  blocked: boolean;
+  sessionId?: string;
+  authorizationUrl?: string;
+  transactionId?: string;
+  status?: TransactionStatus;
+  blocked?: boolean;
 }
 
 export interface WithdrawalRequest {
@@ -195,9 +195,18 @@ export interface ErrorState {
   code?: string;
 }
 
+interface TransactionResponse {
+  currency: Currency;
+  amount: number;
+  quid: string;
+  transactionId: string;
+  status: TransactionStatus;
+  timestamp: Date;
+}
+
 // SSE Types
 export interface SSEMessage {
-  type: string;
-  data: any;
+  type: "TRANSACTION" | "WITHDRAWAL" | "MESSAGE";
+  data: TransactionResponse | any; //"PAYMENT" | "WITHDRAWAL" = TransactionResponse
   timestamp: string;
 }

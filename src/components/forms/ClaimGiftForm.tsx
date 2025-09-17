@@ -3,10 +3,10 @@ import { Search, Lock, Eye, EyeOff } from 'lucide-react';
 import { useQuidStore } from '../../stores/useQuidStore';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { ErrorMessage } from '../ui/ErrorMessage';
-import type { ClaimGiftForm } from '../../types/api';
+import type { ClaimGiftForm as ClaimForm } from '../../types/api';
 
 export const ClaimGiftForm: React.FC = () => {
-  const [formData, setFormData] = useState<ClaimGiftForm>({
+  const [formData, setFormData] = useState<ClaimForm>({
     quid: '',
     password: '',
   });
@@ -41,7 +41,7 @@ export const ClaimGiftForm: React.FC = () => {
     }
   };
 
-  const handleInputChange = (field: keyof ClaimGiftForm, value: string) => {
+  const handleInputChange = (field: keyof ClaimForm, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear field error when user starts typing
     if (formErrors[field]) {
