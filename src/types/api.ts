@@ -1,3 +1,60 @@
+// types/rules.ts
+export enum RuleType {
+  NTH_PERSON = 'NTH_PERSON',
+  SPLIT = 'SPLIT',
+  TIME = 'TIME'
+}
+
+export enum SplitMode {
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
+  PERCENTAGE = 'PERCENTAGE'
+}
+
+export interface SplitRule {
+  percentage?: number;
+  amount?: number;
+  fixedAmount: boolean;
+}
+
+export interface TimeRule {
+  start: string;
+  end: string;
+}
+
+export interface SplitConfig {
+  mode: SplitMode;
+  totalSplits: number;
+  totalAmount: number;
+  splits: SplitRule[];
+}
+
+export interface RuleState {
+  ruleType: RuleType;
+  nthPerson: number;
+  splitConfig: SplitConfig;
+  timeRule: TimeRule;
+}
+
+export interface Rule {
+  id?: number;
+  quid?: Quid;
+  nthPerson?: number;
+  startTime?: string;
+  endTime?: string;
+  totalSplits?: number;
+  totalAmount?: number;
+  splits?: SplitRule[];
+}
+
+export interface RuleDTO {
+  quid: string;
+  nthPerson?: number;
+  totalSplits?: number;
+  startTime?: string;
+  endTime?: string;
+  splits?: { percentage: number }[];
+}
+
 // API Response Types
 export interface QuiikaResponse {
   message: string;
@@ -71,17 +128,6 @@ export interface QuidClaimResponse {
   allowAccess: boolean;
   message: string;
   accessKey: string;
-}
-
-export interface Rule {
-  id: number;
-  quid: Quid;
-  nthPerson: number;
-  startTime: string;
-  endTime: string;
-  totalSplits: number;
-  totalAmount: number;
-  splits: Split[];
 }
 
 export interface RuleDTO {
@@ -210,3 +256,4 @@ export interface SSEMessage {
   data: TransactionResponse | any; //"PAYMENT" | "WITHDRAWAL" = TransactionResponse
   timestamp: string;
 }
+

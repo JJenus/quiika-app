@@ -17,6 +17,8 @@ import { HelpPage } from "./pages/HelpPage";
 import { Toaster } from "react-hot-toast";
 import { Footer as PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 
+import { RulesPage } from "./pages/RulesPage";
+
 function App() {
 	const { initializeTheme } = useThemeStore();
 
@@ -40,13 +42,17 @@ function App() {
 							path="/transactions"
 							element={<TransactionsPage />}
 						/>
+						<Route path="/rules" element={<RulesPage />} />
 						<Route
 							path="/payment/callback"
 							element={<PaymentCallbackPage />}
 						/>
 						<Route path="/withdraw" element={<WithdrawPage />} />
 						<Route path="/help" element={<HelpPage />} />
-						<Route path="/privacy" element={<PrivacyPolicyPage />} />
+						<Route
+							path="/privacy"
+							element={<PrivacyPolicyPage />}
+						/>
 
 						{/* Redirect any unknown routes to home */}
 						<Route path="*" element={<Navigate to="/" replace />} />

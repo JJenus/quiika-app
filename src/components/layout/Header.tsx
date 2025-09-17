@@ -54,6 +54,12 @@ export const Header: React.FC<HeaderProps> = ({ isMobileMenuOpen, setIsMobileMen
             >
               Transactions
             </Link>
+            <Link 
+              to="/rules" 
+              className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
+            >
+              Rule Manager
+            </Link>
           </nav>
 
           {/* Right side actions */}
