@@ -15,6 +15,7 @@ import { WithdrawPage } from "./pages/WithdrawPage";
 import { useThemeStore } from "./stores/useThemeStore";
 import { HelpPage } from "./pages/HelpPage";
 import { Toaster } from "react-hot-toast";
+import { Footer as PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 
 function App() {
 	const { initializeTheme } = useThemeStore();
@@ -45,6 +46,7 @@ function App() {
 						/>
 						<Route path="/withdraw" element={<WithdrawPage />} />
 						<Route path="/help" element={<HelpPage />} />
+						<Route path="/privacy" element={<PrivacyPolicyPage />} />
 
 						{/* Redirect any unknown routes to home */}
 						<Route path="*" element={<Navigate to="/" replace />} />
