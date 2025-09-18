@@ -101,12 +101,12 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/cookies" 
                   className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
                 >
                   Cookie Policy
-                </a>
+                </Link>
               </li>
               <li>
                 <a 

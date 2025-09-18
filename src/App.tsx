@@ -19,6 +19,7 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 
 import { RulesPage } from "./pages/RulesPage";
 import { TermsConditionsPage } from "./pages/TermsConditionsPage";
+import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 
 function App() {
 	const { initializeTheme } = useThemeStore();
@@ -57,6 +58,10 @@ function App() {
 						<Route
 							path="/terms"
 							element={<TermsConditionsPage />}
+						/>
+						<Route
+							path="/cookies"
+							element={<CookiePolicyPage />}
 						/>
 
 						{/* Redirect any unknown routes to home */}
