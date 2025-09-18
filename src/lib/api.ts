@@ -16,7 +16,7 @@ import type {
   QuiikaResponse,
 } from '../types/api';
 
-const BASE_URL = 'http://localhost:8085';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://quiika.alwaysdata.net";
 
 // Create axios instance with default config
 const api = axios.create({

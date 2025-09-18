@@ -2,9 +2,9 @@ import React from 'react';
 import { Cookie, Settings, Eye, BarChart3, Shield } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 
-export const CookiePolicyPage: React.FC = () => {
+export const CookiePolicyPage: React.FC = () => {                           
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
