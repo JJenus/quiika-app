@@ -15,9 +15,10 @@ import { WithdrawPage } from "./pages/WithdrawPage";
 import { useThemeStore } from "./stores/useThemeStore";
 import { HelpPage } from "./pages/HelpPage";
 import { Toaster } from "react-hot-toast";
-import { Footer as PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
+import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 
 import { RulesPage } from "./pages/RulesPage";
+import { TermsConditionsPage } from "./pages/TermsConditionsPage";
 
 function App() {
 	const { initializeTheme } = useThemeStore();
@@ -52,6 +53,10 @@ function App() {
 						<Route
 							path="/privacy"
 							element={<PrivacyPolicyPage />}
+						/>
+						<Route
+							path="/terms"
+							element={<TermsConditionsPage />}
 						/>
 
 						{/* Redirect any unknown routes to home */}
