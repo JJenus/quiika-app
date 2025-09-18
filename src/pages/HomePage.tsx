@@ -183,18 +183,19 @@ export const HomePage: React.FC = () => {
               </Link>
             </div>
 
-            <div className="flex items-center justify-center mt-8 space-x-6 text-sm text-text-secondary dark:text-text-secondary-dark">
+            {/* Improved responsive checkmark section */}
+            <div className="flex flex-col sm:flex-row items-center justify-center mt-8 gap-4 sm:gap-6 text-sm text-text-secondary dark:text-text-secondary-dark">
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-success mr-2" />
-                Secure Payments
+                <CheckCircle className="h-4 w-4 text-success mr-2 flex-shrink-0" />
+                <span>Secure Payments</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-success mr-2" />
-                Instant Withdrawals
+                <CheckCircle className="h-4 w-4 text-success mr-2 flex-shrink-0" />
+                <span>Instant Withdrawals</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-success mr-2" />
-                24/7 Support
+                <CheckCircle className="h-4 w-4 text-success mr-2 flex-shrink-0" />
+                <span>24/7 Support</span>
               </div>
             </div>
           </div>

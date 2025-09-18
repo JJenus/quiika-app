@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
               <li>
                 <a 
                   href="#" 
-                  className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
+                  className="text-text-secondary hidden dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
                 >
                   Security
                 </a>
@@ -126,7 +126,7 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-3">
               <li className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-primary" />
+                <Mail className="h-4 w-4 text-primary dark:text-white" />
                 <a 
                   href="mailto:support@quiika.com" 
                   className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
@@ -135,16 +135,16 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-primary" />
+                <Phone className="h-4 w-4 text-primary dark:text-white" />
                 <a 
-                  href="tel:+15551234567" 
+                  href="tel:+2348157868666" 
                   className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
                 >
-                  +1 (555) 123-4567
+                  +234 (815) 786 8666
                 </a>
               </li>
               <li className="flex items-start space-x-2">
-                <MapPin className="h-4 w-4 text-primary mt-0.5" />
+                <MapPin className="h-4 w-4 text-primary mt-0.5 dark:text-white" />
                 <span className="text-text-secondary dark:text-text-secondary-dark">
                   Portharcourt<br />
                   Nigeria
@@ -161,7 +161,7 @@ export const Footer: React.FC = () => {
               <span>© {currentYear} Quiika. Made with</span>
               <Heart className="h-4 w-4 text-red-500 fill-current" />
               <span>for better gifting experiences.</span>
-            </div>
+            </div> 
             
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
