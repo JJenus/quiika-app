@@ -14,9 +14,12 @@ export const Header: React.FC<HeaderProps> = ({ isMobileMenuOpen, setIsMobileMen
     { path: '/', label: 'Home' },
     { path: '/create', label: 'Create Gift' },
     { path: '/claim', label: 'Claim Gift' },
-    // { path: '/transactions', label: 'Transactions' },
     { path: '/rules', label: 'Rule Manager' }
   ];
+
+  if(import.meta.env.DEV){
+    navItems.push({ path: '/transactions', label: 'Transactions' })
+  }
 
   // Helper function to check if a nav item is active
   const isActive = (path: string) => {

@@ -1,8 +1,10 @@
+// components/forms/ClaimGiftForm.tsx
 import React, { useState } from "react";
-import { Search, Lock, Eye, EyeOff } from "lucide-react";
+import { Search, Lock, Eye, EyeOff, Banknote } from "lucide-react";
 import { useQuidStore } from "../../stores/useQuidStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
+import { WithdrawForm } from "./WithdrawForm";
 import type { ClaimGiftForm as ClaimForm } from "../../types/api";
 
 export const ClaimGiftForm: React.FC = () => {
@@ -12,13 +14,15 @@ export const ClaimGiftForm: React.FC = () => {
 	});
 	const [showPassword, setShowPassword] = useState(false);
 	const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+	const [showWithdrawal, setShowWithdrawal] = useState(false);
 
 	const {
-		verifyQuidClaim: claimQuid,
+		verifyQuidClaim,
 		loading,
 		error,
 		clearError,
 		claimResponse,
+		clearQuid,
 	} = useQuidStore();
 
 	const validateForm = (): boolean => {
@@ -26,6 +30,8 @@ export const ClaimGiftForm: React.FC = () => {
 
 		if (!formData.quid) {
 			errors.quid = "Gift code (QUID) is required";
+		} else if (formData.quid.length !== 13) {
+			errors.quid = "QUID must be 13 characters";
 		}
 
 		setFormErrors(errors);
@@ -39,10 +45,10 @@ export const ClaimGiftForm: React.FC = () => {
 
 		clearError();
 
-		const result = await claimQuid(formData.quid);
+		const result = await verifyQuidClaim(formData.quid);
 
 		if (result && result.allowAccess) {
-			// Success - the claim response will be handled by the parent component
+			// Success - show withdrawal form
 			console.log("Gift claimed successfully:", result);
 		}
 	};
@@ -54,6 +60,39 @@ export const ClaimGiftForm: React.FC = () => {
 			setFormErrors((prev) => ({ ...prev, [field]: "" }));
 		}
 	};
+
+	const handleReset = () => {
+		setFormData({ quid: "", password: "" });
+		setShowWithdrawal(false);
+		clearQuid();
+	};
+
+	// Show withdrawal form if claim was successful and access is allowed
+	if (showWithdrawal && claimResponse && claimResponse.allowAccess) {
+		return (
+			<div className="card p-6 max-w-md mx-auto">
+				<div className="text-center mb-6">
+					<div className="bg-gradient-to-br from-success to-green-600 p-3 rounded-xl mx-auto w-fit mb-3">
+						<Banknote className="h-8 w-8 text-white" />
+					</div>
+					<h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-2">
+						Withdraw Your Gift
+					</h2>
+					<p className="text-text-secondary dark:text-text-secondary-dark">
+						Transfer your funds to your bank account
+					</p>
+				</div>
+
+				<WithdrawForm 
+					quid={formData.quid}
+					accessKey={claimResponse.accessKey}
+					amount={claimResponse.quid?.amount || 0}
+					currency={claimResponse.quid?.currency || 'NGN'}
+					onCancel={handleReset}
+				/>
+			</div>
+		);
+	}
 
 	// Show success message if claim was successful
 	if (claimResponse && claimResponse.allowAccess) {
@@ -69,16 +108,32 @@ export const ClaimGiftForm: React.FC = () => {
 					<p className="text-text-secondary dark:text-text-secondary-dark mb-4">
 						{claimResponse.message}
 					</p>
+					
 					{claimResponse.accessKey && (
-						<div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
+						<div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mb-4">
 							<p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-1">
 								Access Key:
 							</p>
-							<p className="text-lg font-mono text-text-primary dark:text-text-primary-dark">
+							<p className="text-lg font-mono text-text-primary dark:text-text-primary-dark break-all">
 								{claimResponse.accessKey}
 							</p>
 						</div>
 					)}
+
+					<button
+						onClick={() => setShowWithdrawal(true)}
+						className="w-full btn-primary py-3 text-base font-semibold"
+					>
+						<Banknote className="h-5 w-5 mr-2 inline" />
+						Withdraw Funds
+					</button>
+
+					<button
+						onClick={handleReset}
+						className="w-full btn-secondary py-3 text-base font-semibold mt-3"
+					>
+						Claim Another Gift
+					</button>
 				</div>
 			</div>
 		);
@@ -121,14 +176,15 @@ export const ClaimGiftForm: React.FC = () => {
 							id="quid"
 							value={formData.quid}
 							onChange={(e) =>
-								handleInputChange("quid", e.target.value)
+								handleInputChange("quid", e.target.value.toUpperCase())
 							}
 							className={`input-field pl-10 uppercase ${
 								formErrors.quid
 									? "border-red-500 focus:ring-red-500"
 									: ""
 							}`}
-							placeholder="Enter your gift code"
+							placeholder="Enter your 8-character gift code"
+							maxLength={15}
 						/>
 					</div>
 					{formErrors.quid && (
@@ -161,6 +217,7 @@ export const ClaimGiftForm: React.FC = () => {
 							type="button"
 							onClick={() => setShowPassword(!showPassword)}
 							className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+							aria-label={showPassword ? "Hide password" : "Show password"}
 						>
 							{showPassword ? (
 								<EyeOff className="h-5 w-5" />

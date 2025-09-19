@@ -11,7 +11,6 @@ import { useTransactionStore } from "../../stores/useTransactionStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
 import type { CreateGiftForm as GiftForm } from "../../types/api";
-import { useSSEStore } from "../../stores/useSSEStore";
 
 export const CreateGiftForm: React.FC = () => {
 	const [formData, setFormData] = useState<GiftForm>({

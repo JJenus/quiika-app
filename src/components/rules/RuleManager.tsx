@@ -302,13 +302,13 @@ export const RuleManager: React.FC = () => {
               />
             </div>
             <p className="mt-1 text-xs text-text-secondary dark:text-text-secondary-dark">
-              Enter the 8-character QUID code to manage its rules
+              Enter the 13-character QUID code to manage its rules
             </p>
           </div>
 
           <button
             onClick={fetchQuidDetails}
-            disabled={!quidInput || isLoading || quidInput.length !== 8}
+            disabled={!quidInput || isLoading || quidInput.length !== 13}
             className="w-full btn-primary py-3 text-base font-semibold"
           >
             {isLoading ? (
