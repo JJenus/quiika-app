@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Mail, MessageCircle, Phone } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { SEO } from '../components/seo/SEO';
 
 export const HelpPage: React.FC = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -54,154 +55,238 @@ export const HelpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-            <HelpCircle className="w-8 h-8 text-white" />
+    <>
+      <SEO 
+        config={{
+          title: 'Help & Support - Quiika Digital Gift Platform',
+          description: 'Get help with Quiika digital gifts, withdrawals, account management, and FAQs. Contact our support team for assistance with QUID codes and gift transactions.',
+          keywords: 'quiika help, digital gift support, QUID assistance, gift withdrawal help, quiika FAQ, customer support',
+          canonicalUrl: 'https://quiika.com/help',
+          structuredData: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+              }
+            }))
+          }
+        }}
+      />
+      
+      <div className="min-h-screen py-12 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <HelpCircle className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-text-primary dark:text-text-primary-dark mb-2">
+              Help & Support
+            </h1>
+            <p className="text-text-secondary dark:text-text-secondary-dark">
+              Find answers to common questions or get in touch with our support team
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Help & Support</h1>
-          <p className="text-gray-600">
-            Find answers to common questions or get in touch with our support team
-          </p>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer">
-            <MessageCircle className="w-8 h-8 text-primary-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Live Chat</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Get instant help from our support team
-            </p>
-            <Button variant="outline" size="sm">
-              Start Chat
-            </Button>
-          </Card>
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-750">
+              <MessageCircle className="w-8 h-8 text-primary-600 dark:text-primary-400 mx-auto mb-3" />
+              <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">Live Chat</h3>
+              <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
+                Get instant help from our support team
+              </p>
+              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                Start Chat
+              </Button>
+            </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer">
-            <Mail className="w-8 h-8 text-primary-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Email Support</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Send us a detailed message
-            </p>
-            <Button variant="outline" size="sm">
-              Send Email
-            </Button>
-          </Card>
+            <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-750">
+              <Mail className="w-8 h-8 text-primary-600 dark:text-primary-400 mx-auto mb-3" />
+              <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">Email Support</h3>
+              <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
+                Send us a detailed message
+              </p>
+              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                Send Email
+              </Button>
+            </Card>
 
-          <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer">
-            <Phone className="w-8 h-8 text-primary-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Phone Support</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Call us for urgent issues
-            </p>
-            <Button variant="outline" size="sm">
-              Call Now
-            </Button>
-          </Card>
-        </div>
+            <Card className="text-center hover:shadow-lg transition-shadow cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-750">
+              <Phone className="w-8 h-8 text-primary-600 dark:text-primary-400 mx-auto mb-3" />
+              <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">Phone Support</h3>
+              <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
+                Call us for urgent issues
+              </p>
+              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+                Call Now
+              </Button>
+            </Card>
+          </div>
 
-        {/* FAQ Section */}
-        <Card>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-          
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg">
-                <button
-                  onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                >
-                  <span className="font-medium text-gray-900">{faq.question}</span>
-                  {openFaq === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
+          {/* FAQ Section */}
+          <Card className="dark:bg-gray-800">
+            <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-6">
+              Frequently Asked Questions
+            </h2>
+            
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full px-6 py-4 text-left flex items-center justify-between btn-outline dark:text-white"
+                    aria-expanded={openFaq === index}
+                    aria-controls={`faq-answer-${index}`}
+                  >
+                    <span className="font-medium ">
+                      {faq.question}
+                    </span>
+                    {openFaq === index ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    )}
+                  </button>
+                  
+                  {openFaq === index && (
+                    <div 
+                      id={`faq-answer-${index}`}
+                      className="px-6 py-4"
+                      aria-hidden={openFaq !== index}
+                    >
+                      <p className="secondary dark:text-white leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
                   )}
-                </button>
-                
-                {openFaq === index && (
-                  <div className="px-6 pb-4">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
+                </div>
+              ))}
+            </div>
+          </Card>
 
-        {/* Contact Information */}
-        <Card className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Support Hours</h3>
-              <div className="space-y-2 text-gray-600">
-                <p><strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM (UTC)</p>
-                <p><strong>Saturday:</strong> 10:00 AM - 4:00 PM (UTC)</p>
-                <p><strong>Sunday:</strong> Closed</p>
-              </div>
-            </div>
+          {/* Contact Information */}
+          <Card className="mt-8 dark:bg-gray-800">
+            <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-6">
+              Contact Information
+            </h2>
             
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Contact Details</h3>
-              <div className="space-y-2 text-gray-600">
-                <p><strong>Email:</strong> support@quiika.com</p>
-                <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                <p><strong>Address:</strong> 123 Tech Street, San Francisco, CA 94105</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-4">
+                  Support Hours
+                </h3>
+                <div className="space-y-2 text-text-secondary dark:text-text-secondary-dark">
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Monday - Friday:</strong> 9:00 AM - 6:00 PM (UTC)</p>
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Saturday:</strong> 10:00 AM - 4:00 PM (UTC)</p>
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Sunday:</strong> Closed</p>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-4">
+                  Contact Details
+                </h3>
+                <div className="space-y-2 text-text-secondary dark:text-text-secondary-dark">
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Email:</strong> support@quiika.com</p>
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Phone:</strong> +1 (555) 123-4567</p>
+                  <p><strong className="text-text-primary dark:text-text-primary-dark">Address:</strong> 123 Tech Street, San Francisco, CA 94105</p>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Getting Started Guide */}
-        <Card className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Getting Started Guide</h2>
-          
-          <div className="space-y-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                1
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Create Your First Gift</h3>
-                <p className="text-gray-600">
-                  Start by clicking "Create Gift" and entering the amount and recipient email. 
-                  You can customize your gift with rules like anonymity or password protection.
-                </p>
-              </div>
-            </div>
+          {/* Getting Started Guide */}
+          <Card className="mt-8 dark:bg-gray-800">
+            <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-6">
+              Getting Started Guide
+            </h2>
             
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                2
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">
+                    Create Your First Gift
+                  </h3>
+                  <p className="text-text-secondary dark:text-text-secondary-dark">
+                    Start by clicking "Create Gift" and entering the amount and recipient email. 
+                    You can customize your gift with rules like anonymity or password protection.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Complete Payment</h3>
-                <p className="text-gray-600">
-                  Pay securely through Paystack. Once payment is confirmed, you'll receive a unique QUID 
-                  that can be shared with the recipient.
-                </p>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">
+                    Complete Payment
+                  </h3>
+                  <p className="text-text-secondary dark:text-text-secondary-dark">
+                    Pay securely through Paystack. Once payment is confirmed, you'll receive a unique QUID 
+                    that can be shared with the recipient.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">
+                    Share and Track
+                  </h3>
+                  <p className="text-text-secondary dark:text-text-secondary-dark">
+                    Share the QUID with your recipient. You can track the status of your gift 
+                    in the transaction history page.
+                  </p>
+                </div>
               </div>
             </div>
+          </Card>
+
+          {/* Additional Resources */}
+          <Card className="mt-8 dark:bg-gray-800">
+            <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-6">
+              Additional Resources
+            </h2>
             
-            <div className="flex items-start space-x-4">
-              <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                3
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Share and Track</h3>
-                <p className="text-gray-600">
-                  Share the QUID with your recipient. You can track the status of your gift 
-                  in the transaction history page.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">
+                  Video Tutorials
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-3">
+                  Watch step-by-step guides on how to use Quiika features
                 </p>
+                <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                  Watch Tutorials
+                </Button>
+              </div>
+              
+              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                <h3 className="font-semibold text-text-primary dark:text-text-primary-dark mb-2">
+                  Community Forum
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-3">
+                  Connect with other users and share tips and experiences
+                </p>
+                <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                  Join Community
+                </Button>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
