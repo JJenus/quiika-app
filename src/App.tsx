@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -20,6 +20,7 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { RulesPage } from "./pages/RulesPage";
 import { TermsConditionsPage } from "./pages/TermsConditionsPage";
 import { CookiePolicyPage } from "./pages/CookiePolicyPage";
+import { RouteSEO } from "./components/seo/RouteSEO";
 
 function App() {
 	const { initializeTheme } = useThemeStore();
@@ -32,6 +33,7 @@ function App() {
 		<Router>
 			<div className="App">
 				<Layout>
+				<RouteSEO />
 					<Routes>
 						<Route path="/" element={<HomePage />} />
 						<Route path="/create" element={<CreateGiftPage />} />
