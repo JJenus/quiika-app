@@ -12,6 +12,7 @@ import { useTransactionStore } from "../stores/useTransactionStore";
 import { useSSEStore } from "../stores/useSSEStore";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { ErrorMessage } from "../components/ui/ErrorMessage";
+import { Button } from "../components/ui/Button";
 
 export const PaymentCallbackPage: React.FC = () => {
 	const [searchParams] = useSearchParams();
@@ -151,18 +152,19 @@ export const PaymentCallbackPage: React.FC = () => {
 						)}
 
 						<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-							<button
+							<Button
 								onClick={handleContinue}
-								className="btn-primary px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
+								className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
 							>
 								Try Again
-							</button>
-							<button
+							</Button>
+							<Button
 								onClick={() => navigate("/")}
-								className="btn-ghost px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
+								variant="ghost"
+								className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
 							>
 								Go Home
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -231,19 +233,20 @@ export const PaymentCallbackPage: React.FC = () => {
 					</div>
 
 					<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-						<button
+						<Button
 							onClick={handleContinue}
-							className="btn-primary px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base group flex items-center justify-center"
+							className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base group flex items-center justify-center"
 						>
 							View Transactions
 							<ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
-						</button>
-						<button
+						</Button>
+						<Button
 							onClick={() => navigate("/create")}
-							className="btn-outline px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
+							variant="outline"
+							className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
 						>
 							Create Another Gift
-						</button>
+						</Button>
 					</div>
 				</div>
 			</div>

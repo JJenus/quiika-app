@@ -4,6 +4,7 @@ import { Search, Lock, Eye, EyeOff, Banknote } from "lucide-react";
 import { useQuidStore } from "../../stores/useQuidStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
+import { Button } from "../ui/Button";
 import { WithdrawForm } from "./WithdrawForm";
 import type { ClaimGiftForm as ClaimForm } from "../../types/api";
 
@@ -120,20 +121,23 @@ export const ClaimGiftForm: React.FC = () => {
 						</div>
 					)}
 
-					<button
+					<Button
 						onClick={() => setShowWithdrawal(true)}
-						className="w-full btn-primary py-3 text-base font-semibold"
+						size="lg"
+						className="w-full font-semibold"
 					>
 						<Banknote className="h-5 w-5 mr-2 inline" />
 						Withdraw Funds
-					</button>
+					</Button>
 
-					<button
+					<Button
 						onClick={handleReset}
-						className="w-full btn-secondary py-3 text-base font-semibold mt-3"
+						variant="secondary"
+						size="lg"
+						className="w-full font-semibold mt-3"
 					>
 						Claim Another Gift
-					</button>
+					</Button>
 				</div>
 			</div>
 		);
@@ -231,17 +235,14 @@ export const ClaimGiftForm: React.FC = () => {
 					</p>
 				</div>
 
-				<button
+				<Button
 					type="submit"
-					disabled={loading.isLoading}
-					className="w-full btn-primary py-3 text-base font-semibold"
+					loading={loading.isLoading}
+					size="lg"
+					className="w-full font-semibold"
 				>
-					{loading.isLoading ? (
-						<LoadingSpinner size="sm" text="Claiming Gift..." />
-					) : (
-						"Claim Gift"
-					)}
-				</button>
+					{loading.isLoading ? "Claiming Gift..." : "Claim Gift"}
+				</Button>
 			</form>
 
 			<div className="mt-6 text-center">

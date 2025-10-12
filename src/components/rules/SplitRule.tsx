@@ -1,6 +1,7 @@
 // components/rules/SplitRule.tsx
 import React from "react";
 import { Plus, X } from "lucide-react";
+import { Button } from "../ui/Button";
 import { SplitMode, SplitConfig } from "../../types/api";
 
 interface SplitRuleProps {
@@ -155,18 +156,19 @@ export const SplitRuleComponent: React.FC<SplitRuleProps> = ({
 							Percentage Splits
 						</label>
 						<div className="flex items-center gap-2">
-							<button
+							<Button
 								type="button"
 								onClick={addPercentageSplit}
 								disabled={
 									splitConfig.splits.length >=
 									MAX_PERCENTAGE_SPLITS
 								}
-								className="inline-flex items-center rounded-md bg-primary px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+								size="sm"
+								className="font-semibold shadow-sm"
 							>
 								<Plus className="h-4 w-4 mr-1" />
 								Add Split
-							</button>
+							</Button>
 							<span className="text-xs text-text-secondary dark:text-text-secondary-dark">
 								{splitConfig.splits.length}/
 								{MAX_PERCENTAGE_SPLITS}

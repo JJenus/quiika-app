@@ -99,7 +99,7 @@ export const HelpPage: React.FC = () => {
               <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
                 Get instant help from our support team
               </p>
-              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+              <Button variant="outline" size="sm">
                 Start Chat
               </Button>
             </Card>
@@ -110,7 +110,7 @@ export const HelpPage: React.FC = () => {
               <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
                 Send us a detailed message
               </p>
-              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+              <Button variant="outline" size="sm">
                 Send Email
               </Button>
             </Card>
@@ -121,7 +121,7 @@ export const HelpPage: React.FC = () => {
               <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4">
                 Call us for urgent issues
               </p>
-              <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+              <Button variant="outline" size="sm">
                 Call Now
               </Button>
             </Card>
@@ -136,9 +136,10 @@ export const HelpPage: React.FC = () => {
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                  <button
+                  <Button
                     onClick={() => toggleFaq(index)}
-                    className="w-full px-6 py-4 text-left flex items-center justify-between btn-outline dark:text-white"
+                    variant="outline"
+                    className="w-full px-6 py-4 text-left flex items-center justify-between"
                     aria-expanded={openFaq === index}
                     aria-controls={`faq-answer-${index}`}
                   >
@@ -150,7 +151,7 @@ export const HelpPage: React.FC = () => {
                     ) : (
                       <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     )}
-                  </button>
+                  </Button>
                   
                   {openFaq === index && (
                     <div 
@@ -267,7 +268,7 @@ export const HelpPage: React.FC = () => {
                 <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-3">
                   Watch step-by-step guides on how to use Quiika features
                 </p>
-                <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                <Button variant="outline" size="sm">
                   Watch Tutorials
                 </Button>
               </div>
@@ -279,7 +280,7 @@ export const HelpPage: React.FC = () => {
                 <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-3">
                   Connect with other users and share tips and experiences
                 </p>
-                <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                <Button variant="outline" size="sm">
                   Join Community
                 </Button>
               </div>

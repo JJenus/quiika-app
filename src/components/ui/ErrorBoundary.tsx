@@ -1,5 +1,6 @@
 // src/components/ui/ErrorBoundary.tsx
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from './Button';
 
 interface Props {
   children: ReactNode;
@@ -27,12 +28,12 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="p-4 text-red-500">
           <h1>Something went wrong.</h1>
           <p>{this.state.error?.message}</p>
-          <button
+          <Button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+            className="mt-4"
           >
             Reload Page
-          </button>
+          </Button>
         </div>
       );
     }
