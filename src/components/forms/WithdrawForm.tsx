@@ -7,11 +7,11 @@ import {
 	ChevronDown,
 } from "lucide-react";
 import { useBankStore } from "../../stores/useBankStore";
-import { useTransactionStore } from "../../stores/useTransactionStore";
+import { useWithdrawalStore } from "../../stores/useWithdrawalStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
 import toast from "react-hot-toast";
-import type { Bank as BankType, ResolveBank } from "../../types/api";
+import type { Bank as BankType } from "../../types/api";
 
 interface WithdrawFormProps {
   quid: string;
@@ -40,7 +40,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
   const bankSelectRef = useRef<HTMLDivElement>(null);
 
   const { banks, resolvedAccount, loading: bankLoading, error: bankError, fetchBanks, resolveAccountName, clearError: clearBankError } = useBankStore();
-  const { loading: transactionLoading, error: transactionError, clearError: clearTransactionError } = useTransactionStore();
+  const { processWithdrawal, loading: withdrawalLoading, error: withdrawalError, clearError: clearWithdrawalError } = useWithdrawalStore();
 
   useEffect(() => {
     fetchBanks();
@@ -116,18 +116,23 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
     if (!validateForm()) return;
 
     clearBankError();
-    clearTransactionError();
+    clearWithdrawalError();
 
     try {
-      // This would typically call a withdrawal API endpoint
-      // For now, we'll simulate a successful withdrawal
+      await processWithdrawal({
+        quid,
+        accessKey,
+        amount,
+        accountNumber: formData.accountNumber,
+        bankCode: formData.bankCode,
+      });
       toast.success("Withdrawal request submitted successfully!");
       
       // Reset form after successful submission
       setFormData({ accountNumber: "", bankCode: "", accountName: "" });
-    } catch (error) {
-      toast.error("Failed to process withdrawal");
+    } catch (error: any) {
       console.error("Withdrawal failed:", error);
+      toast.error(error.message || "Failed to process withdrawal");
     }
   };
 
@@ -185,12 +190,12 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
         </div>
       </div>
 
-      {(bankError.hasError || transactionError.hasError) && (
+      {(bankError.hasError || withdrawalError.hasError) && (
         <ErrorMessage
-          message={bankError.message || transactionError.message || "An error occurred"}
+          message={bankError.message || withdrawalError.message || "An error occurred"}
           onDismiss={() => {
             clearBankError();
-            clearTransactionError();
+            clearWithdrawalError();
           }}
         />
       )}
@@ -302,10 +307,10 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
           </button>
           <button
             type="submit"
-            disabled={bankLoading.isLoading || transactionLoading.isLoading || isResolving}
+            disabled={bankLoading.isLoading || withdrawalLoading.isLoading || isResolving}
             className="flex-1 btn-primary py-2.5"
           >
-            {bankLoading.isLoading || transactionLoading.isLoading ? (
+            {bankLoading.isLoading || withdrawalLoading.isLoading ? (
               <LoadingSpinner size="sm" text="Processing..." />
             ) : (
               <>
