@@ -240,6 +240,7 @@ export const ClaimGiftForm: React.FC = () => {
 					loading={loading.isLoading}
 					size="lg"
 					className="w-full font-semibold"
+					variant="primary"
 				>
 					{loading.isLoading ? "Claiming Gift..." : "Claim Gift"}
 				</Button>

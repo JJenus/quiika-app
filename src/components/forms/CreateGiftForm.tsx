@@ -228,7 +228,7 @@ export const CreateGiftForm: React.FC = () => {
 					>
 						{loading.isLoading ? (
 							<LoadingSpinner
-								size="sm"
+						 		size="sm"
 								text="Initializing Payment..."
 							/>
 						) : (
