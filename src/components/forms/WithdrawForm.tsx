@@ -1,6 +1,11 @@
 // components/forms/WithdrawForm.tsx
-import React, { useState, useEffect } from "react";
-import { Landmark as Bank, ArrowLeft, CheckCircle } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+	Landmark as Bank,
+	ArrowLeft,
+	CheckCircle,
+	ChevronDown,
+} from "lucide-react";
 import { useBankStore } from "../../stores/useBankStore";
 import { useTransactionStore } from "../../stores/useTransactionStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
@@ -30,6 +35,9 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isResolving, setIsResolving] = useState(false);
+  const [bankSearch, setBankSearch] = useState("");
+  const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
+  const bankSelectRef = useRef<HTMLDivElement>(null);
 
   const { banks, resolvedAccount, loading: bankLoading, error: bankError, fetchBanks, resolveAccountName, clearError: clearBankError } = useBankStore();
   const { loading: transactionLoading, error: transactionError, clearError: clearTransactionError } = useTransactionStore();
@@ -52,6 +60,21 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
       }));
     }
   }, [resolvedAccount]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        bankSelectRef.current &&
+        !bankSelectRef.current.contains(event.target as Node)
+      ) {
+        setIsBankDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const resolveAccountDetails = async () => {
     if (formData.accountNumber.length < 10 || !formData.bankCode) return;
@@ -108,6 +131,22 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
     }
   };
 
+  const handleBankSelect = (bank: BankType) => {
+    handleInputChange("bankCode", bank.code);
+    setBankSearch(bank.name);
+    setIsBankDropdownOpen(false);
+  };
+
+  const handleBankSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBankSearch(e.target.value);
+    if (formData.bankCode) {
+      handleInputChange("bankCode", ""); // Clear selection if user types
+    }
+    if (!isBankDropdownOpen) {
+      setIsBankDropdownOpen(true);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
@@ -124,6 +163,10 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
       minimumFractionDigits: 2
     }).format(amount / 100); // Assuming amount is in kobo
   };
+
+  const filteredBanks = banks.filter((bank) =>
+    bank.name.toLowerCase().includes(bankSearch.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -177,19 +220,41 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
           <label htmlFor="bankCode" className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2">
             Bank
           </label>
-          <select
-            id="bankCode"
-            value={formData.bankCode}
-            onChange={(e) => handleInputChange("bankCode", e.target.value)}
-            className={`input-field ${formErrors.bankCode ? "border-red-500 focus:ring-red-500" : ""}`}
-          >
-            <option value="">Select your bank</option>
-            {banks.map((bank: BankType) => (
-              <option key={bank.code} value={bank.code}>
-                {bank.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative" ref={bankSelectRef}>
+            <input
+              type="text"
+              id="bankCode"
+              value={bankSearch}
+              onChange={handleBankSearchChange}
+              onFocus={() => setIsBankDropdownOpen(true)}
+              className={`input-field pr-10 ${formErrors.bankCode ? "border-red-500 focus:ring-red-500" : ""}`}
+              placeholder="Search and select your bank"
+              autoComplete="off"
+            />
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+
+            {isBankDropdownOpen && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                <ul className="py-1">
+                  {filteredBanks.length > 0 ? (
+                    filteredBanks.map((bank: BankType) => (
+                      <li
+                        key={bank.code}
+                        onClick={() => handleBankSelect(bank)}
+                        className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        {bank.name}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-4 py-2 text-sm text-gray-500">
+                      No banks found
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
           {formErrors.bankCode && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
               {formErrors.bankCode}
