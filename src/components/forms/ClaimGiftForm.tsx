@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Search, Lock, Eye, EyeOff, Banknote } from "lucide-react";
 import { useQuidStore } from "../../stores/useQuidStore";
-import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
 import { Button } from "../ui/Button";
 import { WithdrawForm } from "./WithdrawForm";
@@ -28,11 +27,11 @@ export const ClaimGiftForm: React.FC = () => {
 
 	const validateForm = (): boolean => {
 		const errors: Record<string, string> = {};
-
+		formData.quid = formData.quid.trim()
 		if (!formData.quid) {
 			errors.quid = "Gift code (QUID) is required";
 		} else if (formData.quid.length !== 13) {
-			errors.quid = "QUID must be 13 characters";
+			errors.quid = "QUID must be 13 characters"; // MGOG8R-BSO3LG
 		}
 
 		setFormErrors(errors);

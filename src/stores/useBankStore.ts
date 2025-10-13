@@ -31,7 +31,6 @@ export const useBankStore = create<BankStore>((set) => ({
       const response = await transactionAPI.getBanks();
       // Filter active banks and sort alphabetically
       const activeBanks = response.data
-        .filter(bank => bank.active && !bank.is_deleted)
         .sort((a, b) => a.name.localeCompare(b.name));
       
       set({ 
