@@ -124,7 +124,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
         accessKey,
         amount,
         accountNumber: formData.accountNumber,
-        bankCode: formData.bankCode,
+        bankCode: resolvedAccount?.bankCode!,
       });
       toast.success("Withdrawal request submitted successfully!");
       

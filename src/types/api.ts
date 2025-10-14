@@ -103,6 +103,15 @@ export interface WithdrawalRequest {
   updatedAt: string;
 }
 
+export interface WithdrawalData {
+	quid: string;
+	accessKey: string;
+	amount: number;
+	accountNumber: string;
+	bankCode: string;
+  currency?: Currency;
+}
+
 export interface WithdrawalUpdateDto {
   quid: string;
   status: TransactionStatus;

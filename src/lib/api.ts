@@ -14,6 +14,7 @@ import type {
   Bank,
   ResolveBank,
   QuiikaResponse,
+  WithdrawalData,
 } from '../types/api';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://quiika.alwaysdata.net";
@@ -86,7 +87,7 @@ export const withdrawalAPI = {
   fetchRequest: (quid: string): Promise<AxiosResponse<WithdrawalRequest>> =>
     api.get(`/withdrawal-request/${quid}`),
 
-  initiateRequest: (data: WithdrawalRequest): Promise<AxiosResponse<Record<string, string>>> =>
+  initiateRequest: (data: WithdrawalData): Promise<AxiosResponse<QuiikaResponse>> =>
     api.post('/withdrawal-request', data),
 
   updateRequest: (data: WithdrawalUpdateDto): Promise<AxiosResponse<void>> =>

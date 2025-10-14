@@ -1,79 +1,107 @@
-import { create } from 'zustand';
-import { transactionAPI } from '../lib/api';
-import type { Bank, ResolveBank, LoadingState, ErrorState } from '../types/api';
+import { create } from "zustand";
+import { transactionAPI } from "../lib/api";
+import type { Bank, ResolveBank, LoadingState, ErrorState } from "../types/api";
 
 interface BankStore {
-  banks: Bank[];
-  resolvedAccount: ResolveBank | null;
-  loading: LoadingState;
-  error: ErrorState;
-  
-  // Actions
-  fetchBanks: () => Promise<void>;
-  resolveAccountName: (accountNumber: string, bankCode: string) => Promise<ResolveBank | null>;
-  clearResolvedAccount: () => void;
-  clearError: () => void;
+	banks: Bank[];
+	resolvedAccount: ResolveBank | null;
+	loading: LoadingState;
+	error: ErrorState;
+
+	// Actions
+	fetchBanks: () => Promise<void>;
+	resolveAccountName: (
+		accountNumber: string,
+		bankCode: string
+	) => Promise<ResolveBank | null>;
+	clearResolvedAccount: () => void;
+	clearError: () => void;
 }
 
 export const useBankStore = create<BankStore>((set) => ({
-  banks: [],
-  resolvedAccount: null,
-  loading: { isLoading: false },
-  error: { hasError: false },
+	banks: [],
+	resolvedAccount: null,
+	loading: { isLoading: false },
+	error: { hasError: false },
 
-  fetchBanks: async () => {
-    set({ 
-      loading: { isLoading: true, message: 'Loading banks...' },
-      error: { hasError: false }
-    });
+	fetchBanks: async () => {
+		set({
+			loading: { isLoading: true, message: "Loading banks..." },
+			error: { hasError: false },
+		});
 
-    try {
-      const response = await transactionAPI.getBanks();
-      // Filter active banks and sort alphabetically
-      const activeBanks = response.data
-        .sort((a, b) => a.name.localeCompare(b.name));
-      
-      set({ 
-        banks: activeBanks,
-        loading: { isLoading: false }
-      });
-    } catch (error: any) {
-      set({
-        loading: { isLoading: false },
-        error: { 
-          hasError: true, 
-          message: error.response?.data?.message || error.message || 'Failed to fetch banks'
-        }
-      });
-    }
-  },
+		try {
+			const response = await transactionAPI.getBanks();
+			// Filter active banks and sort alphabetically
+			const activeBanks = response.data.sort((a, b) =>
+				a.name.localeCompare(b.name)
+			);
 
-  resolveAccountName: async (accountNumber, bankCode) => {
-    set({ 
-      loading: { isLoading: true, message: 'Resolving account name...' },
-      error: { hasError: false }
-    });
+			set({
+				banks: activeBanks,
+				loading: { isLoading: false },
+			});
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message:
+						error.response?.data?.message ||
+						error.message ||
+						"Failed to fetch banks",
+				},
+			});
+		}
+	},
 
-    try {
-      const response = await transactionAPI.resolveBank({ accountNumber, bankCode });
-      set({ 
-        resolvedAccount: response.data,
-        loading: { isLoading: false }
-      });
-      return response.data;
-    } catch (error: any) {
-      set({
-        loading: { isLoading: false },
-        error: { 
-          hasError: true, 
-          message: error.response?.data?.message || error.message || 'Failed to resolve account name'
-        }
-      });
-      return null;
-    }
-  },
+	resolveAccountName: async (accountNumber, bankCode) => {
+		if (import.meta.env.DEV) {
+			const data = {
+				accountNumber: "3029534236",
+				bankCode: "001",
+				accountName: "Test Account Name",
+			};
 
-  clearResolvedAccount: () => set({ resolvedAccount: null }),
+			set({
+				resolvedAccount: data,
+				loading: { isLoading: false },
+			});
 
-  clearError: () => set({ error: { hasError: false } }),
+			return data;
+		}
+
+		set({
+			loading: { isLoading: true, message: "Resolving account name..." },
+			error: { hasError: false },
+		});
+
+		try {
+			const response = await transactionAPI.resolveBank({
+				accountNumber,
+				bankCode,
+			});
+			set({
+				resolvedAccount: response.data,
+				loading: { isLoading: false },
+			});
+			return response.data;
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message:
+						error.response?.data?.message ||
+						error.message ||
+						"Failed to resolve account name",
+				},
+			});
+			return null;
+		}
+	},
+
+	clearResolvedAccount: () => set({ resolvedAccount: null }),
+
+	clearError: () => set({ error: { hasError: false } }),
 }));
