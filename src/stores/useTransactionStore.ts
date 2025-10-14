@@ -42,13 +42,9 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 		});
 
 		try {
-			const reference = `qiika_${Date.now()}_${Math.random()
-				.toString(36)
-				.substr(2, 9)}`;
 			const paymentData = {
 				...data,
-				reference,
-				callback_url: `${window.location.origin}/payment/callback`,
+				authorizationUrl: `${window.location.origin}/payment/callback`,
 			};
 
 			const response = await paystackAPI.initializePayment(paymentData);
@@ -92,7 +88,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 				throw new Error("Failed to initialize payment");
 			}
 		} catch (error: any) {
-			console.log(error)
+			console.log(error);
 			set({
 				loading: { isLoading: false },
 				error: {
@@ -120,7 +116,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 				loading: { isLoading: false },
 			});
 		} catch (error: any) {
-			console.log(error)
+			console.log(error);
 			set({
 				loading: { isLoading: false },
 				error: {
@@ -148,8 +144,9 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 				currentTransaction: response.data,
 				loading: { isLoading: false },
 			});
-		} catch (error: any) {console.log(error)
-			console.log(error)
+		} catch (error: any) {
+			console.log(error);
+			console.log(error);
 			set({
 				loading: { isLoading: false },
 				error: {
@@ -177,7 +174,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 			});
 			return response.data;
 		} catch (error: any) {
-			console.log(error)
+			console.log(error);
 			set({
 				loading: { isLoading: false },
 				error: {
@@ -206,7 +203,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 			});
 			return response.data;
 		} catch (error: any) {
-			console.log(error)
+			console.log(error);
 			set({
 				loading: { isLoading: false },
 				error: {

@@ -56,7 +56,7 @@ export const useBankStore = create<BankStore>((set) => ({
 	},
 
 	resolveAccountName: async (accountNumber, bankCode) => {
-		if (import.meta.env.DEV) {
+		if (import.meta.env.VITE_TEST_ENV === "yes") {
 			const data = {
 				accountNumber: "3029534236",
 				bankCode: "001",

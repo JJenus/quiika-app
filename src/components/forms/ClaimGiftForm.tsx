@@ -27,7 +27,7 @@ export const ClaimGiftForm: React.FC = () => {
 
 	const validateForm = (): boolean => {
 		const errors: Record<string, string> = {};
-		formData.quid = formData.quid.trim()
+		formData.quid = formData.quid.trim();
 		if (!formData.quid) {
 			errors.quid = "Gift code (QUID) is required";
 		} else if (formData.quid.length !== 13) {
@@ -45,12 +45,7 @@ export const ClaimGiftForm: React.FC = () => {
 
 		clearError();
 
-		const result = await verifyQuidClaim(formData.quid);
-
-		if (result && result.allowAccess) {
-			// Success - show withdrawal form
-			console.log("Gift claimed successfully:", result);
-		}
+		await verifyQuidClaim(formData.quid);
 	};
 
 	const handleInputChange = (field: keyof ClaimForm, value: string) => {
@@ -83,11 +78,11 @@ export const ClaimGiftForm: React.FC = () => {
 					</p>
 				</div>
 
-				<WithdrawForm 
+				<WithdrawForm
 					quid={formData.quid}
 					accessKey={claimResponse.accessKey}
 					amount={claimResponse.quid?.amount || 0}
-					currency={claimResponse.quid?.currency || 'NGN'}
+					currency={claimResponse.quid?.currency || "NGN"}
 					onCancel={handleReset}
 				/>
 			</div>
@@ -108,7 +103,7 @@ export const ClaimGiftForm: React.FC = () => {
 					<p className="text-text-secondary dark:text-text-secondary-dark mb-4">
 						{claimResponse.message}
 					</p>
-					
+
 					{claimResponse.accessKey && (
 						<div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mb-4">
 							<p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-1">
@@ -179,7 +174,10 @@ export const ClaimGiftForm: React.FC = () => {
 							id="quid"
 							value={formData.quid}
 							onChange={(e) =>
-								handleInputChange("quid", e.target.value.toUpperCase())
+								handleInputChange(
+									"quid",
+									e.target.value.toUpperCase()
+								)
 							}
 							className={`input-field pl-10 uppercase ${
 								formErrors.quid
@@ -220,7 +218,9 @@ export const ClaimGiftForm: React.FC = () => {
 							type="button"
 							onClick={() => setShowPassword(!showPassword)}
 							className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-							aria-label={showPassword ? "Hide password" : "Show password"}
+							aria-label={
+								showPassword ? "Hide password" : "Show password"
+							}
 						>
 							{showPassword ? (
 								<EyeOff className="h-5 w-5" />

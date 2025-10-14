@@ -110,6 +110,7 @@ export interface WithdrawalData {
 	accountNumber: string;
 	bankCode: string;
   currency?: Currency;
+  accountName: string
 }
 
 export interface WithdrawalUpdateDto {
@@ -162,8 +163,7 @@ export interface SplitDTO {
 export interface PayStackTransactionDto {
   amount: number;
   email: string;
-  callback_url: string;
-  reference: string;
+  authorizationUrl: string;
 }
 
 export interface PayStackAuthorizationResponse {
