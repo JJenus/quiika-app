@@ -1,0 +1,86 @@
+# Admin & Role-Based Access Control (RBAC) Implementation Plan
+
+This document outlines the plan for adding a comprehensive, role-based admin management portal to the application.
+
+## 1. High-Level Goals
+- Create a secure, auth-protected area for application management.
+- Implement a role-based access control (RBAC) system.
+- Provide interfaces for managing transactions, withdrawals, QUIDs, and users.
+- Ensure the admin portal maintains the existing UI/UX standards, including responsiveness and dark/light mode support.
+
+## 2. User Roles & Permissions
+Three distinct roles will be established:
+
+- **SUPER_ADMIN**:
+  - Full access to all admin features.
+  - Can manage Admins and Support users (invite, change role, deactivate).
+  - Can configure application-level settings.
+
+- **ADMIN**:
+  - Can manage day-to-day operations.
+  - Can view all transactions, withdrawals, and QUIDs.
+  - Can approve/reject withdrawal requests.
+  - Can manage Support users (invite, deactivate).
+  - Cannot manage other Admins or access super-admin settings.
+
+- **SUPPORT**:
+  - Limited, often view-only access.
+  - Can view transactions and withdrawal requests to assist with customer inquiries.
+  - Cannot perform sensitive actions like approving withdrawals or managing users.
+
+## 3. Admin Portal Structure (`/admin`)
+The portal will be accessible via the `/admin` route prefix.
+
+### 3.1. Pages & Routes
+- `/admin/login`: Login page for authorized personnel. Unauthorized access to any `/admin/*` route will redirect here.
+- `/admin/dashboard`: The landing page after login. Displays key metrics, recent activities, and system health at a glance.
+- `/admin/transactions`:
+  - A comprehensive list of all transactions.
+  - Features for searching (by QUID, email, etc.) and filtering (by status, date range).
+  - A detail view for each transaction.
+- `/admin/withdrawals`:
+  - A list of all withdrawal requests.
+  - Tabs/filters for "Pending", "Completed", "Failed".
+  - Actions to approve or reject pending requests (for Admin/Super Admin roles).
+- `/admin/quids`:
+  - A searchable list of all created QUIDs.
+  - Ability to view QUID details and associated rules.
+  - Actions to manually block or unblock a QUID (for Admin/Super Admin roles).
+- `/admin/users`: (Admin & Super Admin only)
+  - A list of all administrative users.
+  - An "Invite User" feature that sends an invitation link via email.
+  - Actions to change a user's role or deactivate/reactivate their account.
+- `/admin/settings`: (Super Admin only)
+  - A page for managing critical application settings (e.g., API keys, feature flags).
+
+## 4. Authentication & Authorization
+### 4.1. Authentication Flow
+1.  **Login**: Users authenticate via `/admin/login` using email and password.
+2.  **Token Issuance**: Upon success, the backend API issues a JSON Web Token (JWT).
+3.  **Token Storage**: The JWT is stored securely in the browser (`localStorage`).
+4.  **Authenticated Requests**: The JWT is sent as a `Bearer` token in the `Authorization` header for all subsequent API requests to protected admin endpoints.
+5.  **Session Persistence**: On app load, the application checks for a valid token in `localStorage` to re-authenticate the user automatically.
+6.  **Logout**: The token is removed from storage, and the user is redirected to the login page.
+
+### 4.2. Protected Routes
+- A `ProtectedRoute` component will wrap all admin pages.
+- It will check for a valid authentication token. If none is found, it will redirect to `/admin/login`.
+- This component will also check the user's role against the roles required for the specific page, displaying an "Access Denied" message if permissions are insufficient.
+
+## 5. API Client (`src/lib/api.ts`)
+- The Axios request interceptor will be updated to conditionally attach the `Authorization` header.
+- It will retrieve the token from the authentication state management store.
+- The header will only be added for requests to protected API endpoints (e.g., those starting with `/api/admin/*`). Public-facing API calls will remain unchanged.
+
+## 6. State Management
+- A new global state store, `useAuthStore` (using Zustand), will be created to manage:
+  - `isAuthenticated: boolean`
+  - `user: { email: string, role: string } | null`
+  - `token: string | null`
+  - Actions for `login`, `logout`, and `initializeAuth`.
+
+## 7. UI/UX
+- **Layout**: A dedicated `AdminLayout` will provide a consistent frame with a sidebar for navigation and a header displaying user info and a logout button.
+- **Component Reusability**: Existing components from `src/components/ui` will be used extensively to ensure a consistent look and feel.
+- **Theming**: All new components and pages will fully support the existing light/dark mode functionality.
+- **Responsiveness**: The admin portal will be fully responsive and usable on devices of all sizes.
