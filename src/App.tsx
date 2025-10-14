@@ -4,6 +4,7 @@ import {
 	Routes,
 	Route,
 	Navigate,
+	Outlet,
 } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
 import { HomePage } from "./pages/HomePage";
@@ -21,6 +22,17 @@ import { RulesPage } from "./pages/RulesPage";
 import { TermsConditionsPage } from "./pages/TermsConditionsPage";
 import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 import { RouteSEO } from "./components/seo/RouteSEO";
+import { LoginPage } from "./pages/admin/LoginPage";
+import { DashboardPage } from "./pages/admin/DashboardPage";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { AdminLayout } from "./components/layout/AdminLayout";
+
+const PublicLayout = () => (
+	<Layout>
+		<RouteSEO />
+		<Outlet />
+	</Layout>
+);
 
 function App() {
 	const { initializeTheme } = useThemeStore();
@@ -32,20 +44,14 @@ function App() {
 	return (
 		<Router>
 			<div className="App">
-				<Layout>
-				<RouteSEO />
-					<Routes>
+				<Routes>
+					{/* Public Routes */}
+					<Route element={<PublicLayout />}>
 						<Route path="/" element={<HomePage />} />
 						<Route path="/create" element={<CreateGiftPage />} />
 						<Route path="/claim" element={<ClaimGiftPage />} />
-						<Route
-							path="/claim/:quid"
-							element={<ClaimGiftPage />}
-						/>
-						<Route
-							path="/transactions"
-							element={<TransactionsPage />}
-						/>
+						<Route path="/claim/:quid" element={<ClaimGiftPage />} />
+						<Route path="/transactions" element={<TransactionsPage />} />
 						<Route path="/rules" element={<RulesPage />} />
 						<Route
 							path="/payment/callback"
@@ -53,23 +59,22 @@ function App() {
 						/>
 						<Route path="/withdraw" element={<WithdrawPage />} />
 						<Route path="/help" element={<HelpPage />} />
-						<Route
-							path="/privacy"
-							element={<PrivacyPolicyPage />}
-						/>
-						<Route
-							path="/terms"
-							element={<TermsConditionsPage />}
-						/>
-						<Route
-							path="/cookies"
-							element={<CookiePolicyPage />}
-						/>
+						<Route path="/privacy" element={<PrivacyPolicyPage />} />
+						<Route path="/terms" element={<TermsConditionsPage />} />
+						<Route path="/cookies" element={<CookiePolicyPage />} />
+					</Route>
 
-						{/* Redirect any unknown routes to home */}
-						<Route path="*" element={<Navigate to="/" replace />} />
-					</Routes>
-				</Layout>
+					{/* Admin Routes */}
+					<Route path="/admin/login" element={<LoginPage />} />
+					<Route element={<ProtectedRoute />}>
+						<Route element={<AdminLayout />}>
+							<Route path="/admin/dashboard" element={<DashboardPage />} />
+						</Route>
+					</Route>
+
+					{/* Redirect any unknown routes to home */}
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Routes>
 				<Toaster
 					position="top-right"
 					toastOptions={{
