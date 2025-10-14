@@ -11,6 +11,10 @@ import { useTransactionStore } from "../../stores/useTransactionStore";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
 import type { CreateGiftForm as GiftForm } from "../../types/api";
+import {
+	formatNumberWithCommas,
+	parseNumberWithCommas,
+} from "../../utils/numberFormatter";
 
 export const CreateGiftForm: React.FC = () => {
 	const [formData, setFormData] = useState<GiftForm>({
@@ -103,15 +107,20 @@ export const CreateGiftForm: React.FC = () => {
 						<div className="relative">
 							<DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
 							<input
-								type="number"
+								type="text"
 								id="amount"
-								min="1"
-								step="0.01"
-								value={formData.amount || ""}
+								inputMode="decimal"
+								value={
+									formData.amount
+										? formatNumberWithCommas(
+												formData.amount
+										  )
+										: ""
+								}
 								onChange={(e) =>
 									handleInputChange(
 										"amount",
-										parseFloat(e.target.value) || 0
+										parseNumberWithCommas(e.target.value)
 									)
 								}
 								className={`input-field pl-10 ${
