@@ -261,8 +261,8 @@ interface TransactionResponse {
 
 // SSE Types
 export interface SSEMessage {
-  type: "TRANSACTION" | "WITHDRAWAL" | "MESSAGE";
-  data: TransactionResponse | any; //"PAYMENT" | "WITHDRAWAL" = TransactionResponse
+  event: "PAYMENT" | "WITHDRAWAL" | "MESSAGE";
+  message: TransactionResponse | any; //"PAYMENT" | "WITHDRAWAL" = TransactionResponse
   timestamp: string;
 }
 

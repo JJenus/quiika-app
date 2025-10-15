@@ -61,10 +61,10 @@ export const PaymentCallbackPage: React.FC = () => {
 	useEffect(() => {
 		// Listen for SSE messages about payment updates
 		const latestMessage = messages[messages.length - 1];
-		if (latestMessage && latestMessage.type === "TRANSACTION") {
+		if (latestMessage && latestMessage.event === "PAYMENT") {
 			setPaymentStatus("success");
-			if (latestMessage.data.quid) {
-				setQuid(latestMessage.data.quid);
+			if (latestMessage.message.quid) {
+				setQuid(latestMessage.message.quid);
 			}
 		}
 	}, [messages]);
