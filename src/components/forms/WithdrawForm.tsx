@@ -5,6 +5,9 @@ import {
 	ArrowLeft,
 	CheckCircle,
 	ChevronDown,
+	AlertCircle,
+	Clock,
+	Shield,
 } from "lucide-react";
 import { useBankStore } from "../../stores/useBankStore";
 import { useWithdrawalStore } from "../../stores/useWithdrawalStore";
@@ -39,7 +42,9 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 	const [isResolving, setIsResolving] = useState(false);
 	const [bankSearch, setBankSearch] = useState("");
 	const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
-	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+		useState(false);
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 	const bankSelectRef = useRef<HTMLDivElement>(null);
 
 	const {
@@ -195,14 +200,22 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 				bankCode: sanitizedBankCode,
 				accountName: formData.accountName.replace(/[^a-zA-Z\s]/g, ""),
 			});
-			toast.success("Withdrawal request submitted successfully!");
+
+			// Show success modal instead of toast
+			setIsSuccessModalOpen(true);
 
 			// Reset form after successful submission
 			setFormData({ accountNumber: "", bankCode: "", accountName: "" });
+			setBankSearch("");
 		} catch (error: any) {
 			console.error("Withdrawal failed:", error);
 			toast.error(error.message || "Failed to process withdrawal");
 		}
+	};
+
+	const handleSuccessModalClose = () => {
+		setIsSuccessModalOpen(false);
+		onCancel(); // Return to previous screen
 	};
 
 	const handleBankSelect = (bank: BankType) => {
@@ -250,34 +263,37 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 	return (
 		<div className="space-y-6">
 			{/* Transaction Summary */}
-			<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
-				<div className="flex justify-between items-center">
-					<span className="text-sm text-text-primary dark:text-text-primary-dark">
-						Amount to withdraw
-					</span>
-					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-						{formatCurrency(amount)}
-					</span>
-				</div>
-				<div className="flex justify-between items-center">
-					<span className="text-sm text-text-primary dark:text-text-primary-dark">
-						Withdrawal Fee (3%)
-					</span>
-					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-						- {formatCurrency(feeAmount)}
-					</span>
-				</div>
-				<div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
-				<div className="flex justify-between items-center">
-					<span className="text-sm font-bold text-text-primary dark:text-text-primary-dark">
-						You will receive
-					</span>
-					<span className="text-lg font-bold text-primary dark:text-primary-light">
-						{formatCurrency(netAmount)}
-					</span>
-				</div>
-				<div className="pt-1 text-xs text-text-secondary dark:text-text-secondary-dark text-right">
-					QUID: {quid}
+			<div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-100 dark:border-gray-700 p-6 rounded-xl shadow-sm">
+				<div className="space-y-3">
+					<div className="flex justify-between items-center">
+						<span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+							Amount to withdraw
+						</span>
+						<span className="text-sm font-semibold text-gray-900 dark:text-white">
+							{formatCurrency(amount)}
+						</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+							Withdrawal Fee (3%)
+						</span>
+						<span className="text-sm font-semibold text-gray-900 dark:text-white">
+							- {formatCurrency(feeAmount)}
+						</span>
+					</div>
+					<div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+						<div className="flex justify-between items-center">
+							<span className="text-base font-bold text-gray-900 dark:text-white">
+								You will receive
+							</span>
+							<span className="text-lg font-bold text-green-600 dark:text-green-400">
+								{formatCurrency(netAmount)}
+							</span>
+						</div>
+					</div>
+					<div className="pt-2 text-xs text-gray-500 dark:text-gray-400 text-right">
+						QUID: {quid}
+					</div>
 				</div>
 			</div>
 
@@ -295,11 +311,11 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 				/>
 			)}
 
-			<form onSubmit={handleSubmit} className="space-y-4">
+			<form onSubmit={handleSubmit} className="space-y-6">
 				<div>
 					<label
 						htmlFor="accountNumber"
-						className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
+						className="block text-sm font-semibold text-gray-900 dark:text-white mb-3"
 					>
 						Account Number
 					</label>
@@ -313,16 +329,17 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 								e.target.value.replace(/\D/g, "")
 							)
 						}
-						className={`input-field ${
+						className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors ${
 							formErrors.accountNumber
-								? "border-red-500 focus:ring-red-500"
-								: ""
-						}`}
-						placeholder="Enter your account number"
+								? "border-red-500 focus:ring-red-200 dark:focus:ring-red-800"
+								: "border-gray-300 dark:border-gray-600 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-500 dark:focus:border-blue-400"
+						} bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+						placeholder="Enter your 10-digit account number"
 						maxLength={10}
 					/>
 					{formErrors.accountNumber && (
-						<p className="mt-1 text-sm text-red-600 dark:text-red-400">
+						<p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+							<AlertCircle className="h-4 w-4 mr-1" />
 							{formErrors.accountNumber}
 						</p>
 					)}
@@ -331,7 +348,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 				<div>
 					<label
 						htmlFor="bankCode"
-						className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
+						className="block text-sm font-semibold text-gray-900 dark:text-white mb-3"
 					>
 						Bank
 					</label>
@@ -342,19 +359,19 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 							value={bankSearch}
 							onChange={handleBankSearchChange}
 							onFocus={() => setIsBankDropdownOpen(true)}
-							className={`input-field pr-10 ${
+							className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors ${
 								formErrors.bankCode
-									? "border-red-500 focus:ring-red-500"
-									: ""
-							}`}
+									? "border-red-500 focus:ring-red-200 dark:focus:ring-red-800"
+									: "border-gray-300 dark:border-gray-600 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-500 dark:focus:border-blue-400"
+							} bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 pr-10`}
 							placeholder="Search and select your bank"
 							autoComplete="off"
 						/>
-						<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+						<ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
 
 						{isBankDropdownOpen && (
-							<div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
-								<ul className="py-1">
+							<div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+								<ul className="py-2">
 									{filteredBanks.length > 0 ? (
 										filteredBanks.map((bank: BankType) => (
 											<li
@@ -362,13 +379,13 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 												onClick={() =>
 													handleBankSelect(bank)
 												}
-												className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+												className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors border-b border-gray-100 dark:border-gray-600 last:border-b-0"
 											>
 												{bank.name}
 											</li>
 										))
 									) : (
-										<li className="px-4 py-2 text-sm text-gray-500">
+										<li className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
 											No banks found
 										</li>
 									)}
@@ -377,7 +394,8 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 						)}
 					</div>
 					{formErrors.bankCode && (
-						<p className="mt-1 text-sm text-red-600 dark:text-red-400">
+						<p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+							<AlertCircle className="h-4 w-4 mr-1" />
 							{formErrors.bankCode}
 						</p>
 					)}
@@ -386,7 +404,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 				<div>
 					<label
 						htmlFor="accountName"
-						className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
+						className="block text-sm font-semibold text-gray-900 dark:text-white mb-3"
 					>
 						Account Name
 					</label>
@@ -396,9 +414,11 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 							id="accountName"
 							value={formData.accountName}
 							readOnly
-							className={`input-field bg-gray-50 dark:bg-gray-800 ${
-								formErrors.accountName ? "border-red-500" : ""
-							}`}
+							className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:outline-none transition-colors ${
+								formErrors.accountName
+									? "border-red-500 focus:ring-red-200 dark:focus:ring-red-800"
+									: "border-gray-300 dark:border-gray-600 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-500 dark:focus:border-blue-400"
+							} bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
 							placeholder="Account name will appear here"
 						/>
 						{isResolving && (
@@ -411,118 +431,238 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 						)}
 					</div>
 					{formErrors.accountName && (
-						<p className="mt-1 text-sm text-red-600 dark:text-red-400">
+						<p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+							<AlertCircle className="h-4 w-4 mr-1" />
 							{formErrors.accountName}
 						</p>
 					)}
 				</div>
 
-				<div className="flex gap-3 pt-4">
+				<div className="flex gap-4 pt-2">
 					<Button
 						type="button"
 						onClick={onCancel}
-						variant="outline"
-						className="flex-1"
+						variant="secondary"
+						className="flex-1 py-3 text-base font-medium"
 					>
-						<ArrowLeft className="h-4 w-4 mr-1 inline" />
+						<ArrowLeft className="h-5 w-5 mr-2 inline" />
 						Back
 					</Button>
 					<Button
 						type="submit"
+            variant="primary"
 						disabled={
 							bankLoading.isLoading ||
 							withdrawalLoading.isLoading ||
-							isResolving
+							isResolving ||
+							!formData.accountName
 						}
-						className="flex-1"
+						className="flex-1 py-3 text-base font-medium disabled:cursor-not-allowed"
 					>
 						{bankLoading.isLoading ||
 						withdrawalLoading.isLoading ? (
 							<LoadingSpinner size="sm" text="Processing..." />
 						) : (
 							<>
-								<Bank className="h-4 w-4 mr-1 inline" />
-								Withdraw Funds
+								<Bank className="h-5 w-5 mr-2 inline" />
+								Claim Funds
 							</>
 						)}
 					</Button>
 				</div>
 			</form>
 
+			{/* Confirmation Modal */}
 			<Modal
 				isOpen={isConfirmationModalOpen}
 				onClose={() => setIsConfirmationModalOpen(false)}
-				title="Confirm Withdrawal Details"
+				title="Confirm Withdrawal"
+				size="md"
 			>
-				<div className="space-y-4">
-					<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-						Please review and confirm the details below before
-						proceeding.
-					</p>
-					<div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
-						<div className="flex justify-between">
-							<span className="font-medium text-text-primary dark:text-text-primary-dark">
-								Bank
-							</span>
-							<span>{selectedBank?.name}</span>
-						</div>
-						<div className="flex justify-between">
-							<span className="font-medium text-text-primary dark:text-text-primary-dark">
-								Account Number
-							</span>
-							<span>{formData.accountNumber}</span>
-						</div>
-						<div className="flex justify-between">
-							<span className="font-medium text-text-primary dark:text-text-primary-dark">
-								Account Name
-							</span>
-							<span>{formData.accountName}</span>
+				<div className="space-y-6">
+					{/* Security Badge */}
+					<div className="flex items-center justify-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+						<Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
+						<span className="text-sm font-medium text-green-800 dark:text-green-300">
+							Secure Transaction
+						</span>
+					</div>
+
+					<div>
+						<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+							Transfer Details
+						</h3>
+						<div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
+							<div className="flex justify-between">
+								<span className="font-medium text-gray-700 dark:text-gray-300">
+									Bank
+								</span>
+								<span className="text-gray-900 dark:text-white font-semibold">
+									{selectedBank?.name}
+								</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="font-medium text-gray-700 dark:text-gray-300">
+									Account Number
+								</span>
+								<span className="text-gray-900 dark:text-white font-mono font-semibold">
+									{formData.accountNumber}
+								</span>
+							</div>
+							<div className="flex justify-between">
+								<span className="font-medium text-gray-700 dark:text-gray-300">
+									Account Name
+								</span>
+								<span className="text-gray-900 dark:text-white font-semibold">
+									{formData.accountName}
+								</span>
+							</div>
 						</div>
 					</div>
-					<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
-						<div className="flex justify-between items-center">
-							<span className="text-sm">Amount to withdraw</span>
-							<span className="font-medium">
+
+					<div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-100 dark:border-gray-700 p-4 rounded-lg space-y-2">
+						<div className="flex justify-between items-center text-sm">
+							<span className="text-gray-600 dark:text-gray-300">
+								Amount
+							</span>
+							<span className="font-medium text-gray-900 dark:text-white">
 								{formatCurrency(amount)}
 							</span>
 						</div>
-						<div className="flex justify-between items-center">
-							<span className="text-sm">Fee</span>
-							<span className="font-medium">
+						<div className="flex justify-between items-center text-sm">
+							<span className="text-gray-600 dark:text-gray-300">
+								Fee
+							</span>
+							<span className="font-medium text-gray-900 dark:text-white">
 								- {formatCurrency(feeAmount)}
 							</span>
 						</div>
-						<div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
-						<div className="flex justify-between items-center">
-							<span className="font-bold">You will receive</span>
-							<span className="font-bold text-lg text-primary">
-								{formatCurrency(netAmount)}
-							</span>
+						<div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+							<div className="flex justify-between items-center">
+								<span className="font-bold text-gray-900 dark:text-white">
+									Total Receive
+								</span>
+								<span className="font-bold text-lg text-green-600 dark:text-green-400">
+									{formatCurrency(netAmount)}
+								</span>
+							</div>
 						</div>
 					</div>
+
+					{/* Processing Time Info */}
+					<div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+						<Clock className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+						<div>
+							<p className="text-sm font-medium text-blue-800 dark:text-blue-300">
+								Processing Time
+							</p>
+							<p className="text-xs text-blue-600 dark:text-blue-400">
+								Funds will arrive within 24 hours
+							</p>
+						</div>
+					</div>
+
 					<div className="flex gap-3 pt-2">
 						<Button
 							type="button"
 							variant="outline"
 							onClick={() => setIsConfirmationModalOpen(false)}
-							className="flex-1"
+							className="flex-1 py-3"
+							disabled={withdrawalLoading.isLoading}
 						>
-							Cancel
+							Edit Details
 						</Button>
 						<Button
 							type="button"
 							onClick={handleConfirmWithdrawal}
 							loading={withdrawalLoading.isLoading}
-							className="flex-1"
+							className="flex-1 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
 						>
-							Confirm &amp; Proceed
+							<Shield className="h-5 w-5 mr-2" />
+							Confirm Transfer
 						</Button>
 					</div>
 				</div>
 			</Modal>
 
-			<div className="text-center">
-				<p className="text-xs text-text-secondary dark:text-text-secondary-dark">
+			{/* Success Modal */}
+			<Modal
+				isOpen={isSuccessModalOpen}
+				onClose={handleSuccessModalClose}
+				title=""
+				size="sm"
+				hideCloseButton
+			>
+				<div className="text-center space-y-6">
+					{/* Success Icon */}
+					<div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30">
+						<CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
+					</div>
+
+					<div className="space-y-2">
+						<h3 className="text-xl font-bold text-gray-900 dark:text-white">
+							Withdrawal Successful!
+						</h3>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							Your funds are being processed and will be
+							transferred to your bank account.
+						</p>
+					</div>
+
+					{/* Transaction Summary */}
+					<div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
+						<div className="flex justify-between text-sm">
+							<span className="text-gray-600 dark:text-gray-400">
+								Amount:
+							</span>
+							<span className="font-medium text-gray-900 dark:text-white">
+								{formatCurrency(netAmount)}
+							</span>
+						</div>
+						<div className="flex justify-between text-sm">
+							<span className="text-gray-600 dark:text-gray-400">
+								Bank:
+							</span>
+							<span className="font-medium text-gray-900 dark:text-white">
+								{selectedBank?.name}
+							</span>
+						</div>
+						<div className="flex justify-between text-sm">
+							<span className="text-gray-600 dark:text-gray-400">
+								Account:
+							</span>
+							<span className="font-medium text-gray-900 dark:text-white">
+								{formData.accountNumber}
+							</span>
+						</div>
+					</div>
+
+					{/* Processing Info */}
+					<div className="flex items-center justify-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+						<Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+						<span className="text-sm text-blue-700 dark:text-blue-300">
+							Expected arrival: Within 24 hours
+						</span>
+					</div>
+
+					<Button
+						onClick={handleSuccessModalClose}
+						className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+					>
+						Done
+					</Button>
+				</div>
+			</Modal>
+
+			{/* Footer Info */}
+			<div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+				<div className="flex items-center justify-center gap-2 mb-2">
+					<Shield className="h-4 w-4 text-gray-400" />
+					<p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+						Secure & Encrypted
+					</p>
+				</div>
+				<p className="text-xs text-gray-500 dark:text-gray-400">
 					Funds will be transferred to your bank account within 24
 					hours
 				</p>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Shield } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,6 +8,8 @@ interface ModalProps {
   children: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  hideCloseButton?: boolean;
+  showSecurityBadge?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -17,6 +19,8 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'md',
   className = '',
+  hideCloseButton = false,
+  showSecurityBadge = false,
 }) => {
   const sizeClasses = {
     sm: 'max-w-md',
@@ -28,12 +32,16 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = 'calc(100vw - 100%)'; // Prevent layout shift
+      
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
       };
+      
       document.addEventListener('keydown', handleEscape);
       return () => {
         document.body.style.overflow = 'unset';
+        document.body.style.paddingRight = 'unset';
         document.removeEventListener('keydown', handleEscape);
       };
     }
@@ -44,34 +52,72 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
-        {/* Backdrop */}
+        {/* Enhanced Backdrop with blur effect */}
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+          className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300 ease-out"
           onClick={onClose}
         />
         
-        {/* Modal */}
+        {/* Enhanced Modal Container */}
         <div className={`
-          relative bg-surface dark:bg-surface-dark rounded-xl shadow-xl w-full 
-          ${sizeClasses[size]} ${className} animate-scale-in
+          relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full 
+          border border-gray-200 dark:border-gray-700
+          transform transition-all duration-300 ease-out
+          ${sizeClasses[size]} ${className}
+          ${isOpen ? 'animate-scale-in' : 'animate-scale-out'}
         `}>
-          {title && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-text-primary dark:text-text-primary-dark">
-                {title}
-              </h2>
-              <button
-                onClick={onClose}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-              >
-                <X className="h-5 w-5" />
-              </button>
+          {/* Security Badge */}
+          {showSecurityBadge && (
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <div className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg border border-green-300">
+                <Shield className="h-4 w-4" />
+                <span className="text-sm font-medium">Secure & Encrypted</span>
+              </div>
+            </div>
+          )}
+
+          {/* Enhanced Header */}
+          {(title || !hideCloseButton) && (
+            <div className={`
+              flex items-center justify-between px-6 py-5 
+              border-b border-gray-100 dark:border-gray-800
+              ${!title ? 'justify-end' : ''}
+            `}>
+              {title && (
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {title}
+                  </h2>
+                </div>
+              )}
+              
+              {!hideCloseButton && (
+                <button
+                  onClick={onClose}
+                  className={`
+                    flex-shrink-0 p-2 rounded-xl transition-all duration-200
+                    hover:bg-gray-100 dark:hover:bg-gray-800 
+                    hover:scale-105 active:scale-95
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                    ${title ? 'ml-4' : ''}
+                  `}
+                  aria-label="Close modal"
+                >
+                  <X className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" />
+                </button>
+              )}
             </div>
           )}
           
-          <div className="px-6 py-4">
+          {/* Content Area with improved padding */}
+          <div className={`
+            ${title || !hideCloseButton ? 'px-6 py-6' : 'p-6'}
+          `}>
             {children}
           </div>
+
+          {/* Subtle gradient border effect */}
+          <div className="absolute inset-0 rounded-2xl pointer-events-none border border-transparent bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+/* index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,7 +12,7 @@
 		--background: #f9fafb;
 		--surface: #ffffff;
 		--text-primary: #1f2937;
-		--text-secondary: #4b5563;
+		--text-secondary: #6b7280; /* Improved contrast */
 		--success: #10b981;
 		--warning: #f59e0b;
 		--error: #ef4444;
@@ -62,15 +63,15 @@
 	}
 
 	.btn-primary {
-		@apply btn bg-primary hover:bg-primary-light text-white focus-visible:ring-primary/50 active:scale-95;
+		@apply btn bg-primary hover:bg-primary-light text-white focus-visible:ring-primary/50 active:scale-95 shadow-gentle hover:shadow-moderate;
 	}
 
 	.btn-secondary {
-		@apply btn bg-secondary hover:bg-secondary-light text-white focus-visible:ring-secondary/50 active:scale-95;
+		@apply btn bg-secondary hover:bg-secondary-light text-white focus-visible:ring-secondary/50 active:scale-95 shadow-gentle hover:shadow-moderate;
 	}
 
 	.btn-outline {
-		@apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white focus-visible:ring-primary/50 active:scale-95;
+		@apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white focus-visible:ring-primary/50 active:scale-95 dark:border-primary-300 dark:text-primary-300 dark:hover:bg-primary-300 dark:hover:text-primary-900;
 	}
 
 	.btn-ghost {
@@ -88,10 +89,37 @@
 	.gradient-bg {
 		@apply bg-gradient-to-br from-primary/5 via-secondary/5 to-info/5;
 	}
+
+	/* Enhanced loading states */
+	.loading-skeleton {
+		@apply animate-pulse-gentle bg-gray-200 dark:bg-gray-700 rounded;
+	}
+
+	/* Improved focus states */
+	.focus-ring {
+		@apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+	}
 }
 
 @layer utilities {
 	.text-balance {
 		text-wrap: balance;
+	}
+
+	/* Improved scrollbar for dark mode */
+	.dark ::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.dark ::-webkit-scrollbar-track {
+		@apply bg-gray-800;
+	}
+
+	.dark ::-webkit-scrollbar-thumb {
+		@apply bg-gray-600 rounded-lg;
+	}
+
+	.dark ::-webkit-scrollbar-thumb:hover {
+		@apply bg-gray-500;
 	}
 }

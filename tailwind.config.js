@@ -49,8 +49,8 @@ export default {
             dark: '#f8fafc',
           },
           secondary: {
-            DEFAULT: '#4b5563',
-            dark: '#cbd5e1',
+            DEFAULT: '#6b7280', // Improved contrast
+            dark: '#94a3b8', // Improved visibility
           },
         },
         success: '#10b981',
