@@ -54,7 +54,7 @@ export const CreateGiftForm: React.FC = () => {
 		clearError();
 
 		const response = await initializeTransaction({
-			amount: Math.round(formData.amount * 100), // Convert to kobo/pesewas
+			amount: Math.round(Number(formData.amount.toFixed(2)) * 100), // Convert to kobo/pesewas with 2 decimal precision
 			email: formData.email,
 		});
 

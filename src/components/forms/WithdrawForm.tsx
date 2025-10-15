@@ -79,9 +79,24 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
   const resolveAccountDetails = async () => {
     if (formData.accountNumber.length < 10 || !formData.bankCode) return;
     
+    // Validate bank code format
+    if (!/^[A-Z0-9]{3,10}$/.test(formData.bankCode)) {
+      setFormErrors(prev => ({...prev, bankCode: "Invalid bank code format"}));
+      return;
+    }
+
+    // Validate account number format
+    if (!/^\d{10,20}$/.test(formData.accountNumber)) {
+      setFormErrors(prev => ({...prev, accountNumber: "Invalid account number format"}));
+      return;
+    }
+
     setIsResolving(true);
     try {
-      await resolveAccountName(formData.accountNumber, formData.bankCode);
+      await resolveAccountName(
+        formData.accountNumber.slice(0, 20), // Limit length
+        formData.bankCode.toUpperCase().slice(0, 10)
+      );
     } catch (error) {
       console.error("Failed to resolve account:", error);
     } finally {
@@ -115,6 +130,20 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 
     if (!validateForm()) return;
 
+    // Additional sanitization
+    const sanitizedAccountNumber = formData.accountNumber.replace(/\D/g, '');
+    const sanitizedBankCode = formData.bankCode.replace(/[^a-zA-Z0-9]/g, '');
+    
+    if (!sanitizedAccountNumber || sanitizedAccountNumber.length < 10) {
+      setFormErrors(prev => ({...prev, accountNumber: "Invalid account number"}));
+      return;
+    }
+
+    if (!sanitizedBankCode) {
+      setFormErrors(prev => ({...prev, bankCode: "Invalid bank code"}));
+      return;
+    }
+
     clearBankError();
     clearWithdrawalError();
 
@@ -123,9 +152,9 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
         quid,
         accessKey,
         amount,
-        accountNumber: formData.accountNumber,
-        bankCode: resolvedAccount?.bankCode!,
-        accountName: resolvedAccount?.accountName!
+        accountNumber: sanitizedAccountNumber,
+        bankCode: sanitizedBankCode,
+        accountName: formData.accountName.replace(/[^a-zA-Z\s]/g, '')
       });
       toast.success("Withdrawal request submitted successfully!");
       

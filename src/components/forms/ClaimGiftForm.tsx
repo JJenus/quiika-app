@@ -110,7 +110,7 @@ export const ClaimGiftForm: React.FC = () => {
 								Access Key:
 							</p>
 							<p className="text-lg font-mono text-text-primary dark:text-text-primary-dark break-all">
-								{claimResponse.accessKey}
+								{`${claimResponse.accessKey.slice(0, 6)}...${claimResponse.accessKey.slice(-4)}`}
 							</p>
 						</div>
 					)}

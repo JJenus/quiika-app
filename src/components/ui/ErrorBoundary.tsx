@@ -27,7 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="p-4 text-red-500">
           <h1>Something went wrong.</h1>
-          <p>{this.state.error?.message}</p>
+          <p>An unexpected error occurred. Please try again later.</p>
           <Button
             onClick={() => window.location.reload()}
             className="mt-4"
