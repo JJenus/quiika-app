@@ -82,7 +82,7 @@ export const ClaimGiftForm: React.FC<ClaimGiftFormProps> = ({
 		return (
 			<div className="card p-6 max-w-md mx-auto">
 				<div className="text-center mb-6">
-					<div className="bg-gradient-to-br from-success to-green-600 p-3 rounded-xl mx-auto w-fit mb-3">
+					<div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-xl mx-auto w-fit mb-3">
 						<Banknote className="h-8 w-8 text-white" />
 					</div>
 					<h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-2">
@@ -158,7 +158,7 @@ export const ClaimGiftForm: React.FC<ClaimGiftFormProps> = ({
 	return (
 		<div className="card p-6 max-w-md mx-auto">
 			<div className="text-center mb-6">
-				<div className="bg-gradient-to-br from-info to-primary p-3 rounded-xl mx-auto w-fit mb-3">
+				<div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-xl mx-auto w-fit mb-3">
 					<Search className="h-8 w-8 text-white" />
 				</div>
 				<h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-2">
@@ -190,6 +190,8 @@ export const ClaimGiftForm: React.FC<ClaimGiftFormProps> = ({
 						<input
 							type="text"
 							id="quid"
+							name="quid"
+							autoComplete="true"
 							value={formData.quid}
 							onChange={(e) =>
 								handleInputChange(

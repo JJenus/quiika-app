@@ -237,8 +237,8 @@ export const RuleManager: React.FC = () => {
     return (
       <div className="card p-6 max-w-2xl mx-auto">
         <div className="text-center">
-          <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full mx-auto w-fit mb-4">
-            <Settings className="h-8 w-8 text-green-600" />
+          <div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-full mx-auto w-fit mb-4">
+            <Settings className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-2">
             Rule {currentRule ? 'Updated' : 'Created'} Successfully!
@@ -260,7 +260,7 @@ export const RuleManager: React.FC = () => {
   return (
     <div className="card p-6 max-w-2xl mx-auto">
       <div className="text-center mb-6">
-        <div className="bg-gradient-to-br from-primary to-purple-600 p-3 rounded-xl mx-auto w-fit mb-3">
+        <div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-xl mx-auto w-fit mb-3">
           <Settings className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-2">

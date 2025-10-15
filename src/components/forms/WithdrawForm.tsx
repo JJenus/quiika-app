@@ -323,6 +323,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 						type="text"
 						id="accountNumber"
 						value={formData.accountNumber}
+            disabled={withdrawalLoading.isLoading}
 						onChange={(e) =>
 							handleInputChange(
 								"accountNumber",

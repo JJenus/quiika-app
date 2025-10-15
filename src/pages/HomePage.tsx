@@ -30,22 +30,26 @@ export const HomePage: React.FC = () => {
     {
       step: '01',
       title: 'Create Gift',
-      description: 'Set the amount, recipient, and any special rules for your gift.'
+      description: 'Set the amount, recipient, and any special rules for your gift.',
+      icon: Gift
     },
     {
       step: '02',
       title: 'Make Payment',
-      description: 'Secure payment through Paystack with multiple payment options.'
+      description: 'Secure payment through Paystack with multiple payment options.',
+      icon: Shield
     },
     {
       step: '03',
       title: 'Share QUID',
-      description: 'Share the unique gift code (QUID) with your recipient.'
+      description: 'Share the unique gift code (QUID) with your recipient.',
+      icon: Users
     },
     {
       step: '04',
       title: 'Claim & Withdraw',
-      description: 'Recipients can claim and withdraw their gifts instantly.'
+      description: 'Recipients can claim and withdraw their gifts instantly.',
+      icon: Zap
     }
   ];
 
@@ -102,11 +106,11 @@ export const HomePage: React.FC = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="card p-6 text-center hover:scale-105 transition-all duration-300 animate-fade-in"
+                className="card p-6 text-center hover:scale-105 transition-all duration-300 animate-fade-in group hover:shadow-strong"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-4 rounded-xl mx-auto w-fit mb-4">
-                  <feature.icon className="h-8 w-8 text-primary" />
+                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-4 rounded-xl mx-auto w-fit mb-4 group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
+                  <feature.icon className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-300" />
                 </div>
                 <h3 className="text-xl font-semibold text-text-primary dark:text-text-primary-dark mb-3">
                   {feature.title}
@@ -132,30 +136,41 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Steps Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {steps.map((step, index) => (
               <div 
                 key={index}
-                className="relative"
+                className="group"
               >
-                <div className="card p-6 text-center animate-slide-up"
+                {/* Step Card */}
+                <div className="card p-6 text-center h-full flex flex-col transition-all duration-300 animate-slide-up group-hover:shadow-strong group-hover:scale-105 group-hover:border-primary/20 dark:group-hover:border-primary/40"
                      style={{ animationDelay: `${index * 150}ms` }}>
-                  <div className="bg-gradient-to-br from-primary to-secondary text-white p-4 rounded-xl mx-auto w-fit mb-4 font-bold text-lg">
-                    {step.step}
+                  {/* Step Number with Icon */}
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="bg-gradient-to-br from-primary to-secondary text-white p-3 rounded-xl font-bold text-lg min-w-12">
+                      {step.step}
+                    </div>
+                    <div className="bg-gradient-to-br from-primary/10 to-secondary/10 p-2 rounded-lg group-hover:from-primary/20 group-hover:to-secondary/20 transition-all duration-300">
+                      <step.icon className="h-6 w-6 text-primary group-hover:scale-110 transition-transform duration-300" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-text-primary dark:text-text-primary-dark mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-text-secondary dark:text-text-secondary-dark">
-                    {step.description}
-                  </p>
+                  
+                  {/* Content */}
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="text-xl font-semibold text-text-primary dark:text-text-primary-dark mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-text-secondary dark:text-text-secondary-dark flex-1">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  {/* Hover Indicator */}
+                  <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-8 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto"></div>
+                  </div>
                 </div>
-                
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight className="h-6 w-6 text-primary" />
-                  </div>
-                )}
               </div>
             ))}
           </div>
