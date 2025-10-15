@@ -1,5 +1,5 @@
 // components/forms/ClaimGiftForm.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Lock, Eye, EyeOff, Banknote } from "lucide-react";
 import { useQuidStore } from "../../stores/useQuidStore";
 import { ErrorMessage } from "../ui/ErrorMessage";
@@ -7,9 +7,17 @@ import { Button } from "../ui/Button";
 import { WithdrawForm } from "./WithdrawForm";
 import type { ClaimGiftForm as ClaimForm } from "../../types/api";
 
-export const ClaimGiftForm: React.FC = () => {
+interface ClaimGiftFormProps {
+	initialQuid?: string;
+	autoSubmit?: boolean;
+}
+
+export const ClaimGiftForm: React.FC<ClaimGiftFormProps> = ({
+	initialQuid = "",
+	autoSubmit = false,
+}) => {
 	const [formData, setFormData] = useState<ClaimForm>({
-		quid: "",
+		quid: initialQuid,
 		password: "",
 	});
 	const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +32,13 @@ export const ClaimGiftForm: React.FC = () => {
 		claimResponse,
 		clearQuid,
 	} = useQuidStore();
+
+	useEffect(() => {
+		if (autoSubmit && initialQuid && initialQuid.length === 13) {
+			// auto-submit only if valid
+			verifyQuidClaim(initialQuid.trim());
+		}
+	}, [autoSubmit, initialQuid]);
 
 	const validateForm = (): boolean => {
 		const errors: Record<string, string> = {};
@@ -110,7 +125,10 @@ export const ClaimGiftForm: React.FC = () => {
 								Access Key:
 							</p>
 							<p className="text-lg font-mono text-text-primary dark:text-text-primary-dark break-all">
-								{`${claimResponse.accessKey.slice(0, 6)}...${claimResponse.accessKey.slice(-4)}`}
+								{`${claimResponse.accessKey.slice(
+									0,
+									6
+								)}...${claimResponse.accessKey.slice(-4)}`}
 							</p>
 						</div>
 					)}
