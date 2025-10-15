@@ -12,6 +12,8 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorMessage } from "../ui/ErrorMessage";
 import toast from "react-hot-toast";
 import type { Bank as BankType } from "../../types/api";
+import { Modal } from "../ui/Modal";
+import { Button } from "../ui/Button";
 
 interface WithdrawFormProps {
 	quid: string;
@@ -37,6 +39,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 	const [isResolving, setIsResolving] = useState(false);
 	const [bankSearch, setBankSearch] = useState("");
 	const [isBankDropdownOpen, setIsBankDropdownOpen] = useState(false);
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const bankSelectRef = useRef<HTMLDivElement>(null);
 
 	const {
@@ -144,10 +147,15 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 		return Object.keys(errors).length === 0;
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		if (validateForm()) {
+			setIsConfirmationModalOpen(true);
+		}
+	};
 
-		if (!validateForm()) return;
+	const handleConfirmWithdrawal = async () => {
+		setIsConfirmationModalOpen(false);
 
 		// Additional sanitization
 		const sanitizedAccountNumber = formData.accountNumber.replace(
@@ -234,27 +242,41 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 		bank.name.toLowerCase().includes(bankSearch.toLowerCase())
 	);
 
+	const WITHDRAWAL_FEE_PERCENTAGE = 0.03; // 3%
+	const feeAmount = amount * WITHDRAWAL_FEE_PERCENTAGE;
+	const netAmount = amount - feeAmount;
+	const selectedBank = banks.find((b) => b.code === formData.bankCode);
+
 	return (
 		<div className="space-y-6">
 			{/* Transaction Summary */}
-			<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+			<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
 				<div className="flex justify-between items-center">
-					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-						Amount to withdraw:
+					<span className="text-sm text-text-primary dark:text-text-primary-dark">
+						Amount to withdraw
 					</span>
-					<span className="text-lg font-bold text-primary dark:text-primary-light">
+					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
 						{formatCurrency(amount)}
 					</span>
 				</div>
 				<div className="flex justify-between items-center">
-					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
-						Fee:
+					<span className="text-sm text-text-primary dark:text-text-primary-dark">
+						Withdrawal Fee (3%)
 					</span>
-					<span className="text-lg font-bold text-primary dark:text-primary-light">
-						{formatCurrency(amount * 0.03)}
+					<span className="text-sm font-medium text-text-primary dark:text-text-primary-dark">
+						- {formatCurrency(feeAmount)}
 					</span>
 				</div>
-				<div className="mt-2 text-xs text-text-secondary dark:text-text-secondary-dark">
+				<div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
+				<div className="flex justify-between items-center">
+					<span className="text-sm font-bold text-text-primary dark:text-text-primary-dark">
+						You will receive
+					</span>
+					<span className="text-lg font-bold text-primary dark:text-primary-light">
+						{formatCurrency(netAmount)}
+					</span>
+				</div>
+				<div className="pt-1 text-xs text-text-secondary dark:text-text-secondary-dark text-right">
 					QUID: {quid}
 				</div>
 			</div>
@@ -395,62 +417,24 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 					)}
 				</div>
 
-				<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-					
-					<div className="mb-2 text-xs text-text-secondary dark:text-text-secondary-dark">
-						Donate to help better the platform
-					</div>
-
-          <label
-						htmlFor="accountName"
-						className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
-					>
-						Amount
-					</label>
-					<div className="relative">
-						<input
-							type="text"
-							id="accountName"
-							value={formData.accountName}
-							readOnly
-							className={`input-field bg-gray-50 dark:bg-gray-800 ${
-								formErrors.accountName ? "border-red-500" : ""
-							}`}
-							placeholder="Account name will appear here"
-						/>
-						{isResolving && (
-							<div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-								<LoadingSpinner size="sm" />
-							</div>
-						)}
-						{formData.accountName && !isResolving && (
-							<CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
-						)}
-					</div>
-					{formErrors.accountName && (
-						<p className="mt-1 text-sm text-red-600 dark:text-red-400">
-							{formErrors.accountName}
-						</p>
-					)}
-				</div>
-
 				<div className="flex gap-3 pt-4">
-					<button
+					<Button
 						type="button"
 						onClick={onCancel}
-						className="flex-1 btn-secondary py-2.5"
+						variant="outline"
+						className="flex-1"
 					>
 						<ArrowLeft className="h-4 w-4 mr-1 inline" />
 						Back
-					</button>
-					<button
+					</Button>
+					<Button
 						type="submit"
 						disabled={
 							bankLoading.isLoading ||
 							withdrawalLoading.isLoading ||
 							isResolving
 						}
-						className="flex-1 btn-primary py-2.5"
+						className="flex-1"
 					>
 						{bankLoading.isLoading ||
 						withdrawalLoading.isLoading ? (
@@ -461,9 +445,81 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 								Withdraw Funds
 							</>
 						)}
-					</button>
+					</Button>
 				</div>
 			</form>
+
+			<Modal
+				isOpen={isConfirmationModalOpen}
+				onClose={() => setIsConfirmationModalOpen(false)}
+				title="Confirm Withdrawal Details"
+			>
+				<div className="space-y-4">
+					<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
+						Please review and confirm the details below before
+						proceeding.
+					</p>
+					<div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-3">
+						<div className="flex justify-between">
+							<span className="font-medium text-text-primary dark:text-text-primary-dark">
+								Bank
+							</span>
+							<span>{selectedBank?.name}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="font-medium text-text-primary dark:text-text-primary-dark">
+								Account Number
+							</span>
+							<span>{formData.accountNumber}</span>
+						</div>
+						<div className="flex justify-between">
+							<span className="font-medium text-text-primary dark:text-text-primary-dark">
+								Account Name
+							</span>
+							<span>{formData.accountName}</span>
+						</div>
+					</div>
+					<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
+						<div className="flex justify-between items-center">
+							<span className="text-sm">Amount to withdraw</span>
+							<span className="font-medium">
+								{formatCurrency(amount)}
+							</span>
+						</div>
+						<div className="flex justify-between items-center">
+							<span className="text-sm">Fee</span>
+							<span className="font-medium">
+								- {formatCurrency(feeAmount)}
+							</span>
+						</div>
+						<div className="border-t border-gray-300 dark:border-gray-700 my-1"></div>
+						<div className="flex justify-between items-center">
+							<span className="font-bold">You will receive</span>
+							<span className="font-bold text-lg text-primary">
+								{formatCurrency(netAmount)}
+							</span>
+						</div>
+					</div>
+					<div className="flex gap-3 pt-2">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setIsConfirmationModalOpen(false)}
+							className="flex-1"
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							onClick={handleConfirmWithdrawal}
+							loading={withdrawalLoading.isLoading}
+							className="flex-1"
+						>
+							Confirm &amp; Proceed
+						</Button>
+					</div>
+				</div>
+			</Modal>
 
 			<div className="text-center">
 				<p className="text-xs text-text-secondary dark:text-text-secondary-dark">
