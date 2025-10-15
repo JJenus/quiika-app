@@ -58,8 +58,8 @@ export const useBankStore = create<BankStore>((set) => ({
 	resolveAccountName: async (accountNumber, bankCode) => {
 		if (import.meta.env.VITE_TEST_ENV === "yes") {
 			const data = {
-				accountNumber: "3029534236",
-				bankCode: "001",
+				accountNumber: "9033915161",
+				bankCode: "999992",
 				accountName: "Test Account Name",
 			};
 

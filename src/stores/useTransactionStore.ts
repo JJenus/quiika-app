@@ -44,7 +44,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 		try {
 			const paymentData = {
 				...data,
-				authorizationUrl: `${window.location.origin}/payment/callback`,
+				callback_url: `${window.location.origin}/payment/callback`,
 			};
 
 			const response = await paystackAPI.initializePayment(paymentData);
@@ -79,6 +79,7 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 		});
 
 		try {
+			data.authorizationUrl = `${window.location.origin}/payment/callback`;
 			const response = await transactionAPI.initTransaction(data);
 
 			if (response.data.status) {
