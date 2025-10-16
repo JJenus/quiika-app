@@ -22,6 +22,8 @@ import { RulesPage } from "./pages/RulesPage";
 import { TermsConditionsPage } from "./pages/TermsConditionsPage";
 import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 import { RouteSEO } from "./components/seo/RouteSEO";
+import { AdminLayout } from "./components/layout/admin/AdminLayout";
+import { ComingSoon } from "./pages/admin/ComingSoon";
 
 const PublicLayout = () => (
 	<Layout>
@@ -60,6 +62,10 @@ function App() {
 						<Route path="/cookies" element={<CookiePolicyPage />} />
 					</Route>
 
+					<Route path="/admin" element={<AdminLayout />}>
+						<Route path="dashboard" element={<ComingSoon />} />
+						<Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+					</Route>
 
 					{/* Redirect any unknown routes to home */}
 					<Route path="*" element={<Navigate to="/" replace />} />

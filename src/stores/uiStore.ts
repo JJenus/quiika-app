@@ -1,114 +1,134 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface Modal {
-  id: string;
-  component: string;
-  props?: Record<string, any>;
+	id: string;
+	component: string;
+	props?: Record<string, any>;
 }
 
 interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  message: string;
-  duration?: number;
+	id: string;
+	type: "success" | "error" | "warning" | "info";
+	message: string;
+	duration?: number;
 }
 
 interface UIState {
-  modals: Modal[];
-  toasts: Toast[];
-  loadingOverlay: boolean;
-  darkMode: boolean;
-  sidebar: {
-    collapsed: boolean;
-    mobileOpen: boolean;
-  };
+	modals: Modal[];
+	toasts: Toast[];
+	loadingOverlay: boolean;
+	darkMode: boolean;
+	sidebar: {
+		collapsed: boolean;
+		mobileOpen: boolean;
+	};
+
+	sidebarOpen: boolean;
+	sidebarCollapsed: boolean;
+	currentPage: string;
 }
 
 interface UIActions {
-  showModal: (component: string, props?: Record<string, any>) => string;
-  hideModal: (id: string) => void;
-  hideAllModals: () => void;
-  pushToast: (toast: Omit<Toast, 'id'>) => string;
-  removeToast: (id: string) => void;
-  setLoadingOverlay: (loading: boolean) => void;
+	showModal: (component: string, props?: Record<string, any>) => string;
+	hideModal: (id: string) => void;
+	hideAllModals: () => void;
+	pushToast: (toast: Omit<Toast, "id">) => string;
+	removeToast: (id: string) => void;
+	setLoadingOverlay: (loading: boolean) => void;
+
+	setSidebarOpen: (open: boolean) => void;
+	setSidebarCollapsed: (collapsed: boolean) => void;
+	toggleSidebarCollapsed: () => void;
+	toggleDarkMode: () => void;
+  setCurrentPage: (page: string) => void;
+
 }
 
 type UIStore = UIState & UIActions;
 
 export const useUIStore = create<UIStore>()((set, get) => ({
-  // State
-  modals: [],
-  toasts: [],
-  loadingOverlay: false,
-  darkMode: localStorage.getItem('darkMode') === 'true',
-  sidebar: {
-    collapsed: localStorage.getItem('sidebarCollapsed') === 'true',
-    mobileOpen: false,
-  },
+	// State
+	modals: [],
+	toasts: [],
+	loadingOverlay: false,
+	darkMode: localStorage.getItem("darkMode") === "true",
+	sidebar: {
+		collapsed: localStorage.getItem("sidebarCollapsed") === "true",
+		mobileOpen: false,
+	},
+	sidebarOpen: false,
+	sidebarCollapsed: false,
+  currentPage: "Dashboard",
 
-  // Actions
-  showModal: (component: string, props = {}) => {
-    const id = crypto.randomUUID();
-    const modal: Modal = { id, component, props };
-    
-    set((state) => ({
-      modals: [...state.modals, modal],
-    }));
+	// Actions
+	showModal: (component: string, props = {}) => {
+		const id = crypto.randomUUID();
+		const modal: Modal = { id, component, props };
 
-    return id;
-  },
+		set((state) => ({
+			modals: [...state.modals, modal],
+		}));
 
-  hideModal: (id: string) => {
-    set((state) => ({
-      modals: state.modals.filter((modal) => modal.id !== id),
-    }));
-  },
+		return id;
+	},
 
-  hideAllModals: () => {
-    set({ modals: [] });
-  },
+	hideModal: (id: string) => {
+		set((state) => ({
+			modals: state.modals.filter((modal) => modal.id !== id),
+		}));
+	},
 
-  pushToast: (toast) => {
-    const id = crypto.randomUUID();
-    const fullToast: Toast = { ...toast, id };
-    
-    set((state) => ({
-      toasts: [...state.toasts, fullToast],
-    }));
+	hideAllModals: () => {
+		set({ modals: [] });
+	},
 
-    // Auto-remove toast after duration (default 5 seconds)
-    const duration = toast.duration || 5000;
-    setTimeout(() => {
-      get().removeToast(id);
-    }, duration);
+	pushToast: (toast) => {
+		const id = crypto.randomUUID();
+		const fullToast: Toast = { ...toast, id };
 
-    return id;
-  },
+		set((state) => ({
+			toasts: [...state.toasts, fullToast],
+		}));
 
-  removeToast: (id: string) => {
-    set((state) => ({
-      toasts: state.toasts.filter((toast) => toast.id !== id),
-    }));
-  },
+		// Auto-remove toast after duration (default 5 seconds)
+		const duration = toast.duration || 5000;
+		setTimeout(() => {
+			get().removeToast(id);
+		}, duration);
 
-  setLoadingOverlay: (loading: boolean) => {
-    set({ loadingOverlay: loading });
-  },
+		return id;
+	},
 
-  toggleDarkMode: () => {
-    set((state) => {
-      const newDarkMode = !state.darkMode;
-      localStorage.setItem('darkMode', newDarkMode.toString());
-      
-      // Update document class for Tailwind dark mode
-      if (newDarkMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+	removeToast: (id: string) => {
+		set((state) => ({
+			toasts: state.toasts.filter((toast) => toast.id !== id),
+		}));
+	},
 
-      return { darkMode: newDarkMode };
-    });
-  },
-  
+	setLoadingOverlay: (loading: boolean) => {
+		set({ loadingOverlay: loading });
+	},
+
+	toggleDarkMode: () => {
+		set((state) => {
+			const newDarkMode = !state.darkMode;
+			localStorage.setItem("darkMode", newDarkMode.toString());
+
+			// Update document class for Tailwind dark mode
+			if (newDarkMode) {
+				document.documentElement.classList.add("dark");
+			} else {
+				document.documentElement.classList.remove("dark");
+			}
+
+			return { darkMode: newDarkMode };
+		});
+	},
+
+  setCurrentPage: (page) => set({ currentPage: page }),
+
+	setSidebarOpen: (open) => set({ sidebarOpen: open }),
+	setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+	toggleSidebarCollapsed: () =>
+		set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 }));
