@@ -1,6 +1,7 @@
 import React from "react";
 import { Menu, Bell, User } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
+import useAuthStore from "../../../stores/useAuthStore";
 import { ThemeToggle } from "../../ui/ThemeToggle";
 import { Button } from "../../ui/Button";
 
@@ -12,6 +13,7 @@ export const Header: React.FC = () => {
 		setSidebarOpen,
 		toggleSidebarCollapsed,
 	} = useUIStore();
+	const { user } = useAuthStore();
 
 	const unreadCount = toasts.length;
 
@@ -64,7 +66,7 @@ export const Header: React.FC = () => {
 						<User className="h-4 w-4 text-white" />
 					</div>
 					<span className="text-sm font-medium text-gray-700 hidden sm:block">
-						Admin
+						{user?.firstName || 'Admin'}
 					</span>
 				</div>
 			</div>

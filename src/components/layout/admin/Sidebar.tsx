@@ -12,20 +12,23 @@ import {
 	Banknote,
 	Users,
 	Gavel,
+	DollarSign,
 } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
+import useAuthStore from "../../../stores/useAuthStore";
 import { Logo } from "../../ui/Logo";
 import { Button } from "../../ui/Button";
 import { Link } from "react-router-dom";
 
 const menuItems = [
 	{ id: "/admin/dashboard", label: "Dashboard", icon: Home },
+	{ id: "/admin/financial", label: "Financial", icon: DollarSign },
 	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
 	{ id: "/admin/withdrawals", label: "Withdrawals", icon: Banknote },
 	{ id: "/admin/rules", label: "Rules Engine", icon: Gavel },
-	{ id: "/admin/users", label: "User Management", icon: Users },
-	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus },
+	{ id: "/admin/users", label: "User Management", icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
+	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus, roles: ['SUPER_ADMIN', 'ADMIN'] },
 	{ id: "/admin/reports", label: "Reports", icon: FileDown },
 ];
 
@@ -38,6 +41,17 @@ export const Sidebar: React.FC = () => {
 		toggleSidebarCollapsed,
 		setSidebarOpen,
 	} = useUIStore();
+	const { user, logout } = useAuthStore();
+
+	const handleLogout = () => {
+		logout();
+	};
+
+	const canAccessMenuItem = (item: any) => {
+		if (!item.roles) return true;
+		if (!user) return false;
+		return item.roles.includes(user.role);
+	};
 
 	return (
 		<>
@@ -89,7 +103,7 @@ export const Sidebar: React.FC = () => {
 				</div>
 
 				<nav className="p-3 space-y-1">
-					{menuItems.map((item) => {
+					{menuItems.filter(canAccessMenuItem).map((item) => {
 						const Icon = item.icon;
 						const isActive = currentPage === item.label;
 
@@ -158,9 +172,7 @@ export const Sidebar: React.FC = () => {
 					<div className="mb-10">
 						<Button
 							variant="primary"
-							onClick={() => {
-								console.log("Logout");
-							}}
+							onClick={handleLogout}
 							className={`
 								w-full flex items-center rounded-lg text-left transition-colors group
 								${sidebarCollapsed ? "justify-center p-3" : "justify-start gap-3 px-3 py-2.5"}

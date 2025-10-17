@@ -22,12 +22,17 @@ import { RulesPage } from "./pages/RulesPage";
 import { TermsConditionsPage } from "./pages/TermsConditionsPage";
 import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 import { RouteSEO } from "./components/seo/RouteSEO";
+import { LoginPage } from "./pages/admin/LoginPage";
+import { DashboardPage } from "./pages/admin/DashboardPage";
+import { FinancialPage } from "./pages/admin/FinancialPage";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AdminLayout } from "./components/layout/admin/AdminLayout";
 import { ComingSoon } from "./pages/admin/ComingSoon";
 import { QuidManagementPage } from "./pages/admin/QuidManagementPage"; 
 import { UserManagementPage } from "./pages/admin/UserManagementPage";
 import { RulesEnginePage } from "./pages/admin/RulesEnginePage";
 import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";
+import useAuthStore from "./stores/useAuthStore";
 
 const PublicLayout = () => (
 	<Layout>
@@ -38,10 +43,12 @@ const PublicLayout = () => (
 
 function App() {
 	const { initializeTheme } = useThemeStore();
+	const { initializeAuth } = useAuthStore();
 
 	useEffect(() => {
 		initializeTheme();
-	}, [initializeTheme]);
+		initializeAuth();
+	}, [initializeTheme, initializeAuth]);
 
 	return (
 		<Router>
@@ -66,16 +73,25 @@ function App() {
 						<Route path="/cookies" element={<CookiePolicyPage />} />
 					</Route>
 
+					{/* Admin Login Route */}
+					<Route path="/admin/login" element={<LoginPage />} />
+
+					{/* Protected Admin Routes */}
 					<Route path="/admin" element={<AdminLayout />}>
-						<Route path="dashboard" element={<ComingSoon />} />
-						<Route path="quids" element={<QuidManagementPage />} />
-						<Route path="transactions" element={<ComingSoon />} />
-						<Route path="withdrawals" element={<WithdrawalsPage />} />
-						<Route path="rules" element={<RulesEnginePage />} />
-						<Route path="users" element={<UserManagementPage />} />
-						<Route path="invite-user" element={<ComingSoon />} />
-						<Route path="workload" element={<ComingSoon />} />
-						<Route path="reports" element={<ComingSoon />} />
+						<Route element={<ProtectedRoute />}>
+							<Route path="dashboard" element={<DashboardPage />} />
+							<Route path="financial" element={<FinancialPage />} />
+							<Route path="quids" element={<QuidManagementPage />} />
+							<Route path="transactions" element={<ComingSoon />} />
+							<Route path="withdrawals" element={<WithdrawalsPage />} />
+							<Route path="rules" element={<RulesEnginePage />} />
+							<Route element={<ProtectedRoute requiredRoles={['SUPER_ADMIN', 'ADMIN']} />}>
+								<Route path="users" element={<UserManagementPage />} />
+								<Route path="invite-user" element={<ComingSoon />} />
+							</Route>
+							<Route path="workload" element={<ComingSoon />} />
+							<Route path="reports" element={<ComingSoon />} />
+						</Route>
 						<Route
 							path="*"
 							element={<Navigate to="/admin/dashboard" replace />}
