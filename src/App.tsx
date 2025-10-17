@@ -24,7 +24,7 @@ import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 import { RouteSEO } from "./components/seo/RouteSEO";
 import { AdminLayout } from "./components/layout/admin/AdminLayout";
 import { ComingSoon } from "./pages/admin/ComingSoon";
-import { QuidManagementPage } from "./pages/admin/QuidManagementPage";
+import { QuidManagementPage } from "./pages/admin/QuidManagementPage"; 
 import { UserManagementPage } from "./pages/admin/UserManagementPage";
 import { RulesEnginePage } from "./pages/admin/RulesEnginePage";
 import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";

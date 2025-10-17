@@ -26,7 +26,6 @@ const menuItems = [
 	{ id: "/admin/rules", label: "Rules Engine", icon: Gavel },
 	{ id: "/admin/users", label: "User Management", icon: Users },
 	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus },
-	{ id: "/admin/workload", label: "Workload", icon: BarChart3 },
 	{ id: "/admin/reports", label: "Reports", icon: FileDown },
 ];
 
@@ -97,6 +96,7 @@ export const Sidebar: React.FC = () => {
 						return (
 							<Link
 								to={item.id}
+								key={item.id}
 								onClick={() => {
 									setCurrentPage(item.label);
 									setSidebarOpen(false);
