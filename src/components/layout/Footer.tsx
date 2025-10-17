@@ -75,6 +75,14 @@ export const Footer: React.FC = () => {
                   Help & Support
                 </Link>
               </li>
+              <li>
+                <Link 
+                  to="/admin/dashboard" 
+                  className="text-text-secondary dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary-light transition-colors duration-200"
+                >
+                  Manage
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -1,2 +1,2 @@
-1. Withdrawal fee Implementation
-2. Account details and amount confirmation modal
+1. Withdrawal fee Implementation (partial)
+2. Account details and amount confirmation modal (done)

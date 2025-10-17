@@ -1,8 +1,8 @@
 import React from "react";
 import { Menu, Bell, User } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
-import { Logo } from "../../ui/Logo";
 import { ThemeToggle } from "../../ui/ThemeToggle";
+import { Button } from "../../ui/Button";
 
 export const Header: React.FC = () => {
 	const {
@@ -16,36 +16,40 @@ export const Header: React.FC = () => {
 	const unreadCount = toasts.length;
 
 	return (
-		<header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+		<header className="bg-surface dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 backdrop-blur-md bg-opacity-95 dark:bg-opacity-95 sticky top-0 z-50 shadow-sm px-4 py-3 flex items-center justify-between">
 			<div className="flex items-center gap-4">
-				<button
+				<Button
+					variant="ghost"
 					onClick={() => setSidebarOpen(!sidebarOpen)}
-					className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden"
+					className="p-2 hover:bg-gray-100 px-2 py-2 rounded-lg transition-colors md:hidden"
 				>
 					<Menu />
-				</button>
+				</Button>
 
 				{/* Desktop collapse button */}
-				<button
+				<Button
+					variant="ghost"
 					onClick={toggleSidebarCollapsed}
-					className="hidden md:block p-3 hover:bg-gray-100 rounded-lg transition-colors"
+					className="hidden md:block px-2 py-3 rounded-lg"
 				>
 					<Menu className="h-5 w-5" />
-				</button>
+				</Button>
 
 				<div className="flex items-center gap-3">
 					{/* <Logo /> */}
 					<div>
-						<h1 className="text-xl font-semibold text-gray-900">
+						<h1 className="text-xl font-semibold text-text-primary dark:text-text-primary-dark">
 							{currentPage}
 						</h1>
-						<p className="text-sm text-gray-500">Manage Quiika</p>
+						<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
+							Manage Quiika
+						</p>
 					</div>
 				</div>
 			</div>
 
 			<div className="flex items-center gap-3">
-				<ThemeToggle />
+				<ThemeToggle switchOnMobile={true} />
 				<button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
 					<Bell className="h-5 w-5 text-gray-600" />
 					{unreadCount > 0 && (
