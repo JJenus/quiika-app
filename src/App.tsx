@@ -24,6 +24,10 @@ import { CookiePolicyPage } from "./pages/CookiePolicyPage";
 import { RouteSEO } from "./components/seo/RouteSEO";
 import { AdminLayout } from "./components/layout/admin/AdminLayout";
 import { ComingSoon } from "./pages/admin/ComingSoon";
+import { QuidManagementPage } from "./pages/admin/QuidManagementPage";
+import { UserManagementPage } from "./pages/admin/UserManagementPage";
+import { RulesEnginePage } from "./pages/admin/RulesEnginePage";
+import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";
 
 const PublicLayout = () => (
 	<Layout>
@@ -64,7 +68,18 @@ function App() {
 
 					<Route path="/admin" element={<AdminLayout />}>
 						<Route path="dashboard" element={<ComingSoon />} />
-						<Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+						<Route path="quids" element={<QuidManagementPage />} />
+						<Route path="transactions" element={<ComingSoon />} />
+						<Route path="withdrawals" element={<WithdrawalsPage />} />
+						<Route path="rules" element={<RulesEnginePage />} />
+						<Route path="users" element={<UserManagementPage />} />
+						<Route path="invite-user" element={<ComingSoon />} />
+						<Route path="workload" element={<ComingSoon />} />
+						<Route path="reports" element={<ComingSoon />} />
+						<Route
+							path="*"
+							element={<Navigate to="/admin/dashboard" replace />}
+						/>
 					</Route>
 
 					{/* Redirect any unknown routes to home */}
