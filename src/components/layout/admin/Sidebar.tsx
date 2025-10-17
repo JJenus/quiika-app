@@ -1,19 +1,5 @@
 import React from "react";
-import {
-	BarChart3,
-	FileDown,
-	RefreshCw,
-	Home,
-	UserPlus,
-	ChevronLeft,
-	ChevronRight,
-	DoorOpen,
-	Gift,
-	Banknote,
-	Users,
-	Gavel,
-	DollarSign,
-} from "lucide-react";
+import { ChartBar as BarChart3, FileDown, RefreshCw, Hop as Home, UserPlus, ChevronLeft, ChevronRight, DoorOpen, Gift, Banknote, Users, Gavel, DollarSign } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
 import useAuthStore from "../../../stores/useAuthStore";
 import { Logo } from "../../ui/Logo";
