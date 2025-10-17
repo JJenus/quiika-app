@@ -8,6 +8,10 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	DoorOpen,
+	Gift,
+	Banknote,
+	Users,
+	Gavel,
 } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
 import { Logo } from "../../ui/Logo";
@@ -16,8 +20,12 @@ import { Link } from "react-router-dom";
 
 const menuItems = [
 	{ id: "/admin/dashboard", label: "Dashboard", icon: Home },
-	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus },
+	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
+	{ id: "/admin/withdrawals", label: "Withdrawals", icon: Banknote },
+	{ id: "/admin/rules", label: "Rules Engine", icon: Gavel },
+	{ id: "/admin/users", label: "User Management", icon: Users },
+	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus },
 	{ id: "/admin/workload", label: "Workload", icon: BarChart3 },
 	{ id: "/admin/reports", label: "Reports", icon: FileDown },
 ];
