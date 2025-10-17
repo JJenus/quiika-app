@@ -1,15 +1,5 @@
 import React, { useEffect } from 'react';
-import { 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  Activity,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  CheckCircle,
-  AlertTriangle
-} from 'lucide-react';
+import { Users, DollarSign, TrendingUp, Activity, ArrowUpRight, ArrowDownRight, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from 'lucide-react';
 import { useAdminStore } from '../../stores/useAdminStore';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { ErrorMessage } from '../../components/ui/ErrorMessage';

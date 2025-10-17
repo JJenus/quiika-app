@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart,
-  BarChart3,
-  Download,
-  Calendar,
-  Filter
-} from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, ChartPie as PieChart, ChartBar as BarChart3, Download, Calendar, ListFilter as Filter } from 'lucide-react';
 import { useAdminStore } from '../../stores/useAdminStore';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { ErrorMessage } from '../../components/ui/ErrorMessage';
