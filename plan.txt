@@ -1,86 +1,125 @@
-# Admin & Role-Based Access Control (RBAC) Implementation Plan
+Plan: Professional Admin QUID and Transaction Management Pages Implementation
 
-This document outlines the plan for adding a comprehensive, role-based admin management portal to the application.
+1. Data Layer Enhancement
+Extend the API types in types/api.ts to include comprehensive QUID and transaction admin interfaces with pagination, filtering, and sorting parameters
+Create new admin-specific API endpoints in lib/api.ts for QUID management operations including bulk actions, status updates, and detailed analytics
+Add transaction management API endpoints supporting advanced filtering by status, date range, amount range, and user information
+Define TypeScript interfaces for filter options, sort configurations, and bulk operation responses
+Add API endpoints for exporting data in CSV and JSON formats
+2. Store Implementation
+Enhance useAdminStore.ts with dedicated QUID management state including list data, filters, pagination, and selected items
+Add transaction management state with similar structure supporting multi-column sorting and advanced search
+Implement actions for fetching paginated QUID lists with filters for status, date ranges, amount ranges, and search queries
+Create actions for individual QUID operations including view details, update status, block/unblock, and delete
+Add bulk operations actions for QUIDs supporting multi-select status updates and bulk blocking
+Implement transaction fetching with server-side pagination, filtering by multiple criteria, and sorting
+Add transaction detail view action with full transaction chain and related QUID information
+Create actions for transaction operations including refunds, status updates, and flagging suspicious activity
+Implement real-time data refresh mechanism using polling or SSE integration
+Add export functionality actions for generating reports in various formats
+3. QUID Management Page Components
+Create QuidManagementPage.tsx as the main container with responsive grid layout
+Build a comprehensive filter panel component with status checkboxes, date range pickers, amount range sliders, and currency selectors
+Implement a search bar component with debounced input and advanced search options
+Create a data table component with sortable columns for QUID ID, amount, currency, status, creation date, and actions
+Add pagination controls with page size selector and jump-to-page functionality
+Build QUID detail modal showing complete information including rules, splits, claims, and transaction history
+Create status update modal with confirmation dialogs and reason input for blocking
+Implement bulk actions toolbar appearing when items are selected
+Add statistics cards showing total QUIDs, active count, blocked count, and total value
+Create export button with format selection dropdown
+4. QUID Table Features
+Implement multi-column sorting with visual indicators for sort direction
+Add row selection with individual checkboxes and select-all functionality
+Create inline status badges with color coding matching light and dark mode themes
+Add quick action buttons for each row including view, edit, block, and delete
+Implement expandable rows showing summary information before opening full modal
+Add loading skeletons for smooth data fetching experience
+Create empty state component with helpful messaging and quick action suggestions
+Implement error boundary for graceful error handling
+Add sticky header that remains visible during scrolling
+5. Transaction Management Page Components
+Create comprehensive admin transaction page at /admin/transactions replacing the coming soon placeholder
+Build advanced filter sidebar with collapsible sections for status, date, amount, currency, and email filters
+Implement transaction table with columns for ID, QUID reference, email, amount, currency, status, date, and actions
+Add transaction detail panel sliding in from right showing complete transaction data including payment gateway response
+Create timeline view showing transaction lifecycle from initialization to completion
+Build refund processing modal with amount input and reason selection
+Implement transaction flagging system with severity levels and notes
+Add related transactions viewer showing all transactions for a specific QUID
+Create analytics dashboard section with charts for transaction volume, success rates, and revenue trends
+6. Transaction Table Features
+Implement advanced filtering with multi-select dropdowns for status and currency
+Add date range picker with preset options like today, this week, this month, custom range
+Create amount range filter with min/max inputs and validation
+Implement email search with fuzzy matching and suggestions
+Add status badges with appropriate colors and icons for all transaction states
+Create action menu for each transaction with options based on current status
+Implement transaction details modal with tabbed interface for overview, payment details, and logs
+Add quick filters as clickable tags above the table
+Create refresh button with last updated timestamp display
+7. Shared UI Components
+Build a reusable DataTable component supporting generic data types with TypeScript generics
+Create FilterPanel component accepting configuration for different filter types
+Implement StatusBadge component with consistent styling across all status types
+Build ExportButton component with progress indicator during export generation
+Create BulkActionsBar component appearing at top of table when items selected
+Implement DateRangePicker component with calendar interface and preset ranges
+Build AmountRangeSlider component with dual handles and formatted display
+Create ConfirmationDialog component for destructive actions with customizable messaging
+Implement DetailDrawer component sliding from right with smooth animations
+Build EmptyState component with customizable icons, messages, and action buttons
+8. Light and Dark Mode Support
+Ensure all new components use Tailwind's dark mode classes consistently with existing patterns
+Apply proper color schemes using theme colors defined in tailwind config for both modes
+Test all components in both light and dark modes for contrast and readability
+Use CSS variables for dynamic theming where appropriate
+Implement smooth transitions when theme changes
+Ensure status badges are clearly visible in both themes
+Apply appropriate shadows and borders that work in both modes
+Test modal overlays and ensure proper backdrop opacity for both themes
+9. Responsive Design Implementation
+Implement mobile-first responsive layouts for all new pages
+Create collapsible filter panels on mobile devices accessed via button
+Convert data tables to card layouts on smaller screens
+Implement horizontal scrolling for tables on tablets with fixed action columns
+Create mobile-optimized modals that slide up from bottom on small screens
+Ensure touch-friendly button sizes and spacing on mobile devices
+Implement swipe gestures for dismissing modals and drawers on mobile
+Add responsive pagination controls that adapt to screen size
+Create mobile menu for bulk actions
+Test all interactions on various screen sizes and devices
+10. Performance Optimization
+Implement virtual scrolling for large data tables using windowing techniques
+Add memoization for expensive computations and component renders
+Implement debouncing for search inputs and filter changes
+Use lazy loading for modal content and detail views
+Optimize re-renders by using proper React hooks dependencies
+Implement request cancellation for superseded API calls
+Add loading states and skeleton screens for better perceived performance
+Cache frequently accessed data in the store
+Implement optimistic updates for better user experience
+11. Error Handling and Validation
+Add comprehensive error boundaries around major sections
+Implement user-friendly error messages with actionable suggestions
+Create retry mechanisms for failed API calls
+Add input validation for all forms with clear error messaging
+Implement confirmation dialogs for destructive actions
+Add toast notifications for success and error states using existing toast system
+Create fallback UI for network errors
+Implement proper loading states during async operations
+Add form validation using proper TypeScript types
+12. Testing and Quality Assurance
+Test all filter combinations and ensure correct API calls
+Verify pagination works correctly with different page sizes
+Test bulk operations with various selection scenarios
+Ensure all modals and drawers open and close smoothly
+Test sorting on all columns in both directions
+Verify dark mode appearance across all components
+Test responsive behavior on mobile, tablet, and desktop
+Validate all forms accept only valid input
+Test error scenarios and ensure graceful degradation
+Verify export functionality generates correct data
+Summary
 
-## 1. High-Level Goals
-- Create a secure, auth-protected area for application management.
-- Implement a role-based access control (RBAC) system.
-- Provide interfaces for managing transactions, withdrawals, QUIDs, and users.
-- Ensure the admin portal maintains the existing UI/UX standards, including responsiveness and dark/light mode support.
-
-## 2. User Roles & Permissions
-Three distinct roles will be established:
-
-- **SUPER_ADMIN**:
-  - Full access to all admin features.
-  - Can manage Admins and Support users (invite, change role, deactivate).
-  - Can configure application-level settings.
-
-- **ADMIN**:
-  - Can manage day-to-day operations.
-  - Can view all transactions, withdrawals, and QUIDs.
-  - Can approve/reject withdrawal requests.
-  - Can manage Support users (invite, deactivate).
-  - Cannot manage other Admins or access super-admin settings.
-
-- **SUPPORT**:
-  - Limited, often view-only access.
-  - Can view transactions and withdrawal requests to assist with customer inquiries.
-  - Cannot perform sensitive actions like approving withdrawals or managing users.
-
-## 3. Admin Portal Structure (`/admin`)
-The portal will be accessible via the `/admin` route prefix.
-
-### 3.1. Pages & Routes
-- `/admin/login`: Login page for authorized personnel. Unauthorized access to any `/admin/*` route will redirect here.
-- `/admin/dashboard`: The landing page after login. Displays key metrics, recent activities, and system health at a glance.
-- `/admin/transactions`:
-  - A comprehensive list of all transactions.
-  - Features for searching (by QUID, email, etc.) and filtering (by status, date range).
-  - A detail view for each transaction.
-- `/admin/withdrawals`:
-  - A list of all withdrawal requests.
-  - Tabs/filters for "Pending", "Completed", "Failed".
-  - Actions to approve or reject pending requests (for Admin/Super Admin roles).
-- `/admin/quids`:
-  - A searchable list of all created QUIDs.
-  - Ability to view QUID details and associated rules.
-  - Actions to manually block or unblock a QUID (for Admin/Super Admin roles).
-- `/admin/users`: (Admin & Super Admin only)
-  - A list of all administrative users.
-  - An "Invite User" feature that sends an invitation link via email.
-  - Actions to change a user's role or deactivate/reactivate their account.
-- `/admin/settings`: (Super Admin only)
-  - A page for managing critical application settings (e.g., API keys, feature flags).
-
-## 4. Authentication & Authorization
-### 4.1. Authentication Flow
-1.  **Login**: Users authenticate via `/admin/login` using email and password.
-2.  **Token Issuance**: Upon success, the backend API issues a JSON Web Token (JWT).
-3.  **Token Storage**: The JWT is stored securely in the browser (`localStorage`).
-4.  **Authenticated Requests**: The JWT is sent as a `Bearer` token in the `Authorization` header for all subsequent API requests to protected admin endpoints.
-5.  **Session Persistence**: On app load, the application checks for a valid token in `localStorage` to re-authenticate the user automatically.
-6.  **Logout**: The token is removed from storage, and the user is redirected to the login page.
-
-### 4.2. Protected Routes
-- A `ProtectedRoute` component will wrap all admin pages.
-- It will check for a valid authentication token. If none is found, it will redirect to `/admin/login`.
-- This component will also check the user's role against the roles required for the specific page, displaying an "Access Denied" message if permissions are insufficient.
-
-## 5. API Client (`src/lib/api.ts`)
-- The Axios request interceptor will be updated to conditionally attach the `Authorization` header.
-- It will retrieve the token from the authentication state management store.
-- The header will only be added for requests to protected API endpoints (e.g., those starting with `/api/admin/*`). Public-facing API calls will remain unchanged.
-
-## 6. State Management
-- A new global state store, `useAuthStore` (using Zustand), will be created to manage:
-  - `isAuthenticated: boolean`
-  - `user: { email: string, role: string } | null`
-  - `token: string | null`
-  - Actions for `login`, `logout`, and `initializeAuth`.
-
-## 7. UI/UX
-- **Layout**: A dedicated `AdminLayout` will provide a consistent frame with a sidebar for navigation and a header displaying user info and a logout button.
-- **Component Reusability**: Existing components from `src/components/ui` will be used extensively to ensure a consistent look and feel.
-- **Theming**: All new components and pages will fully support the existing light/dark mode functionality.
-- **Responsiveness**: The admin portal will be fully responsive and usable on devices of all sizes.
+This implementation plan creates production-ready admin pages for QUID and transaction management with comprehensive features including advanced filtering, sorting, pagination, bulk operations, and data export capabilities. The design prioritizes user experience with responsive layouts, smooth animations, and consistent dark/light mode support following existing project patterns. All components are properly typed with TypeScript, leverage the existing Zustand store pattern, and integrate seamlessly with the Bolt Database backend through well-defined API endpoints. The implementation focuses on performance, accessibility, and maintainability while providing administrators with powerful tools to manage QUIDs and transactions efficiently.
