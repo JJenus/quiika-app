@@ -28,8 +28,9 @@ import { FinancialPage } from "./pages/admin/FinancialPage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { AdminLayout } from "./components/layout/admin/AdminLayout";
 import { ComingSoon } from "./pages/admin/ComingSoon";
-import { QuidManagementPage } from "./pages/admin/QuidManagementPage"; 
+import { QuidManagementPage } from "./pages/admin/QuidManagementPage";
 import { UserManagementPage } from "./pages/admin/UserManagementPage";
+import { TransactionManagementPage } from "./pages/admin/TransactionManagementPage";
 import { RulesEnginePage } from "./pages/admin/RulesEnginePage";
 import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";
 import useAuthStore from "./stores/useAuthStore";
@@ -82,7 +83,7 @@ function App() {
 							<Route path="dashboard" element={<DashboardPage />} />
 							<Route path="financial" element={<FinancialPage />} />
 							<Route path="quids" element={<QuidManagementPage />} />
-							<Route path="transactions" element={<ComingSoon />} />
+							<Route path="transactions" element={<TransactionManagementPage />} />
 							<Route path="withdrawals" element={<WithdrawalsPage />} />
 							<Route path="rules" element={<RulesEnginePage />} />
 							<Route element={<ProtectedRoute requiredRoles={['SUPER_ADMIN', 'ADMIN']} />}>

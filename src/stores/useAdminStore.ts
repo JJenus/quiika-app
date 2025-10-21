@@ -625,19 +625,69 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			error: { hasError: false },
 		});
 		try {
+			const currentParams = get().transactionListParams;
 			console.log(
 				"Fetching transactions with params:",
-				get().transactionListParams
+				currentParams
 			);
 			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			const mockTransactions: PaginatedResponse<AdminTransaction> = {
+				data: [
+					{
+						id: 1,
+						email: 'test1@example.com',
+						amount: 50000,
+						currency: 'NGN',
+						quid: 'QUID123ABC',
+						reference: 'ref_123',
+						transactionId: 'txn_abc123',
+						status: 'SUCCESS',
+						blocked: false,
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+						quidAmount: 50000,
+						quidCurrency: 'NGN'
+					},
+					{
+						id: 2,
+						email: 'test2@example.com',
+						amount: 25000,
+						currency: 'GHS',
+						quid: 'QUID456DEF',
+						reference: 'ref_456',
+						transactionId: 'txn_def456',
+						status: 'PENDING',
+						blocked: false,
+						createdAt: new Date(Date.now() - 3600000).toISOString(),
+						updatedAt: new Date(Date.now() - 3600000).toISOString(),
+						quidAmount: 25000,
+						quidCurrency: 'GHS'
+					},
+					{
+						id: 3,
+						email: 'test3@example.com',
+						amount: 10000,
+						currency: 'NGN',
+						quid: 'QUID789GHI',
+						reference: 'ref_789',
+						transactionId: 'txn_ghi789',
+						status: 'FAILED',
+						blocked: false,
+						createdAt: new Date(Date.now() - 86400000).toISOString(),
+						updatedAt: new Date(Date.now() - 86400000).toISOString(),
+						quidAmount: 10000,
+						quidCurrency: 'NGN'
+					}
+				],
+				total: 3,
+				page: currentParams.page,
+				limit: currentParams.limit,
+				totalPages: 1,
+			};
+
 			set({
-				transactions: {
-					data: [],
-					total: 0,
-					page: 1,
-					limit: 10,
-					totalPages: 1,
-				},
+				transactions: mockTransactions,
 				loading: { isLoading: false },
 			});
 		} catch (error: any) {
