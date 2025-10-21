@@ -266,3 +266,99 @@ export interface SSEMessage {
   timestamp: string;
 }
 
+// Admin & Data Management Types
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortConfig<T> {
+  field: keyof T;
+  direction: SortDirection;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface DateRangeFilter {
+  from?: string;
+  to?: string;
+}
+
+export interface AmountRangeFilter {
+  min?: number;
+  max?: number;
+}
+
+// QUID Admin Types
+export interface AdminQuid extends Quid {
+  creatorEmail: string;
+  transactionCount: number;
+  claimedByEmail?: string;
+  rules?: Rule[];
+}
+
+export interface AdminQuidFilters {
+  search?: string;
+  status?: QuidStatus[];
+  currency?: Currency[];
+  createdAt?: DateRangeFilter;
+  amount?: AmountRangeFilter;
+}
+
+export interface AdminQuidListParams extends PaginationParams {
+  sort?: SortConfig<AdminQuid>;
+  filters?: AdminQuidFilters;
+}
+
+export interface BulkQuidUpdateDto {
+  ids: number[];
+  status: QuidStatus;
+}
+
+// Transaction Admin Types
+export interface AdminTransaction extends Transaction {
+  user?: {
+    firstName: string;
+    lastName: string;
+  };
+  quidAmount: number;
+  quidCurrency: Currency;
+}
+
+export interface AdminTransactionFilters {
+  search?: string; // Search by quid, email, reference, or transactionId
+  status?: TransactionStatus[];
+  currency?: Currency[];
+  createdAt?: DateRangeFilter;
+  amount?: AmountRangeFilter;
+}
+
+export interface AdminTransactionListParams extends PaginationParams {
+  sort?: SortConfig<AdminTransaction>;
+  filters?: AdminTransactionFilters;
+}
+
+// General Admin Types
+export interface BulkActionResponse {
+  success: boolean;
+  message: string;
+  affectedCount: number;
+}
+
+export type ExportFormat = 'csv' | 'json';
+
+export interface ExportParams<T_Filters> {
+  format: ExportFormat;
+  filters?: T_Filters;
+  sort?: SortConfig<any>;
+}
+
