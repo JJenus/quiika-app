@@ -1,5 +1,20 @@
 import { create } from 'zustand';
-import type { Transaction, Quid, WithdrawalRequest } from '../types/api';
+import type {
+	Transaction,
+	WithdrawalRequest,
+	AdminQuid,
+	AdminTransaction,
+	AdminQuidListParams,
+	AdminTransactionListParams,
+	PaginatedResponse,
+	BulkActionResponse,
+	ExportFormat,
+	QuidStatus,
+	TransactionStatus,
+	AdminQuidFilters,
+	AdminTransactionFilters,
+	ExportParams,
+} from '../types/api';
 
 export interface AdminStats {
   totalUsers: number;
@@ -39,6 +54,17 @@ interface AdminState {
   users: AdminUser[];
   recentTransactions: Transaction[];
   pendingWithdrawals: WithdrawalRequest[];
+
+  // QUID Management
+  quids: PaginatedResponse<AdminQuid> | null;
+  quidListParams: AdminQuidListParams;
+  selectedQuids: number[];
+
+  // Transaction Management
+  transactions: PaginatedResponse<AdminTransaction> | null;
+  transactionListParams: AdminTransactionListParams;
+  selectedTransactions: number[];
+
   loading: { isLoading: boolean; message?: string };
   error: { hasError: boolean; message?: string };
 }
@@ -52,6 +78,30 @@ interface AdminActions {
   deactivateUser: (userId: string) => Promise<boolean>;
   approveWithdrawal: (withdrawalId: string) => Promise<boolean>;
   rejectWithdrawal: (withdrawalId: string, reason: string) => Promise<boolean>;
+  
+  // QUID Management
+  fetchQuids: () => Promise<void>;
+  setQuidListParams: (params: Partial<AdminQuidListParams>) => void;
+  selectQuid: (quidId: number, selected: boolean) => void;
+  selectAllQuids: (select: boolean) => void;
+  clearQuidSelection: () => void;
+  updateQuidStatus: (quidId: number, status: QuidStatus) => Promise<boolean>;
+  bulkUpdateQuidStatus: (status: QuidStatus) => Promise<BulkActionResponse | null>;
+  exportQuids: (format: ExportFormat) => Promise<void>;
+
+  // Transaction Management
+  fetchTransactions: () => Promise<void>;
+  setTransactionListParams: (params: Partial<AdminTransactionListParams>) => void;
+  selectTransaction: (transactionId: number, selected: boolean) => void;
+  selectAllTransactions: (select: boolean) => void;
+  clearTransactionSelection: () => void;
+  fetchTransactionDetails: (transactionId: number) => Promise<AdminTransaction | null>;
+  updateTransactionStatus: (
+		transactionId: number,
+		status: TransactionStatus
+	) => Promise<boolean>;
+  exportTransactions: (format: ExportFormat) => Promise<void>;
+
   clearError: () => void;
 }
 
@@ -79,6 +129,17 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   users: [],
   recentTransactions: [],
   pendingWithdrawals: [],
+
+  // QUID Management state
+  quids: null,
+  quidListParams: { page: 1, limit: 10 },
+  selectedQuids: [],
+
+  // Transaction Management state
+  transactions: null,
+  transactionListParams: { page: 1, limit: 10 },
+  selectedTransactions: [],
+
   loading: { isLoading: false },
   error: { hasError: false },
 
@@ -369,6 +430,169 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         }
       });
       return false;
+    }
+  },
+
+  // QUID Management
+  fetchQuids: async () => {
+    set({ loading: { isLoading: true, message: 'Fetching QUIDs...' }, error: { hasError: false } });
+    try {
+      // const data = await api.getAdminQuids(get().quidListParams);
+      // set({ quids: data, loading: { isLoading: false } });
+      console.log('Fetching QUIDs with params:', get().quidListParams);
+      // Mock data for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      set({ quids: { data: [], total: 0, page: 1, limit: 10, totalPages: 1 }, loading: { isLoading: false } });
+    } catch (error: any) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to fetch QUIDs' } });
+    }
+  },
+
+  setQuidListParams: (params: Partial<AdminQuidListParams>) => {
+    set(state => ({ quidListParams: { ...state.quidListParams, ...params, page: params.page || 1 } }));
+    get().fetchQuids();
+  },
+
+  selectQuid: (quidId: number, selected: boolean) => {
+    set(state => ({
+      selectedQuids: selected
+        ? [...state.selectedQuids, quidId]
+        : state.selectedQuids.filter(id => id !== quidId),
+    }));
+  },
+
+  selectAllQuids: (select: boolean) => {
+    set(state => ({
+      selectedQuids: select ? state.quids?.data.map(q => q.id) || [] : [],
+    }));
+  },
+
+  clearQuidSelection: () => set({ selectedQuids: [] }),
+
+  updateQuidStatus: async (quidId: number, status: QuidStatus) => {
+    set({ loading: { isLoading: true, message: 'Updating QUID status...' }});
+    try {
+      // const result = await api.updateQuidStatus(quidId, status);
+      // if (result) get().fetchQuids();
+      console.log(`Updating QUID ${quidId} to status ${status}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      set({ loading: { isLoading: false } });
+      return true;
+    } catch (error) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to update status' } });
+      return false;
+    }
+  },
+
+  bulkUpdateQuidStatus: async (status: QuidStatus) => {
+    set({ loading: { isLoading: true, message: 'Performing bulk update...' }});
+    const ids = get().selectedQuids;
+    if (ids.length === 0) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'No QUIDs selected' } });
+      return null;
+    }
+    try {
+      // const result = await api.bulkUpdateQuidStatus({ ids, status });
+      console.log(`Bulk updating ${ids.length} QUIDs to status ${status}`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      set({ selectedQuids: [], loading: { isLoading: false } });
+      get().fetchQuids();
+      return { success: true, message: 'Update successful', affectedCount: ids.length };
+    } catch (error: any) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Bulk update failed' } });
+      return null;
+    }
+  },
+
+  exportQuids: async (format: ExportFormat) => {
+    set({ loading: { isLoading: true, message: 'Exporting QUIDs...' }});
+    const { filters, sort } = get().quidListParams;
+    const params: ExportParams<AdminQuidFilters> = { format, filters, sort };
+    try {
+      // await api.exportQuids(params);
+      console.log('Exporting QUIDs with params:', params);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate export time
+      set({ loading: { isLoading: false } });
+    } catch (error: any) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Export failed' } });
+    }
+  },
+
+  // Transaction Management
+  fetchTransactions: async () => {
+    set({ loading: { isLoading: true, message: 'Fetching transactions...' }, error: { hasError: false } });
+    try {
+      // const data = await api.getAdminTransactions(get().transactionListParams);
+      // set({ transactions: data, loading: { isLoading: false } });
+      console.log('Fetching transactions with params:', get().transactionListParams);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      set({ transactions: { data: [], total: 0, page: 1, limit: 10, totalPages: 1 }, loading: { isLoading: false } });
+    } catch (error: any) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to fetch transactions' } });
+    }
+  },
+
+  setTransactionListParams: (params: Partial<AdminTransactionListParams>) => {
+    set(state => ({ transactionListParams: { ...state.transactionListParams, ...params, page: params.page || 1 } }));
+    get().fetchTransactions();
+  },
+
+  selectTransaction: (transactionId: number, selected: boolean) => {
+    set(state => ({
+      selectedTransactions: selected
+        ? [...state.selectedTransactions, transactionId]
+        : state.selectedTransactions.filter(id => id !== transactionId),
+    }));
+  },
+
+  selectAllTransactions: (select: boolean) => {
+    set(state => ({
+      selectedTransactions: select ? state.transactions?.data.map(t => t.id) || [] : [],
+    }));
+  },
+
+  clearTransactionSelection: () => set({ selectedTransactions: [] }),
+
+  fetchTransactionDetails: async (transactionId: number) => {
+    set({ loading: { isLoading: true, message: 'Fetching transaction details...' }});
+    try {
+      // const details = await api.getAdminTransactionDetails(transactionId);
+      console.log(`Fetching details for transaction ${transactionId}`);
+      await new Promise(resolve => setTimeout(resolve, 700));
+      set({ loading: { isLoading: false } });
+      return null; // Replace with 'details'
+    } catch (error) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to fetch details' } });
+      return null;
+    }
+  },
+
+  updateTransactionStatus: async (transactionId: number, status: TransactionStatus) => {
+    set({ loading: { isLoading: true, message: 'Updating transaction status...' }});
+    try {
+      // const result = await api.updateTransactionStatus(transactionId, status);
+      // if (result) get().fetchTransactions();
+      console.log(`Updating transaction ${transactionId} to status ${status}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      set({ loading: { isLoading: false } });
+      return true;
+    } catch (error) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to update status' } });
+      return false;
+    }
+  },
+
+  exportTransactions: async (format: ExportFormat) => {
+    set({ loading: { isLoading: true, message: 'Exporting transactions...' }});
+    const { filters, sort } = get().transactionListParams;
+    const params: ExportParams<AdminTransactionFilters> = { format, filters, sort };
+    try {
+      // await api.exportTransactions(params);
+      console.log('Exporting transactions with params:', params);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      set({ loading: { isLoading: false } });
+    } catch (error: any) {
+      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Export failed' } });
     }
   },
 
