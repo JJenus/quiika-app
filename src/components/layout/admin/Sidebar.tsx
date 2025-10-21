@@ -1,5 +1,19 @@
 import React from "react";
-import { ChartBar as BarChart3, FileDown, RefreshCw, Hop as Home, UserPlus, ChevronLeft, ChevronRight, DoorOpen, Gift, Banknote, Users, Gavel, DollarSign } from "lucide-react";
+import {
+	ChartBar as BarChart3,
+	FileDown,
+	RefreshCw,
+	LayoutDashboard,
+	UserPlus,
+	ChevronLeft,
+	ChevronRight,
+	DoorOpen,
+	Gift,
+	Banknote,
+	Users,
+	Gavel,
+	DollarSign,
+} from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
 import useAuthStore from "../../../stores/useAuthStore";
 import { Logo } from "../../ui/Logo";
@@ -7,14 +21,24 @@ import { Button } from "../../ui/Button";
 import { Link } from "react-router-dom";
 
 const menuItems = [
-	{ id: "/admin/dashboard", label: "Dashboard", icon: Home },
+	{ id: "/admin/dashboard", label: "Dashboard", icon:  LayoutDashboard},
 	{ id: "/admin/financial", label: "Financial", icon: DollarSign },
 	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
 	{ id: "/admin/withdrawals", label: "Withdrawals", icon: Banknote },
 	{ id: "/admin/rules", label: "Rules Engine", icon: Gavel },
-	{ id: "/admin/users", label: "User Management", icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
-	{ id: "/admin/invite-user", label: "Invite User", icon: UserPlus, roles: ['SUPER_ADMIN', 'ADMIN'] },
+	{
+		id: "/admin/users",
+		label: "User Management",
+		icon: Users,
+		roles: ["SUPER_ADMIN", "ADMIN"],
+	},
+	{
+		id: "/admin/invite-user",
+		label: "Invite User",
+		icon: UserPlus,
+		roles: ["SUPER_ADMIN", "ADMIN"],
+	},
 	{ id: "/admin/reports", label: "Reports", icon: FileDown },
 ];
 
