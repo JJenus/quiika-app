@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /admin/
 
-Sitemap: https://quiika.com/sitemap.xml
+Sitemap: https://quiika.vercel.app/sitemap.xml

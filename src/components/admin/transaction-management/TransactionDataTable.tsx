@@ -1,121 +1,229 @@
 import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
-import { AdminTransaction } from '../../../types/api';
-import { Button } from '../../ui/Button';
-import { MoreVertical } from 'lucide-react';
-import { LoadingSpinner } from '../../ui/LoadingSpinner';
-
-// Using the same mock components from QuidDataTable for now.
-const Table = ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400" {...props}>{children}</table>;
-const TableHeader = ({ children, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400" {...props}>{children}</thead>;
-const TableBody = ({ children, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => <tbody {...props}>{children}</tbody>;
-const TableRow = ({ children, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" {...props}>{children}</tr>;
-const TableHead = ({ children, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => <th scope="col" className="px-6 py-3" {...props}>{children}</th>;
-const TableCell = ({ children, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => <td className="px-6 py-4" {...props}>{children}</td>;
-
-interface BadgeType {
-	children: any;
-	variant: "default" | "success" | "warning" | "error" | "processing";
-}
-const Badge = ({ children, variant = "default", ...props }: BadgeType) => {
-	const variantClasses = {
-		default: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
-		success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-		warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-		error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-        processing: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-	};
-	return (
-		<span className={`px-2 py-1 text-xs font-medium rounded-full ${variantClasses[variant]}`} {...props}>
-			{children}
-		</span>
-	);
-};
-
+import { AdminTransaction, TransactionStatus, SortDirection } from '../../../types/api';
+import { DataTable, Column, Badge, Pagination } from '../../ui/DataTable';
+import { Eye, Edit, RefreshCw, Download, Ban, CheckCircle } from 'lucide-react';
+import { ActionItem } from '../../../types/table';
 
 export const TransactionDataTable: React.FC = () => {
-	const { transactions, loading } = useAdminStore();
+  const { 
+    transactions, 
+    loading, 
+    selectedTransactions, 
+    selectTransaction,
+    selectAllTransactions,
+    transactionListParams,
+    setTransactionListParams,
+    fetchTransactions,
+    updateTransactionStatus,
+    exportTransactions
+  } = useAdminStore();
 
-	if (loading.isLoading && !transactions?.data) {
-		return <div className="flex justify-center items-center h-64"><LoadingSpinner text="Fetching transactions..." /></div>;
-	}
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-	if (!transactions || transactions.data.length === 0) {
-		return (
-			<div className="text-center py-16">
-				<h3 className="text-lg font-semibold">No Transactions Found</h3>
-				<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-					Try adjusting your filters or search terms.
-				</p>
-			</div>
-		);
-	}
-	
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleString('en-US', {
-			year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-		});
-	};
-	
-	const formatCurrency = (amount: number, currency: string) => {
-		return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount / 100);
-	};
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+    }).format(amount / 100);
+  };
 
-	const getStatusVariant = (status: string): BadgeType['variant'] => {
-		switch (status) {
-			case "SUCCESS":
-			case "COMPLETED":
-				return "success";
-			case "PENDING":
-				return "warning";
-            case "PROCESSING":
-                return "processing";
-			case "FAILED":
-				return "error";
-			default:
-				return "default";
-		}
-	};
+  const getStatusVariant = (status: TransactionStatus) => {
+    switch (status) {
+      case 'SUCCESS':
+      case 'COMPLETED':
+        return 'success';
+      case 'PENDING':
+        return 'warning';
+      case 'PROCESSING':
+        return 'processing';
+      case 'FAILED':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
 
-	return (
-		<div className="space-y-4">
-			<div className="overflow-x-auto">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Transaction ID</TableHead>
-							<TableHead>Email</TableHead>
-							<TableHead>Amount</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>QUID</TableHead>
-							<TableHead>Date</TableHead>
-							<TableHead>Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{transactions.data.map((tx: AdminTransaction) => (
-							<TableRow key={tx.id}>
-								<TableCell className="font-mono text-xs">{tx.transactionId}</TableCell>
-								<TableCell>{tx.email}</TableCell>
-								<TableCell>{formatCurrency(tx.amount, tx.currency)}</TableCell>
-								<TableCell>
-									<Badge variant={getStatusVariant(tx.status)}>
-										{tx.status}
-									</Badge>
-								</TableCell>
-								<TableCell className="font-mono text-xs">{tx.quid}</TableCell>
-								<TableCell>{formatDate(tx.createdAt)}</TableCell>
-								<TableCell>
-									<Button variant="ghost" size="sm">
-										<MoreVertical className="h-4 w-4" />
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
-			{/* Pagination will go here */}
-		</div>
-	);
+  const columns: Column<AdminTransaction>[] = [
+    {
+      key: 'transactionId',
+      header: 'Transaction ID',
+      render: (tx) => (
+        <span className="font-mono text-xs">{tx.transactionId}</span>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      sortable: true,
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      render: (tx) => formatCurrency(tx.amount, tx.currency),
+      sortable: true,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (tx) => (
+        <Badge variant={getStatusVariant(tx.status)}>
+          {tx.status}
+        </Badge>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'quid',
+      header: 'QUID',
+      render: (tx) => (
+        <span className="font-mono text-xs">{tx.quid}</span>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'createdAt',
+      header: 'Date',
+      render: (tx) => formatDate(tx.createdAt),
+      sortable: true,
+    },
+  ];
+
+  const handleViewDetails = (transaction: AdminTransaction) => {
+    console.log('View transaction details:', transaction);
+    // navigate(`/admin/transactions/${transaction.id}`);
+  };
+
+  const handleRetry = (transaction: AdminTransaction) => {
+    if (window.confirm(`Retry transaction ${transaction.transactionId}?`)) {
+      updateTransactionStatus(transaction.id, 'PROCESSING');
+    }
+  };
+
+  const handleExport = (transaction: AdminTransaction) => {
+    exportTransactions('csv');
+  };
+
+  const handleBlock = (transaction: AdminTransaction) => {
+    if (window.confirm(`Block transaction ${transaction.transactionId}?`)) {
+      console.log('Block transaction:', transaction);
+    }
+  };
+
+  const handleApprove = (transaction: AdminTransaction) => {
+    if (window.confirm(`Approve transaction ${transaction.transactionId}?`)) {
+      updateTransactionStatus(transaction.id, 'COMPLETED');
+    }
+  };
+
+  const getTransactionActions = (transaction: AdminTransaction) => {
+    const baseActions: ActionItem[] = [
+      {
+        label: 'View Details',
+        onClick: handleViewDetails,
+        icon: <Eye className="h-4 w-4" />,
+      },
+      {
+        label: 'Export',
+        onClick: handleExport,
+        icon: <Download className="h-4 w-4" />,
+      },
+    ];
+
+    if (transaction.status === 'FAILED' || transaction.status === 'PENDING') {
+      baseActions.push({
+        label: 'Retry',
+        onClick: handleRetry,
+        icon: <RefreshCw className="h-4 w-4" />,
+      });
+    }
+
+    if (transaction.status === 'PENDING') {
+      baseActions.push({
+        label: 'Approve',
+        onClick: handleApprove,
+        icon: <CheckCircle className="h-4 w-4" />,
+      });
+    }
+
+    if (transaction.status !== 'BLOCKED') {
+      baseActions.push({
+        label: 'Block',
+        onClick: handleBlock,
+        icon: <Ban className="h-4 w-4" />,
+        variant: 'destructive' as const,
+      });
+    }
+
+    return baseActions;
+  };
+
+  const handleSort = (field: string, direction: SortDirection) => {
+    setTransactionListParams({
+      sort: { field: field as keyof AdminTransaction, direction },
+      page: 1,
+    });
+    fetchTransactions();
+  };
+
+  const handlePageChange = (page: number) => {
+    setTransactionListParams({ page });
+    fetchTransactions();
+  };
+
+  const handleSelectItem = (transactionId: number) => {
+    const isSelected = selectedTransactions.includes(transactionId);
+    selectTransaction(transactionId, !isSelected);
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    selectAllTransactions(selected);
+  };
+
+  // Safe data access
+  const tableData = transactions?.data || [];
+  const pagination = transactions || {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0
+  };
+
+  return (
+    <div className="space-y-4">
+      <DataTable
+        data={tableData}
+        columns={columns}
+        loading={loading.isLoading}
+        actions={getTransactionActions}
+        onSort={handleSort}
+        sortBy={transactionListParams.sort?.field as string}
+        sortDirection={transactionListParams.sort?.direction}
+        selectedItems={selectedTransactions}
+        onSelectItem={handleSelectItem}
+        onSelectAll={handleSelectAll}
+        selectable={true}
+        keyField="id"
+      />
+      
+      {tableData.length > 0 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={handlePageChange}
+        />
+      )}
+    </div>
+  );
 };

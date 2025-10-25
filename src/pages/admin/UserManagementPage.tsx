@@ -1,403 +1,305 @@
-import React, { useEffect, useState } from "react";
-import {
-	Users,
-	UserPlus,
-	Shield,
-	Mail,
-	Calendar,
-	MoreVertical,
-	Edit,
-	Trash2,
-	CheckCircle,
-	XCircle,
-} from "lucide-react";
-import { useAdminStore } from "../../stores/useAdminStore";
-import useAuthStore from "../../stores/useAuthStore";
-import { LoadingSpinner } from "../../components/ui/LoadingSpinner";
-import { ErrorMessage } from "../../components/ui/ErrorMessage";
-import { Card } from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { Modal } from "../../components/ui/Modal";
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAdminStore } from '../../stores/useAdminStore';
+import useAuthStore from '../../stores/useAuthStore';
+import { UserStatsCards } from '../../components/admin/user-management/UserStatsCards';
+import { UserFilterPanel } from '../../components/admin/user-management/UserFilterPanel';
+import { UserDataTable } from '../../components/admin/user-management/UserDataTable';
+import { UserSearchBar } from '../../components/admin/user-management/UserSearchBar';
+import { UserInviteModal } from '../../components/admin/user-management/UserInviteModal';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { ErrorMessage } from '../../components/ui/ErrorMessage';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { UserPlus, Download, RefreshCw } from 'lucide-react';
+import { AdminUser } from '../../types/admin';
 
 export const UserManagementPage: React.FC = () => {
-	const {
-		users,
-		fetchUsers,
-		inviteUser,
-		updateUserRole,
-		deactivateUser,
-		loading,
-		error,
-		clearError,
-	} = useAdminStore();
+  const {
+    users,
+    fetchUsers,
+    inviteUser,
+    deactivateUser,
+    loading,
+    error,
+    clearError,
+    selectedUsers,
+    clearUserSelection,
+    exportUsers
+  } = useAdminStore();
 
-	const { user: currentUser } = useAuthStore();
+  const { user: currentUser } = useAuthStore();
 
-	const [showInviteModal, setShowInviteModal] = useState(false);
-	const [inviteForm, setInviteForm] = useState({
-		email: "",
-		role: "SUPPORT" as "SUPER_ADMIN" | "ADMIN" | "SUPPORT",
-	});
-	const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showUserDetails, setShowUserDetails] = useState<AdminUser | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-	useEffect(() => {
-		fetchUsers();
-	}, [fetchUsers]);
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
-	const handleInviteUser = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const success = await inviteUser(inviteForm.email, inviteForm.role);
-		if (success) {
-			setShowInviteModal(false);
-			setInviteForm({ email: "", role: "SUPPORT" });
-		}
-	};
+  // Filter users based on search term
+  const filteredUsers = React.useMemo(() => {
+    if (!searchTerm) return users;
+    
+    const term = searchTerm.toLowerCase();
+    return users.filter(user => 
+      user.email.toLowerCase().includes(term) ||
+      user.firstName.toLowerCase().includes(term) ||
+      user.lastName.toLowerCase().includes(term) ||
+      user.role.toLowerCase().includes(term)
+    );
+  }, [users, searchTerm]);
 
-	const handleRoleChange = async (
-		userId: string,
-		newRole: "SUPER_ADMIN" | "ADMIN" | "SUPPORT"
-	) => {
-		await updateUserRole(userId, newRole);
-	};
+  const handleInviteUser = async (email: string, role: string) => {
+    return await inviteUser(email, role as any);
+  };
 
-	const handleDeactivateUser = async (userId: string) => {
-		if (confirm("Are you sure you want to deactivate this user?")) {
-			await deactivateUser(userId);
-		}
-	};
+  const handleViewDetails = useCallback((user: AdminUser) => {
+    setShowUserDetails(user);
+  }, []);
 
-	const getRoleBadgeColor = (role: string) => {
-		switch (role) {
-			case "SUPER_ADMIN":
-				return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-			case "ADMIN":
-				return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-			case "SUPPORT":
-				return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-			default:
-				return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
-		}
-	};
+  const handleEditUser = useCallback((user: AdminUser) => {
+    // Implement edit user functionality
+    console.log('Edit user:', user);
+  }, []);
 
-	const canManageUser = (targetUser: any) => {
-		if (!currentUser) return false;
-		if (currentUser.role === "SUPER_ADMIN") return true;
-		if (currentUser.role === "ADMIN" && targetUser.role === "SUPPORT")
-			return true;
-		return false;
-	};
+  const handleDeleteUser = useCallback((user: AdminUser) => {
+    if (window.confirm(`Are you sure you want to deactivate ${user.firstName} ${user.lastName}?`)) {
+      deactivateUser(user.id);
+    }
+  }, [deactivateUser]);
 
-	if (loading.isLoading && users.length === 0) {
-		return (
-			<div className="flex items-center justify-center h-64">
-				<LoadingSpinner size="lg" text={loading.message} />
-			</div>
-		);
-	}
+  const handleSendInvite = useCallback((user: AdminUser) => {
+    // Implement resend invite functionality
+    console.log('Resend invite to:', user.email);
+  }, []);
 
-	return (
-		<div className="space-y-6">
-			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div>
-					<h1 className="text-3xl font-bold text-text-primary dark:text-text-primary-dark">
-						User Management
-					</h1>
-					<p className="text-text-secondary dark:text-text-secondary-dark mt-1">
-						Manage admin users and their permissions
-					</p>
-				</div>
+  const handleRefresh = useCallback(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
-				{(currentUser?.role === "SUPER_ADMIN" ||
-					currentUser?.role === "ADMIN") && (
-					<Button onClick={() => setShowInviteModal(true)}>
-						<UserPlus className="h-4 w-4 mr-2" />
-						Invite User
-					</Button>
-				)}
-			</div>
+  const handleExport = useCallback(() => {
+    exportUsers('csv');
+  }, [exportUsers]);
 
-			{error.hasError && (
-				<ErrorMessage
-					message={error.message || "Failed to load users"}
-					onRetry={fetchUsers}
-					onDismiss={clearError}
-				/>
-			)}
+  const handleSearch = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
 
-			{/* Users Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{users.map((user) => (
-					<Card
-						key={user.id}
-						className="p-6 hover:shadow-moderate transition-all duration-200"
-					>
-						<div className="flex items-start justify-between mb-4">
-							<div className="flex items-center space-x-3">
-								<div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-									<span className="text-white font-semibold text-sm">
-										{user.firstName[0]}
-										{user.lastName[0]}
-									</span>
-								</div>
-								<div>
-									<h3 className="font-semibold text-text-primary dark:text-text-primary-dark">
-										{user.firstName} {user.lastName}
-									</h3>
-									<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-										{user.email}
-									</p>
-								</div>
-							</div>
+  const handleBulkAction = useCallback((action: string) => {
+    console.log('Bulk action:', action, selectedUsers);
+    // Implement bulk actions
+  }, [selectedUsers]);
 
-							{canManageUser(user) && (
-								<div className="relative">
-									<button
-										onClick={() =>
-											setSelectedUser(
-												selectedUser === user.id
-													? null
-													: user.id
-											)
-										}
-										className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-									>
-										<MoreVertical className="h-4 w-4" />
-									</button>
+  const canManageUsers = currentUser?.role === 'SUPER_ADMIN' || currentUser?.role === 'ADMIN';
 
-									{selectedUser === user.id && (
-										<div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-10 min-w-[150px]">
-											<button
-												onClick={() => {
-													// Handle edit user
-													setSelectedUser(null);
-												}}
-												className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-											>
-												<Edit className="h-4 w-4 mr-2" />
-												Edit User
-											</button>
-											<button
-												onClick={() => {
-													handleDeactivateUser(
-														user.id
-													);
-													setSelectedUser(null);
-												}}
-												className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-error"
-											>
-												<Trash2 className="h-4 w-4 mr-2" />
-												Deactivate
-											</button>
-										</div>
-									)}
-								</div>
-							)}
-						</div>
+  if (loading.isLoading && users.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner size="lg" text={loading.message} />
+      </div>
+    );
+  }
 
-						<div className="space-y-3">
-							<div className="flex items-center justify-between">
-								<span className="text-sm text-text-secondary dark:text-text-secondary-dark">
-									Role
-								</span>
-								<select
-									value={user.role}
-									onChange={(e) =>
-										handleRoleChange(
-											user.id,
-											e.target.value as any
-										)
-									}
-									disabled={
-										!canManageUser(user) ||
-										loading.isLoading
-									}
-									className={`text-xs px-2 py-1 rounded-full font-medium ${getRoleBadgeColor(
-										user.role
-									)} ${
-										canManageUser(user)
-											? "cursor-pointer"
-											: "cursor-not-allowed"
-									}`}
-								>
-									<option value="SUPPORT">Support</option>
-									<option value="ADMIN">Admin</option>
-									{currentUser?.role === "SUPER_ADMIN" && (
-										<option value="SUPER_ADMIN">
-											Super Admin
-										</option>
-									)}
-								</select>
-							</div>
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-text-primary dark:text-text-primary-dark">
+            User Management
+          </h1>
+          <p className="text-text-secondary dark:text-text-secondary-dark mt-1">
+            Manage admin users and their permissions
+          </p>
+        </div>
 
-							<div className="flex items-center justify-between">
-								<span className="text-sm text-text-secondary dark:text-text-secondary-dark">
-									Status
-								</span>
-								<div className="flex items-center">
-									{user.isActive ? (
-										<CheckCircle className="h-4 w-4 text-success mr-1" />
-									) : (
-										<XCircle className="h-4 w-4 text-error mr-1" />
-									)}
-									<span
-										className={`text-xs font-medium ${
-											user.isActive
-												? "text-success"
-												: "text-error"
-										}`}
-									>
-										{user.isActive ? "Active" : "Inactive"}
-									</span>
-								</div>
-							</div>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleRefresh} variant="outline" className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </Button>
+          <Button onClick={handleExport} variant="outline" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          {canManageUsers && (
+            <Button onClick={() => setShowInviteModal(true)} className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              Invite User
+            </Button>
+          )}
+        </div>
+      </div>
 
-							<div className="flex items-center justify-between">
-								<span className="text-sm text-text-secondary dark:text-text-secondary-dark">
-									Last Login
-								</span>
-								<span className="text-xs text-text-secondary dark:text-text-secondary-dark">
-									{user.lastLogin
-										? new Date(
-												user.lastLogin
-										  ).toLocaleDateString()
-										: "Never"}
-								</span>
-							</div>
+      {/* Error Display */}
+      {error.hasError && (
+        <ErrorMessage
+          message={error.message || "Failed to load users"}
+          onRetry={fetchUsers}
+          onDismiss={clearError}
+        />
+      )}
 
-							<div className="flex items-center justify-between">
-								<span className="text-sm text-text-secondary dark:text-text-secondary-dark">
-									Joined
-								</span>
-								<span className="text-xs text-text-secondary dark:text-text-secondary-dark">
-									{new Date(
-										user.createdAt
-									).toLocaleDateString()}
-								</span>
-							</div>
-						</div>
-					</Card>
-				))}
-			</div>
+      {/* Stats Cards */}
+      <UserStatsCards />
 
-			{/* Invite User Modal */}
-			<Modal
-				isOpen={showInviteModal}
-				onClose={() => setShowInviteModal(false)}
-				title="Invite New User"
-				size="md"
-			>
-				<form onSubmit={handleInviteUser} className="space-y-6">
-					<div>
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
-						>
-							Email Address
-						</label>
-						<div className="relative">
-							<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-							<input
-								id="email"
-								type="email"
-								value={inviteForm.email}
-								onChange={(e) =>
-									setInviteForm((prev) => ({
-										...prev,
-										email: e.target.value,
-									}))
-								}
-								className="input-field pl-10"
-								placeholder="user@example.com"
-								required
-							/>
-						</div>
-					</div>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Filters Sidebar */}
+        <div className="lg:col-span-1">
+          <Card padding={false}>
+            <UserFilterPanel onFiltersChange={handleRefresh} />
+          </Card>
+        </div>
 
-					<div>
-						<label
-							htmlFor="role"
-							className="block text-sm font-medium text-text-primary dark:text-text-primary-dark mb-2"
-						>
-							Role
-						</label>
-						<div className="relative">
-							<Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-							<select
-								id="role"
-								value={inviteForm.role}
-								onChange={(e) =>
-									setInviteForm((prev) => ({
-										...prev,
-										role: e.target.value as any,
-									}))
-								}
-								className="input-field pl-10"
-								required
-							>
-								<option value="SUPPORT">Support</option>
-								<option value="ADMIN">Admin</option>
-								{currentUser?.role === "SUPER_ADMIN" && (
-									<option value="SUPER_ADMIN">
-										Super Admin
-									</option>
-								)}
-							</select>
-						</div>
-					</div>
+        {/* Table Section */}
+        <div className="lg:col-span-3 space-y-4">
+          <Card>
+            <UserSearchBar onSearchChange={handleSearch} />
+          </Card>
 
-					<div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-						<h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-							Role Permissions:
-						</h4>
-						<ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-							{inviteForm.role === "SUPPORT" && (
-								<>
-									<li>• View transactions and withdrawals</li>
-									<li>• Assist with customer inquiries</li>
-									<li>• Limited access to sensitive data</li>
-								</>
-							)}
-							{inviteForm.role === "ADMIN" && (
-								<>
-									<li>
-										• Full transaction and withdrawal
-										management
-									</li>
-									<li>
-										• User management (Support users only)
-									</li>
-									<li>• Financial reporting and analytics</li>
-								</>
-							)}
-							{inviteForm.role === "SUPER_ADMIN" && (
-								<>
-									<li>• Complete system access</li>
-									<li>• Manage all user roles</li>
-									<li>• System configuration and settings</li>
-								</>
-							)}
-						</ul>
-					</div>
+          <Card>
+            {/* Bulk Actions Toolbar */}
+            {selectedUsers.length > 0 && (
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {selectedUsers.length} user(s) selected
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleBulkAction('activate')}
+                    >
+                      Activate Selected
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleBulkAction('deactivate')}
+                    >
+                      Deactivate Selected
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={clearUserSelection}
+                    >
+                      Clear Selection
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
-					<div className="flex gap-3 pt-4">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setShowInviteModal(false)}
-							className="flex-1"
-						>
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							loading={loading.isLoading}
-							className="flex-1"
-						>
-							Send Invitation
-						</Button>
-					</div>
-				</form>
-			</Modal>
-		</div>
-	);
+            {/* Data Table */}
+            {loading.isLoading && !users.length ? (
+              <div className="flex justify-center items-center h-96">
+                <LoadingSpinner text="Loading users..." />
+              </div>
+            ) : (
+              <UserDataTable
+                onViewDetails={handleViewDetails}
+                onEditUser={handleEditUser}
+                onDeleteUser={handleDeleteUser}
+                onSendInvite={handleSendInvite}
+              />
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {/* Invite User Modal */}
+      <UserInviteModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onInvite={handleInviteUser}
+        loading={loading.isLoading}
+        currentUserRole={currentUser?.role}
+      />
+
+      {/* User Details Modal */}
+      <Modal
+        isOpen={!!showUserDetails}
+        onClose={() => setShowUserDetails(null)}
+        title="User Details"
+        size="lg"
+      >
+        {showUserDetails && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                <span className="text-white font-semibold text-lg">
+                  {showUserDetails.firstName[0]}{showUserDetails.lastName[0]}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-text-primary dark:text-text-primary-dark">
+                  {showUserDetails.firstName} {showUserDetails.lastName}
+                </h3>
+                <p className="text-text-secondary dark:text-text-secondary-dark">
+                  {showUserDetails.email}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
+                  Role
+                </label>
+                <p className="text-text-primary dark:text-text-primary-dark font-medium">
+                  {showUserDetails.role.replace('_', ' ')}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
+                  Status
+                </label>
+                <p className={`font-medium ${
+                  showUserDetails.isActive ? 'text-success' : 'text-error'
+                }`}>
+                  {showUserDetails.isActive ? 'Active' : 'Inactive'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
+                  Last Login
+                </label>
+                <p className="text-text-primary dark:text-text-primary-dark">
+                  {showUserDetails.lastLogin 
+                    ? new Date(showUserDetails.lastLogin).toLocaleString()
+                    : 'Never'
+                  }
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
+                  Joined
+                </label>
+                <p className="text-text-primary dark:text-text-primary-dark">
+                  {new Date(showUserDetails.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+
+            {showUserDetails.invitedBy && (
+              <div>
+                <label className="block text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
+                  Invited By
+                </label>
+                <p className="text-text-primary dark:text-text-primary-dark">
+                  User #{showUserDetails.invitedBy}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
 };

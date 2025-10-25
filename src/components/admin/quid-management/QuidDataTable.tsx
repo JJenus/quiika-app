@@ -1,192 +1,215 @@
-import React from "react";
-import { useAdminStore } from "../../../stores/useAdminStore";
-import { AdminQuid } from "../../../types/api";
-import { Button } from "../../ui/Button";
-import { MoreVertical } from "lucide-react";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
-
-// Mock components
-const Table = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableElement>) => (
-	<table
-		className="w-full text-sm text-left text-gray-500 dark:text-gray-400"
-		{...props}
-	>
-		{children}
-	</table>
-);
-const TableHeader = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableSectionElement>) => (
-	<thead
-		className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-		{...props}
-	>
-		{children}
-	</thead>
-);
-const TableBody = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableSectionElement>) => (
-	<tbody {...props}>{children}</tbody>
-);
-const TableRow = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableRowElement>) => (
-	<tr
-		className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-		{...props}
-	>
-		{children}
-	</tr>
-);
-const TableHead = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableCellElement>) => (
-	<th scope="col" className="px-6 py-3" {...props}>
-		{children}
-	</th>
-);
-const TableCell = ({
-	children,
-	...props
-}: React.HTMLAttributes<HTMLTableCellElement>) => (
-	<td className="px-6 py-4" {...props}>
-		{children}
-	</td>
-);
-
-interface BadgeType {
-	children: any;
-	variant: "default" | "success" | "warning" | "error";
-}
-
-const Badge = ({ children, variant = "default", ...props }: BadgeType) => {
-	const variantClasses = {
-		default:
-			"bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-		success:
-			"bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-		warning:
-			"bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-		error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-	};
-
-	return (
-		<span
-			className={`px-2 py-1 text-xs font-medium rounded-full ${variantClasses[variant]}`}
-			{...props}
-		>
-			{children}
-		</span>
-	);
-};
+import React from 'react';
+import { useAdminStore } from '../../../stores/useAdminStore';
+import { AdminQuid, QuidStatus, SortDirection } from '../../../types/api';
+import { DataTable, Column, Badge, Pagination } from '../../ui/DataTable';
+import { Eye, Edit, Trash2, Blocks as Block, Download, CheckCircle } from 'lucide-react';
 
 export const QuidDataTable: React.FC = () => {
-	// Use individual selectors to avoid unnecessary re-renders
-	const quids = useAdminStore((state) => state.quids);
-	const loading = useAdminStore((state) => state.loading);
+  const { 
+    quids, 
+    loading, 
+    selectedQuids, 
+    selectQuid,
+    selectAllQuids,
+    quidListParams,
+    setQuidListParams,
+    fetchQuids,
+    updateQuidStatus,
+    exportQuids
+  } = useAdminStore();
 
-	if (loading.isLoading && !quids?.data) {
-		return (
-			<div className="flex justify-center items-center h-64">
-				<LoadingSpinner text="Fetching QUIDs..." />
-			</div>
-		);
-	}
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
-	if (!quids || quids.data.length === 0) {
-		return (
-			<div className="text-center py-16">
-				<h3 className="text-lg font-semibold">No QUIDs Found</h3>
-				<p className="text-sm text-text-secondary dark:text-text-secondary-dark">
-					Try adjusting your filters or search terms.
-				</p>
-			</div>
-		);
-	}
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+    }).format(amount / 100);
+  };
 
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
+  const getStatusVariant = (status: QuidStatus) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'success';
+      case 'CLAIMED':
+        return 'default';
+      case 'BLOCKED':
+        return 'error';
+      case 'EXPIRED':
+        return 'warning';
+      case 'SPLIT':
+        return 'info';
+      case 'CONFLICTED':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
 
-	const formatCurrency = (amount: number, currency: string) => {
-		return new Intl.NumberFormat("en-US", {
-			style: "currency",
-			currency,
-			minimumFractionDigits: 2,
-		}).format(amount / 100);
-	};
+  const columns: Column<AdminQuid>[] = [
+    {
+      key: 'quid',
+      header: 'QUID',
+      render: (quid) => (
+        <span className="font-mono text-sm">{quid.quid}</span>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      render: (quid) => formatCurrency(quid.amount, quid.currency),
+      sortable: true,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (quid) => (
+        <Badge variant={getStatusVariant(quid.status)}>
+          {quid.status}
+        </Badge>
+      ),
+      sortable: true,
+    },
+    {
+      key: 'creatorEmail',
+      header: 'Creator Email',
+      sortable: true,
+    },
+    {
+      key: 'transactionCount',
+      header: 'Transactions',
+      sortable: true,
+    },
+    {
+      key: 'createdAt',
+      header: 'Created At',
+      render: (quid) => formatDate(quid.createdAt),
+      sortable: true,
+    },
+  ];
 
-	const getStatusVariant = (status: string) => {
-		switch (status) {
-			case "ACTIVE":
-				return "success";
-			case "CLAIMED":
-				return "default";
-			case "BLOCKED":
-				return "error";
-			case "EXPIRED":
-				return "warning";
-			default:
-				return "default";
-		}
-	};
+  const handleViewDetails = (quid: AdminQuid) => {
+    // Navigate to quid details page
+    console.log('View quid details:', quid);
+    // You can use your routing here, e.g., navigate(`/admin/quids/${quid.id}`);
+  };
 
-	return (
-		<div className="space-y-4">
-			<div className="overflow-x-auto">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>QUID</TableHead>
-							<TableHead>Amount</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>Creator Email</TableHead>
-							<TableHead>Created At</TableHead>
-							<TableHead>Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{quids.data.map((quid: AdminQuid) => (
-							<TableRow key={quid.id}>
-								<TableCell className="font-mono text-sm">
-									{quid.quid}
-								</TableCell>
-								<TableCell className="font-medium">
-									{formatCurrency(quid.amount, quid.currency)}
-								</TableCell>
-								<TableCell>
-									<Badge
-										variant={getStatusVariant(quid.status)}
-									>
-										{quid.status}
-									</Badge>
-								</TableCell>
-								<TableCell>{quid.creatorEmail}</TableCell>
-								<TableCell>
-									{formatDate(quid.createdAt)}
-								</TableCell>
-								<TableCell>
-									<Button variant="ghost" size="sm">
-										<MoreVertical className="h-4 w-4" />
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
-		</div>
-	);
+  const handleEdit = (quid: AdminQuid) => {
+    // Open edit modal
+    console.log('Edit quid:', quid);
+  };
+
+  const handleToggleBlock = (quid: AdminQuid) => {
+    const newStatus: QuidStatus = quid.status === 'BLOCKED' ? 'ACTIVE' : 'BLOCKED';
+    updateQuidStatus(quid.id, newStatus);
+  };
+
+  const handleExport = (quid: AdminQuid) => {
+    exportQuids('csv');
+  };
+
+  const handleDelete = (quid: AdminQuid) => {
+    if (window.confirm(`Are you sure you want to delete QUID ${quid.quid}?`)) {
+      console.log('Delete quid:', quid);
+      // Implement delete logic
+    }
+  };
+
+  const actions = (quid: AdminQuid) => [
+    {
+      label: 'View Details',
+      onClick: handleViewDetails,
+      icon: <Eye className="h-4 w-4" />,
+    },
+    {
+      label: 'Edit',
+      onClick: handleEdit,
+      icon: <Edit className="h-4 w-4" />,
+    },
+    {
+      label: 'Export',
+      onClick: handleExport,
+      icon: <Download className="h-4 w-4" />,
+    },
+    {
+      label: quid.status === 'BLOCKED' ? 'Unblock' : 'Block',
+      onClick: handleToggleBlock,
+      icon: quid.status === 'BLOCKED' ? <CheckCircle className="h-4 w-4" /> : <Block className="h-4 w-4" />,
+      variant: quid.status === 'BLOCKED' ? 'default' as const : 'destructive' as const,
+    },
+    {
+      label: 'Delete',
+      onClick: handleDelete,
+      icon: <Trash2 className="h-4 w-4" />,
+      variant: 'destructive' as const,
+    },
+  ];
+
+  const handleSort = (field: string, direction: SortDirection) => {
+    setQuidListParams({
+      sort: { field: field as keyof AdminQuid, direction },
+      page: 1,
+    });
+    fetchQuids();
+  };
+
+  const handlePageChange = (page: number) => {
+    setQuidListParams({ page });
+    fetchQuids();
+  };
+
+  const handleSelectItem = (quidId: number) => {
+    const isSelected = selectedQuids.includes(quidId);
+    selectQuid(quidId, !isSelected);
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    selectAllQuids(selected);
+  };
+
+  // Safe data access
+  const tableData = quids?.data || [];
+  const pagination = quids || {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0
+  };
+
+  return (
+    <div className="space-y-4">
+      <DataTable
+        data={tableData}
+        columns={columns}
+        loading={loading.isLoading}
+        actions={actions}
+        onSort={handleSort}
+        sortBy={quidListParams.sort?.field as string}
+        sortDirection={quidListParams.sort?.direction}
+        selectedItems={selectedQuids}
+        onSelectItem={handleSelectItem}
+        onSelectAll={handleSelectAll}
+        selectable={true}
+        keyField="id"
+      />
+      
+      {tableData.length > 0 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={handlePageChange}
+        />
+      )}
+    </div>
+  );
 };

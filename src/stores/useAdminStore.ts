@@ -15,42 +15,7 @@ import type {
 	AdminTransactionFilters,
 	ExportParams,
 } from "../types/api";
-
-export interface AdminStats {
-	totalUsers: number;
-	totalTransactions: number;
-	totalRevenue: number;
-	totalWithdrawals: number;
-	activeQuids: number;
-	pendingWithdrawals: number;
-	monthlyGrowth: number;
-	conversionRate: number;
-}
-
-export interface FinancialData {
-	totalRevenue: number;
-	totalFees: number;
-	totalWithdrawals: number;
-	netProfit: number;
-	monthlyRevenue: Array<{ month: string; revenue: number; fees: number }>;
-	revenueBySource: Array<{
-		source: string;
-		amount: number;
-		percentage: number;
-	}>;
-}
-
-export interface AdminUser {
-	id: string;
-	email: string;
-	firstName: string;
-	lastName: string;
-	role: "SUPER_ADMIN" | "ADMIN" | "SUPPORT";
-	isActive: boolean;
-	lastLogin?: string;
-	createdAt: string;
-	invitedBy?: string;
-}
+import { AdminStats, AdminUser, FinancialData } from "../types/admin";
 
 interface AdminState {
 	stats: AdminStats;
@@ -71,6 +36,7 @@ interface AdminState {
 
 	loading: { isLoading: boolean; message?: string };
 	error: { hasError: boolean; message?: string };
+	selectedUsers: string[];
 }
 
 interface AdminActions {
@@ -119,7 +85,18 @@ interface AdminActions {
 	exportTransactions: (format: ExportFormat) => Promise<void>;
 
 	clearError: () => void;
+
+	selectUser: (userId: string, selected: boolean) => void;
+	selectAllUsers: (select: boolean) => void;
+	clearUserSelection: () => void;
+	exportUsers: (format: ExportFormat) => Promise<void>;
 }
+
+// Add to AdminState interface
+
+// Add to AdminActions interface
+
+// Add to the store implementation
 
 type AdminStore = AdminState & AdminActions;
 
@@ -158,6 +135,38 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
 	loading: { isLoading: false },
 	error: { hasError: false },
+
+	selectedUsers: [],
+
+	selectUser: (userId: string, selected: boolean) => {
+		set((state) => ({
+			selectedUsers: selected
+				? [...state.selectedUsers, userId]
+				: state.selectedUsers.filter((id) => id !== userId),
+		}));
+	},
+
+	selectAllUsers: (select: boolean) => {
+		set((state) => ({
+			selectedUsers: select ? state.users.map((u) => u.id) : [],
+		}));
+	},
+
+	clearUserSelection: () => set({ selectedUsers: [] }),
+
+	exportUsers: async (format: ExportFormat) => {
+		set({ loading: { isLoading: true, message: "Exporting users..." } });
+		try {
+			console.log("Exporting users in format:", format);
+			await new Promise((resolve) => setTimeout(resolve, 2000));
+			set({ loading: { isLoading: false } });
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: { hasError: true, message: "Export failed" },
+			});
+		}
+	},
 
 	fetchDashboardStats: async () => {
 		set({
@@ -467,67 +476,83 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
 	// QUID Management
 	fetchQuids: async (params?: Partial<AdminQuidListParams>) => {
-    set({ loading: { isLoading: true, message: 'Fetching QUIDs...' }, error: { hasError: false } });
-    try {
-      // If params are provided, update the state first
-      if (params) {
-        set(state => ({ 
-          quidListParams: { ...state.quidListParams, ...params, page: params.page || 1 } 
-        }));
-      }
-      
-      const currentParams = get().quidListParams;
-      console.log('Fetching QUIDs with params:', currentParams);
-      
-      // Mock data for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock response data
-      const mockQuids: PaginatedResponse<AdminQuid> = {
-        data: [
-          {
-            id: 1,
-            quid: 'QUID123456',
-            amount: 500000, // 5000 NGN in kobo
-            currency: 'NGN',
-            status: 'ACTIVE',
-            creatorEmail: 'user@example.com',
-            createdAt: new Date().toISOString(),
-            transactionCount: 0,
-            blocked: false,
-            updatedAt: ""
-          },
-          {
-            id: 2,
-            quid: 'QUID789012',
-            amount: 100000, // 1000 NGN in kobo
-            currency: 'NGN',
-            status: 'CLAIMED',
-            creatorEmail: 'user2@example.com',
-            createdAt: new Date(Date.now() - 86400000).toISOString(),
-            transactionCount: 0,
-            blocked: false,
-            updatedAt: ""
-          }
-        ],
-        total: 2,
-        page: currentParams.page,
-        limit: currentParams.limit,
-        totalPages: 1
-      };
-      
-      set({ quids: mockQuids, loading: { isLoading: false } });
-    } catch (error: any) {
-      set({ loading: { isLoading: false }, error: { hasError: true, message: 'Failed to fetch QUIDs' } });
-    }
-  },
+		set({
+			loading: { isLoading: true, message: "Fetching QUIDs..." },
+			error: { hasError: false },
+		});
+		try {
+			// If params are provided, update the state first
+			if (params) {
+				set((state) => ({
+					quidListParams: {
+						...state.quidListParams,
+						...params,
+						page: params.page || 1,
+					},
+				}));
+			}
 
-  setQuidListParams: (params: Partial<AdminQuidListParams>) => {
-    set(state => ({ 
-      quidListParams: { ...state.quidListParams, ...params, page: params.page || 1 } 
-    }));
-    // Don't automatically fetch - let components control when to fetch
-  },
+			const currentParams = get().quidListParams;
+			console.log("Fetching QUIDs with params:", currentParams);
+
+			// Mock data for now
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			// Mock response data
+			const mockQuids: PaginatedResponse<AdminQuid> = {
+				data: [
+					{
+						id: 1,
+						quid: "QUID123456",
+						amount: 500000, // 5000 NGN in kobo
+						currency: "NGN",
+						status: "ACTIVE",
+						creatorEmail: "user@example.com",
+						createdAt: new Date().toISOString(),
+						transactionCount: 0,
+						blocked: false,
+						updatedAt: "",
+					},
+					{
+						id: 2,
+						quid: "QUID789012",
+						amount: 100000, // 1000 NGN in kobo
+						currency: "NGN",
+						status: "CLAIMED",
+						creatorEmail: "user2@example.com",
+						createdAt: new Date(
+							Date.now() - 86400000
+						).toISOString(),
+						transactionCount: 0,
+						blocked: false,
+						updatedAt: "",
+					},
+				],
+				total: 2,
+				page: currentParams.page,
+				limit: currentParams.limit,
+				totalPages: 1,
+			};
+
+			set({ quids: mockQuids, loading: { isLoading: false } });
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: { hasError: true, message: "Failed to fetch QUIDs" },
+			});
+		}
+	},
+
+	setQuidListParams: (params: Partial<AdminQuidListParams>) => {
+		set((state) => ({
+			quidListParams: {
+				...state.quidListParams,
+				...params,
+				page: params.page || 1,
+			},
+		}));
+		// Don't automatically fetch - let components control when to fetch
+	},
 
 	selectQuid: (quidId: number, selected: boolean) => {
 		set((state) => ({
@@ -626,59 +651,60 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 		try {
 			const currentParams = get().transactionListParams;
-			console.log(
-				"Fetching transactions with params:",
-				currentParams
-			);
+			console.log("Fetching transactions with params:", currentParams);
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			const mockTransactions: PaginatedResponse<AdminTransaction> = {
 				data: [
 					{
 						id: 1,
-						email: 'test1@example.com',
+						email: "test1@example.com",
 						amount: 50000,
-						currency: 'NGN',
-						quid: 'QUID123ABC',
-						reference: 'ref_123',
-						transactionId: 'txn_abc123',
-						status: 'SUCCESS',
+						currency: "NGN",
+						quid: "QUID123ABC",
+						reference: "ref_123",
+						transactionId: "txn_abc123",
+						status: "SUCCESS",
 						blocked: false,
 						createdAt: new Date().toISOString(),
 						updatedAt: new Date().toISOString(),
 						quidAmount: 50000,
-						quidCurrency: 'NGN'
+						quidCurrency: "NGN",
 					},
 					{
 						id: 2,
-						email: 'test2@example.com',
+						email: "test2@example.com",
 						amount: 25000,
-						currency: 'GHS',
-						quid: 'QUID456DEF',
-						reference: 'ref_456',
-						transactionId: 'txn_def456',
-						status: 'PENDING',
+						currency: "GHS",
+						quid: "QUID456DEF",
+						reference: "ref_456",
+						transactionId: "txn_def456",
+						status: "PENDING",
 						blocked: false,
 						createdAt: new Date(Date.now() - 3600000).toISOString(),
 						updatedAt: new Date(Date.now() - 3600000).toISOString(),
 						quidAmount: 25000,
-						quidCurrency: 'GHS'
+						quidCurrency: "GHS",
 					},
 					{
 						id: 3,
-						email: 'test3@example.com',
+						email: "test3@example.com",
 						amount: 10000,
-						currency: 'NGN',
-						quid: 'QUID789GHI',
-						reference: 'ref_789',
-						transactionId: 'txn_ghi789',
-						status: 'FAILED',
+						currency: "NGN",
+						quid: "QUID789GHI",
+						reference: "ref_789",
+						transactionId: "txn_ghi789",
+						status: "FAILED",
 						blocked: false,
-						createdAt: new Date(Date.now() - 86400000).toISOString(),
-						updatedAt: new Date(Date.now() - 86400000).toISOString(),
+						createdAt: new Date(
+							Date.now() - 86400000
+						).toISOString(),
+						updatedAt: new Date(
+							Date.now() - 86400000
+						).toISOString(),
 						quidAmount: 10000,
-						quidCurrency: 'NGN'
-					}
+						quidCurrency: "NGN",
+					},
 				],
 				total: 3,
 				page: currentParams.page,

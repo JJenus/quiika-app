@@ -1,96 +1,164 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
-import { Button } from '../../ui/Button';
 import { TransactionStatus, Currency } from '../../../types/api';
-import { Filter, X } from 'lucide-react';
+import { FilterPanel, FilterConfig } from '../../ui/FilterPanel';
 
-export const TransactionFilterSidebar: React.FC = () => {
-	const { transactionListParams, setTransactionListParams, fetchTransactions } = useAdminStore();
-	const [filters, setFilters] = useState(transactionListParams.filters || {});
+interface TransactionFilterSidebarProps {
+  onFiltersChange?: () => void;
+}
 
-	const handleFilterChange = <K extends keyof typeof filters>(key: K, value: (typeof filters)[K]) => {
-		setFilters(prev => ({ ...prev, [key]: value }));
-	};
+export const TransactionFilterSidebar: React.FC<TransactionFilterSidebarProps> = ({ onFiltersChange }) => {
+  const { transactionListParams, setTransactionListParams, fetchTransactions, transactions } = useAdminStore();
 
-	const applyFilters = () => {
-		setTransactionListParams({ filters, page: 1 });
-		fetchTransactions();
-	};
+  // Calculate counts from current data
+  const statusCounts = React.useMemo(() => {
+    return {
+      PENDING: transactions?.data.filter(tx => tx.status === 'PENDING').length || 0,
+      PROCESSING: transactions?.data.filter(tx => tx.status === 'PROCESSING').length || 0,
+      SUCCESS: transactions?.data.filter(tx => tx.status === 'SUCCESS').length || 0,
+      COMPLETED: transactions?.data.filter(tx => tx.status === 'COMPLETED').length || 0,
+      FAILED: transactions?.data.filter(tx => tx.status === 'FAILED').length || 0,
+      UNKNOWN_STATUS: transactions?.data.filter(tx => tx.status === 'UNKNOWN_STATUS').length || 0,
+    };
+  }, [transactions]);
 
-	const clearFilters = () => {
-		const { search } = transactionListParams.filters || {};
-		const clearedFilters = { search };
-		setFilters(clearedFilters);
-		setTransactionListParams({ filters: clearedFilters, page: 1 });
-		fetchTransactions();
-	};
+  const currencyCounts = React.useMemo(() => {
+    return {
+      NGN: transactions?.data.filter(tx => tx.currency === 'NGN').length || 0,
+      GHS: transactions?.data.filter(tx => tx.currency === 'GHS').length || 0,
+      KES: transactions?.data.filter(tx => tx.currency === 'KES').length || 0,
+      ZAR: transactions?.data.filter(tx => tx.currency === 'ZAR').length || 0,
+    };
+  }, [transactions]);
 
-	const transactionStatuses: TransactionStatus[] = ['PENDING', 'PROCESSING', 'SUCCESS', 'COMPLETED', 'FAILED', 'UNKNOWN_STATUS'];
-	const currencies: Currency[] = ['NGN', 'GHS', 'KES', 'ZAR'];
+  // Define filters with transaction-specific colors and options
+  const filters: FilterConfig[] = [
+    {
+      key: 'dateRange',
+      label: 'Date Range',
+      type: 'date-range',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'multiselect',
+      options: [
+        { 
+          value: 'PENDING', 
+          label: 'Pending', 
+          count: statusCounts.PENDING,
+          color: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800'
+        },
+        { 
+          value: 'PROCESSING', 
+          label: 'Processing', 
+          count: statusCounts.PROCESSING,
+          color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800'
+        },
+        { 
+          value: 'SUCCESS', 
+          label: 'Success', 
+          count: statusCounts.SUCCESS,
+          color: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
+        },
+        { 
+          value: 'COMPLETED', 
+          label: 'Completed', 
+          count: statusCounts.COMPLETED,
+          color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800'
+        },
+        { 
+          value: 'FAILED', 
+          label: 'Failed', 
+          count: statusCounts.FAILED,
+          color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
+        },
+        { 
+          value: 'UNKNOWN_STATUS', 
+          label: 'Unknown', 
+          count: statusCounts.UNKNOWN_STATUS,
+          color: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+        },
+      ],
+    },
+    {
+      key: 'currency',
+      label: 'Currency',
+      type: 'multiselect',
+      options: [
+        { 
+          value: 'NGN', 
+          label: 'NGN', 
+          count: currencyCounts.NGN,
+          color: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300'
+        },
+        { 
+          value: 'GHS', 
+          label: 'GHS', 
+          count: currencyCounts.GHS,
+          color: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300'
+        },
+        { 
+          value: 'KES', 
+          label: 'KES', 
+          count: currencyCounts.KES,
+          color: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300'
+        },
+        { 
+          value: 'ZAR', 
+          label: 'ZAR', 
+          count: currencyCounts.ZAR,
+          color: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300'
+        },
+      ],
+    },
+    {
+      key: 'amount',
+      label: 'Amount Range',
+      type: 'number-range',
+    },
+    {
+      key: 'search',
+      label: 'Search',
+      type: 'search',
+      placeholder: 'Search by QUID, email, transaction ID...',
+    },
+  ];
 
-	return (
-		<div className="space-y-4 p-4">
-			<div className="flex justify-between items-center">
-				<h3 className="text-lg font-semibold flex items-center gap-2">
-					<Filter className="h-5 w-5" />
-					Filters
-				</h3>
-				<Button variant="ghost" size="sm" onClick={clearFilters} className="text-sm">
-					<X className="h-4 w-4 mr-1" />
-					Clear
-				</Button>
-			</div>
-			
-			{/* Status Filter */}
-			<div>
-				<label className="block text-sm font-medium mb-2">Status</label>
-				<div className="flex flex-wrap gap-2">
-					{transactionStatuses.map(status => (
-						<Button
-							key={status}
-							variant={filters.status?.includes(status) ? 'primary' : 'outline'}
-							size="sm"
-							onClick={() => {
-								const currentStatus = filters.status || [];
-								const newStatus = currentStatus.includes(status)
-									? currentStatus.filter(s => s !== status)
-									: [...currentStatus, status];
-								handleFilterChange('status', newStatus);
-							}}
-							className="text-xs"
-						>
-							{status}
-						</Button>
-					))}
-				</div>
-			</div>
+  const handleFiltersChange = (filters: Record<string, any>) => {
+    setTransactionListParams({ 
+      ...transactionListParams, 
+      filters: { ...transactionListParams.filters, ...filters },
+      page: 1 
+    });
+    
+    if (onFiltersChange) {
+      onFiltersChange();
+    } else {
+      fetchTransactions();
+    }
+  };
 
-			{/* Currency Filter */}
-			<div>
-				<label className="block text-sm font-medium mb-2">Currency</label>
-				<div className="grid grid-cols-2 gap-2">
-					{currencies.map(currency => (
-						<Button
-							key={currency}
-							variant={filters.currency?.includes(currency) ? 'primary' : 'outline'}
-							size="sm"
-							onClick={() => {
-								const currentCurrency = filters.currency || [];
-								const newCurrency = currentCurrency.includes(currency)
-									? currentCurrency.filter(c => c !== currency)
-									: [...currentCurrency, currency];
-								handleFilterChange('currency', newCurrency);
-							}}
-						>
-							{currency}
-						</Button>
-					))}
-				</div>
-			</div>
-			
-			<Button onClick={applyFilters} className="w-full">
-				Apply Filters
-			</Button>
-		</div>
-	);
+  const handleClearAll = () => {
+    setTransactionListParams({ 
+      ...transactionListParams, 
+      filters: { search: transactionListParams.filters?.search } 
+    });
+    
+    if (onFiltersChange) {
+      onFiltersChange();
+    } else {
+      fetchTransactions();
+    }
+  };
+
+  return (
+    <FilterPanel
+      filters={filters}
+      initialValues={transactionListParams.filters || {}}
+      onFiltersChange={handleFiltersChange}
+      onClearAll={handleClearAll}
+      title="Transaction Filters"
+    />
+  );
 };

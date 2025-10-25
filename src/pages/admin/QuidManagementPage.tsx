@@ -7,19 +7,36 @@ import { QuidSearchBar } from '../../components/admin/quid-management/QuidSearch
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Download, RefreshCw } from 'lucide-react';
 
 export const QuidManagementPage: React.FC = () => {
-  const { fetchQuids, quids, loading, selectedQuids } = useAdminStore();
+  const { 
+    fetchQuids, 
+    quids, 
+    loading, 
+    selectedQuids, 
+    clearQuidSelection,
+    exportQuids,
+    bulkUpdateQuidStatus 
+  } = useAdminStore();
 
-  // Fetch quids only on initial mount
+  // Fetch quids on mount and when dependencies change
   useEffect(() => {
     fetchQuids();
-  }, []); // Empty dependency array - only run on mount
+  }, []);
 
-  // Create a stable refresh function
   const handleRefresh = useCallback(() => {
     fetchQuids();
   }, [fetchQuids]);
+
+  const handleExport = () => {
+    exportQuids('csv');
+  };
+
+  const handleBulkAction = (status: string) => {
+    // Implement bulk action logic
+    console.log('Bulk action:', status, selectedQuids);
+  };
 
   return (
     <div className="space-y-6">
@@ -33,10 +50,14 @@ export const QuidManagementPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleRefresh} variant="outline">
+          <Button onClick={handleRefresh} variant="outline" className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button>Export</Button>
+          <Button onClick={handleExport} className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
         </div>
       </div>
 
@@ -53,7 +74,38 @@ export const QuidManagementPage: React.FC = () => {
             <QuidSearchBar onSearchChange={handleRefresh} />
           </Card>
           <Card>
-            {selectedQuids.length > 0 && <p>Bulk actions toolbar here...</p>}
+            {selectedQuids.length > 0 && (
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {selectedQuids.length} QUID(s) selected
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleBulkAction('ACTIVE')}
+                    >
+                      Activate
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleBulkAction('BLOCKED')}
+                    >
+                      Block
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={clearQuidSelection}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
             
             {loading.isLoading && !quids?.data ? (
               <div className="flex justify-center items-center h-96">
