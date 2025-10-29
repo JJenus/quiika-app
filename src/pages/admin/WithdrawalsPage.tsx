@@ -299,7 +299,7 @@ export const WithdrawalsPage: React.FC = () => {
 							>
 								<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 									<div className="flex-1 space-y-3">
-										<div className="flex items-center justify-between">
+										<div className="flex flex-wrap justify-betweeni gap-3">
 											<div>
 												<h4 className="font-semibold text-text-primary dark:text-text-primary-dark">
 													{withdrawal.accountName}
@@ -311,16 +311,18 @@ export const WithdrawalsPage: React.FC = () => {
 													}
 												</p>
 											</div>
-											<div
-												className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-													withdrawal.status
-												)}`}
-											>
-												{getStatusIcon(
-													withdrawal.status
-												)}
-												<span className="ml-1">
-													{withdrawal.status}
+											<div>
+												<span
+													className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+														withdrawal.status
+													)}`}
+												>
+													{getStatusIcon(
+														withdrawal.status
+													)}
+													<span className="ml-1">
+														{withdrawal.status}
+													</span>
 												</span>
 											</div>
 										</div>
@@ -330,7 +332,7 @@ export const WithdrawalsPage: React.FC = () => {
 												<span className="text-text-secondary dark:text-text-secondary-dark">
 													QUID:
 												</span>
-												<p className="font-mono font-medium">
+												<p className="font-mono font-medium dark:text-gray-300 font-medium">
 													{withdrawal.quid}
 												</p>
 											</div>
@@ -338,7 +340,7 @@ export const WithdrawalsPage: React.FC = () => {
 												<span className="text-text-secondary dark:text-text-secondary-dark">
 													Amount:
 												</span>
-												<p className="font-semibold text-success">
+												<p className="font-semibold text-success dark:text-gray-300">
 													{formatCurrency(
 														withdrawal.amount
 													)}
@@ -348,7 +350,7 @@ export const WithdrawalsPage: React.FC = () => {
 												<span className="text-text-secondary dark:text-text-secondary-dark">
 													Bank:
 												</span>
-												<p className="font-medium">
+												<p className="font-medium dark:text-gray-300">
 													{withdrawal.bank}
 												</p>
 											</div>
@@ -356,7 +358,7 @@ export const WithdrawalsPage: React.FC = () => {
 												<span className="text-text-secondary dark:text-text-secondary-dark">
 													Account:
 												</span>
-												<p className="font-mono">
+												<p className="font-mono dark:text-gray-300">
 													{withdrawal.accountNumber}
 												</p>
 											</div>

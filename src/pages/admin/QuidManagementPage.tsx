@@ -63,13 +63,13 @@ export const QuidManagementPage: React.FC = () => {
 
       <QuidStatsCards />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-4i gap-6">
+        <div className="hidden lg:col-span-1">
           <Card padding={false}>
             <QuidFilterPanel onFiltersChange={handleRefresh} />
           </Card>
         </div>
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3i space-y-4">
           <Card>
             <QuidSearchBar onSearchChange={handleRefresh} />
           </Card>

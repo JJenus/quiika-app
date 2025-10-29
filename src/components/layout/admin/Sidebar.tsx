@@ -26,19 +26,19 @@ const menuItems = [
 	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
 	{ id: "/admin/withdrawals", label: "Withdrawals", icon: Banknote },
-	{ id: "/admin/rules", label: "Rules Engine", icon: Gavel },
+	// { id: "/admin/rules", label: "Rules Engine", icon: Gavel },
 	{
 		id: "/admin/users",
 		label: "User Management",
 		icon: Users,
 		roles: ["SUPER_ADMIN", "ADMIN"],
 	},
-	{
-		id: "/admin/invite-user",
-		label: "Invite User",
-		icon: UserPlus,
-		roles: ["SUPER_ADMIN", "ADMIN"],
-	},
+	// {
+	// 	id: "/admin/invite-user",
+	// 	label: "Invite User",
+	// 	icon: UserPlus,
+	// 	roles: ["SUPER_ADMIN", "ADMIN"],
+	// },
 	{ id: "/admin/reports", label: "Reports", icon: FileDown },
 ];
 
