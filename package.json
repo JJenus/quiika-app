@@ -9,10 +9,12 @@
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"generate-seo": "NODE_ENV=production node scripts/generate-seo-files.js",
-		"generate-seo:dev": "NODE_ENV=development node scripts/generate-seo-files.js"
+		"generate-seo:dev": "NODE_ENV=development node scripts/generate-seo-files.js",
+		"generate:api": "openapi-generator-cli generate -i http://localhost:8080/api-docs -g typescript-fetch -o src/lib/api-sdk --additional-properties=useSingleRequestParameter=true,withNodeImports=true,npmName=@app/api-sdk"
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.57.4",
+		"@tanstack/react-table": "^8.21.3",
 		"@types/react-router-dom": "^5.3.3",
 		"axios": "^1.12.2",
 		"date-fns": "^4.1.0",

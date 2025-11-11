@@ -16,7 +16,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ switchOnMobile }) => {
 	];
 
 	return (
-		<div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+		<div className="flex justify-center items-center space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
 			{themes.map(({ key, icon: Icon, label }) => (
 				<button
 					key={key}
