@@ -1,8 +1,9 @@
 import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
 import { AdminQuid, QuidStatus, SortDirection } from '../../../types/api';
-import { DataTable, Column, Badge, Pagination } from '../../ui/DataTable';
+import { DataTable, Column, Pagination } from '../../ui/DataTable';
 import { Eye, Edit, Trash2, Blocks as Block, Download, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 
 export const QuidDataTable: React.FC = () => {
   const { 

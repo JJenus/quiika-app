@@ -14,11 +14,20 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* ---------- UPDATED: PATH ALIAS ---------- */
+    "baseUrl": "./src",                    // <-- Change from "." to "./src"
+    "paths": {
+      "@/*": ["*"]                         // <-- Update paths mapping
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* ---------- ADD: IGNORE DEPRECATIONS ---------- */
+    "ignoreDeprecations": "6.0"            // <-- Add this to silence the warning
   },
-  "include": ["src"]
+  "include": ["src", "vite-env.d.ts"]
 }

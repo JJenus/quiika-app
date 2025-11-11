@@ -1,9 +1,10 @@
 import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
 import { AdminUser } from '../../../types/admin';
-import { DataTable, Column, Badge } from '../../ui/DataTable';
+import { DataTable, Column } from '../../ui/DataTable';
 import { Eye, Edit, Trash2, Mail, Shield, User, CheckCircle, XCircle } from 'lucide-react';
 import { ActionItem } from '../../../types/table';
+import { Badge } from '@/components/ui/Badge';
 
 interface UserDataTableProps {
   onViewDetails: (user: AdminUser) => void;

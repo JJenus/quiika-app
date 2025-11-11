@@ -1,9 +1,10 @@
 import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
 import { AdminTransaction, TransactionStatus, SortDirection } from '../../../types/api';
-import { DataTable, Column, Badge, Pagination } from '../../ui/DataTable';
+import { DataTable, Column, Pagination } from '../../ui/DataTable';
 import { Eye, Edit, RefreshCw, Download, Ban, CheckCircle } from 'lucide-react';
 import { ActionItem } from '../../../types/table';
+import { Badge } from '@/components/ui/Badge';
 
 export const TransactionDataTable: React.FC = () => {
   const { 

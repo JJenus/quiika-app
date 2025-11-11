@@ -92,12 +92,6 @@ interface AdminActions {
 	exportUsers: (format: ExportFormat) => Promise<void>;
 }
 
-// Add to AdminState interface
-
-// Add to AdminActions interface
-
-// Add to the store implementation
-
 type AdminStore = AdminState & AdminActions;
 
 export const useAdminStore = create<AdminStore>((set, get) => ({

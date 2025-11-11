@@ -4,7 +4,7 @@ import { RuleType, SplitMode, Rule, SplitRule, RuleState, Quid } from '../types/
 export const MIN_AMOUNT = 1000;
 export const MAX_PERCENTAGE_SPLITS = 5;
 
-export const formatFractionalCurrency = (amount: number, currency: string): string => {
+export const formatFractionalCurrency = (amount: number, currency: string = ""): string => {
   return `${currency} ${(amount / 100).toFixed(2)}`;
 };
 
