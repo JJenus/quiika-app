@@ -1,0 +1,9 @@
+{
+	"npmName": "@app/api-sdk",
+	"supportsES6": true,
+	"useSingleRequestParameter": true,
+	"withNodeImports": false,
+	"useES6": true,
+	"withInterfaces": true,
+	"modelPropertyNaming": "original"
+}

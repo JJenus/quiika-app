@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { WithdrawForm } from '../components/forms/WithdrawForm';
-import { withdrawalAPI } from '../lib/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { ErrorMessage } from '../components/ui/ErrorMessage';
 import type { WithdrawForm as WithdrawFormType } from '../types/api';
+import { useWithdrawalStore } from '@/stores/useWithdrawalStore';
+import { CheckCircle } from 'lucide-react';
 
 export const WithdrawPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,7 @@ export const WithdrawPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState(false);
+  const withdrawalStore = useWithdrawalStore();
 
   const quid = searchParams.get('quid');
   const amount = parseFloat(searchParams.get('amount') || '0');
@@ -44,7 +46,7 @@ export const WithdrawPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      await withdrawalAPI.initiateRequest(withdrawalRequest);
+      await withdrawalStore.processWithdrawal(withdrawalRequest);
       setSuccess(true);
       
       // Redirect to success page after a delay
@@ -132,10 +134,9 @@ export const WithdrawPage: React.FC = () => {
         )}
         
         <WithdrawForm 
-          amount={amount}
-          onSubmit={handleWithdraw}
-          isLoading={isLoading}
-        />
+          amount={amount} quid={''} accessKey={''} currency={''} onCancel={function (): void {
+            throw new Error('Function not implemented.');
+          } }        />
       </div>
     </div>
   );

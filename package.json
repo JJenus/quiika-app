@@ -10,7 +10,7 @@
 		"preview": "vite preview",
 		"generate-seo": "NODE_ENV=production node scripts/generate-seo-files.js",
 		"generate-seo:dev": "NODE_ENV=development node scripts/generate-seo-files.js",
-		"generate:api": "openapi-generator-cli generate -i http://localhost:8085/v3/api-docs -g typescript-axios -o src/lib/api-sdk --additional-properties=useSingleRequestParameter=true,withNodeImports=true,npmName=@app/api-sdk,supportsES6=true"
+		"generate:api": "openapi-generator-cli generate -i http://localhost:8085/v3/api-docs -g typescript-axios -o src/lib/api-sdk -c openapi-config.json"
 	},
 	"dependencies": {
 		"@tanstack/react-table": "^8.21.3",

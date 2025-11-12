@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { admin, auth, createPageable, PERIOD } from "../lib/api";
 import type {
 	Transaction,
 	WithdrawalRequest,
@@ -40,7 +41,7 @@ interface AdminState {
 }
 
 interface AdminActions {
-	fetchDashboardStats: () => Promise<void>;
+	fetchDashboardStats: (period?: PERIOD) => Promise<void>;
 	fetchFinancialData: () => Promise<void>;
 	fetchUsers: () => Promise<void>;
 	inviteUser: (email: string, role: AdminUser["role"]) => Promise<boolean>;
@@ -152,7 +153,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		set({ loading: { isLoading: true, message: "Exporting users..." } });
 		try {
 			console.log("Exporting users in format:", format);
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			// TODO: Implement actual export when backend supports it
 			set({ loading: { isLoading: false } });
 		} catch (error: any) {
 			set({
@@ -162,31 +163,41 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		}
 	},
 
-	fetchDashboardStats: async () => {
+	fetchDashboardStats: async (period?: PERIOD) => {
 		set({
 			loading: { isLoading: true, message: "Loading dashboard stats..." },
 			error: { hasError: false },
 		});
 
 		try {
-			// Mock data - replace with actual API calls
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			const { data, error } = await admin.dashboard.getMetrics(
+				period || "MONTHLY"
+			);
 
-			const mockStats: AdminStats = {
-				totalUsers: 1247,
-				totalTransactions: 3456,
-				totalRevenue: 125000000, // in kobo
-				totalWithdrawals: 98000000,
-				activeQuids: 234,
-				pendingWithdrawals: 12,
-				monthlyGrowth: 15.3,
-				conversionRate: 78.5,
-			};
+			if (error) {
+				throw new Error(error);
+			}
 
-			set({
-				stats: mockStats,
-				loading: { isLoading: false },
-			});
+			if (data) {
+				// Transform API response to match your AdminStats type
+				const stats: AdminStats = {
+					totalUsers: data.totalUsers?.value || 0,
+					totalTransactions: data.totalTransactions?.value || 0,
+					totalRevenue: data.totalQuidValue?.value || 0,
+					totalWithdrawals:
+						data.totalApprovedWithdrawalValue?.value || 0,
+					activeQuids: data.totalQuids?.value || 0,
+					pendingWithdrawals:
+						data.withdrawalRequestsByStatus!["pending"] || 0,
+					monthlyGrowth: data.totalQuidValue?.growth || 0,
+					conversionRate: 0,
+				};
+
+				set({
+					stats,
+					loading: { isLoading: false },
+				});
+			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -205,44 +216,31 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 800));
+			// Using time series data for financial insights
+			const { data, error } = await admin.dashboard.getTimeSeries(
+				"MONTHLY"
+			);
 
-			const mockFinancialData: FinancialData = {
-				totalRevenue: 125000000,
-				totalFees: 3750000, // 3% of revenue
-				totalWithdrawals: 98000000,
-				netProfit: 27000000, // revenue - withdrawals - operational costs
-				monthlyRevenue: [
-					{ month: "Jan", revenue: 8500000, fees: 255000 },
-					{ month: "Feb", revenue: 9200000, fees: 276000 },
-					{ month: "Mar", revenue: 10100000, fees: 303000 },
-					{ month: "Apr", revenue: 11800000, fees: 354000 },
-					{ month: "May", revenue: 13200000, fees: 396000 },
-					{ month: "Jun", revenue: 15400000, fees: 462000 },
-				],
-				revenueBySource: [
-					{
-						source: "Transaction Fees",
-						amount: 2500000,
-						percentage: 66.7,
-					},
-					{
-						source: "Withdrawal Fees",
-						amount: 950000,
-						percentage: 25.3,
-					},
-					{
-						source: "Currency Exchange",
-						amount: 300000,
-						percentage: 8.0,
-					},
-				],
-			};
+			if (error) {
+				throw new Error(error);
+			}
 
-			set({
-				financialData: mockFinancialData,
-				loading: { isLoading: false },
-			});
+			if (data) {
+				// Transform API response to FinancialData
+				const financialData: FinancialData = {
+					totalRevenue: 0,
+					totalFees: 0,
+					totalWithdrawals: 0,
+					netProfit: 0,
+					monthlyRevenue: [],
+					revenueBySource: [],
+				};
+
+				set({
+					financialData,
+					loading: { isLoading: false },
+				});
+			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -261,47 +259,36 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 600));
-
-			const mockUsers: AdminUser[] = [
-				{
-					id: "1",
-					email: "admin@quiika.com",
-					firstName: "Admin",
-					lastName: "User",
-					role: "SUPER_ADMIN",
-					isActive: true,
-					lastLogin: new Date().toISOString(),
-					createdAt: "2024-01-01T00:00:00Z",
-				},
-				{
-					id: "2",
-					email: "manager@quiika.com",
-					firstName: "Manager",
-					lastName: "Smith",
-					role: "ADMIN",
-					isActive: true,
-					lastLogin: new Date(Date.now() - 86400000).toISOString(),
-					createdAt: "2024-02-15T00:00:00Z",
-					invitedBy: "1",
-				},
-				{
-					id: "3",
-					email: "support@quiika.com",
-					firstName: "Support",
-					lastName: "Agent",
-					role: "SUPPORT",
-					isActive: true,
-					lastLogin: new Date(Date.now() - 3600000).toISOString(),
-					createdAt: "2024-03-01T00:00:00Z",
-					invitedBy: "1",
-				},
-			];
-
-			set({
-				users: mockUsers,
-				loading: { isLoading: false },
+			const pageable = createPageable({
+				page: 0,
+				size: 50,
+				sort: ["createdAt,desc"],
 			});
+			const { data, error } = await admin.users.listUsers(pageable);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data && data.content) {
+				// Transform UserDto[] to AdminUser[]
+				const users: AdminUser[] = data.content.map((user: any) => ({
+					id: user.id?.toString() || "",
+					email: user.email || "",
+					firstName: user.firstName || "",
+					lastName: user.lastName || "",
+					role: user.role || "SUPPORT",
+					isActive: user.enabled || false,
+					lastLogin: user.lastLogin,
+					createdAt: user.createdAt || "",
+					invitedBy: user.invitedBy,
+				}));
+
+				set({
+					users,
+					loading: { isLoading: false },
+				});
+			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -320,26 +307,22 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			// Mock successful invitation
-			const newUser: AdminUser = {
-				id: Date.now().toString(),
+			const { data, error } = await admin.invites.createInvite({
 				email,
-				firstName: "New",
-				lastName: "User",
-				role,
-				isActive: false, // Pending activation
-				createdAt: new Date().toISOString(),
-				invitedBy: "1",
-			};
+				roleName: role,
+			});
 
-			set((state) => ({
-				users: [...state.users, newUser],
-				loading: { isLoading: false },
-			}));
+			if (error) {
+				throw new Error(error);
+			}
 
-			return true;
+			if (data) {
+				// Refresh users list
+				get().fetchUsers();
+				set({ loading: { isLoading: false } });
+				return true;
+			}
+			return false;
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -359,16 +342,26 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			const { data, error } = await admin.users.updateUserRole(
+				parseInt(userId),
+				{ role }
+			);
 
-			set((state) => ({
-				users: state.users.map((user) =>
-					user.id === userId ? { ...user, role } : user
-				),
-				loading: { isLoading: false },
-			}));
+			if (error) {
+				throw new Error(error);
+			}
 
-			return true;
+			if (data) {
+				// Update local state
+				set((state) => ({
+					users: state.users.map((user) =>
+						user.id === userId ? { ...user, role } : user
+					),
+					loading: { isLoading: false },
+				}));
+				return true;
+			}
+			return false;
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -388,16 +381,25 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			const { data, error } = await admin.users.updateUserStatus(
+				parseInt(userId),
+				{ action: "DEACTIVATE" }
+			);
 
-			set((state) => ({
-				users: state.users.map((user) =>
-					user.id === userId ? { ...user, isActive: false } : user
-				),
-				loading: { isLoading: false },
-			}));
+			if (error) {
+				throw new Error(error);
+			}
 
-			return true;
+			if (data) {
+				set((state) => ({
+					users: state.users.map((user) =>
+						user.id === userId ? { ...user, isActive: false } : user
+					),
+					loading: { isLoading: false },
+				}));
+				return true;
+			}
+			return false;
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -417,16 +419,24 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			const { data, error } = await admin.withdrawals.approveWithdrawal(
+				parseInt(withdrawalId)
+			);
 
-			set((state) => ({
-				pendingWithdrawals: state.pendingWithdrawals.filter(
-					(w) => w.id.toString() !== withdrawalId
-				),
-				loading: { isLoading: false },
-			}));
+			if (error) {
+				throw new Error(error);
+			}
 
-			return true;
+			if (data) {
+				set((state) => ({
+					pendingWithdrawals: state.pendingWithdrawals.filter(
+						(w) => w.id.toString() !== withdrawalId
+					),
+					loading: { isLoading: false },
+				}));
+				return true;
+			}
+			return false;
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -446,16 +456,25 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			const { data, error } = await admin.withdrawals.rejectWithdrawal(
+				parseInt(withdrawalId),
+				reason
+			);
 
-			set((state) => ({
-				pendingWithdrawals: state.pendingWithdrawals.filter(
-					(w) => w.id.toString() !== withdrawalId
-				),
-				loading: { isLoading: false },
-			}));
+			if (error) {
+				throw new Error(error);
+			}
 
-			return true;
+			if (data) {
+				set((state) => ({
+					pendingWithdrawals: state.pendingWithdrawals.filter(
+						(w) => w.id.toString() !== withdrawalId
+					),
+					loading: { isLoading: false },
+				}));
+				return true;
+			}
+			return false;
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
@@ -469,70 +488,56 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 	},
 
 	// QUID Management
-	fetchQuids: async (params?: Partial<AdminQuidListParams>) => {
+	fetchQuids: async () => {
 		set({
 			loading: { isLoading: true, message: "Fetching QUIDs..." },
 			error: { hasError: false },
 		});
+
 		try {
-			// If params are provided, update the state first
-			if (params) {
-				set((state) => ({
-					quidListParams: {
-						...state.quidListParams,
-						...params,
-						page: params.page || 1,
-					},
-				}));
+			const currentParams = get().quidListParams;
+			const pageable = createPageable({
+				page: currentParams.page - 1,
+				size: currentParams.limit,
+			});
+
+			const { data, error } = await admin.quids.getQuids(pageable);
+
+			if (error) {
+				throw new Error(error);
 			}
 
-			const currentParams = get().quidListParams;
-			console.log("Fetching QUIDs with params:", currentParams);
+			if (data) {
+				// Transform API response to match your AdminQuid type
+				const quids: PaginatedResponse<AdminQuid> = {
+					data:
+						data.content?.map((quid: any) => ({
+							id: quid.id,
+							quid: quid.quid,
+							amount: quid.amount,
+							currency: quid.currency,
+							status: quid.status,
+							creatorEmail: quid.creatorEmail,
+							createdAt: quid.createdAt,
+							transactionCount: quid.transactionCount,
+							blocked: quid.blocked,
+							updatedAt: quid.updatedAt,
+						})) || [],
+					total: data.totalElements || 0,
+					page: currentParams.page,
+					limit: currentParams.limit,
+					totalPages: data.totalPages || 1,
+				};
 
-			// Mock data for now
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			// Mock response data
-			const mockQuids: PaginatedResponse<AdminQuid> = {
-				data: [
-					{
-						id: 1,
-						quid: "QUID123456",
-						amount: 500000, // 5000 NGN in kobo
-						currency: "NGN",
-						status: "ACTIVE",
-						creatorEmail: "user@example.com",
-						createdAt: new Date().toISOString(),
-						transactionCount: 0,
-						blocked: false,
-						updatedAt: "",
-					},
-					{
-						id: 2,
-						quid: "QUID789012",
-						amount: 100000, // 1000 NGN in kobo
-						currency: "NGN",
-						status: "CLAIMED",
-						creatorEmail: "user2@example.com",
-						createdAt: new Date(
-							Date.now() - 86400000
-						).toISOString(),
-						transactionCount: 0,
-						blocked: false,
-						updatedAt: "",
-					},
-				],
-				total: 2,
-				page: currentParams.page,
-				limit: currentParams.limit,
-				totalPages: 1,
-			};
-
-			set({ quids: mockQuids, loading: { isLoading: false } });
+				set({ quids, loading: { isLoading: false } });
+			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Failed to fetch QUIDs" },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to fetch QUIDs",
+				},
 			});
 		}
 	},
@@ -545,7 +550,6 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 				page: params.page || 1,
 			},
 		}));
-		// Don't automatically fetch - let components control when to fetch
 	},
 
 	selectQuid: (quidId: number, selected: boolean) => {
@@ -571,14 +575,31 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			loading: { isLoading: true, message: "Updating QUID status..." },
 		});
 		try {
-			console.log(`Updating QUID ${quidId} to status ${status}`);
-			await new Promise((resolve) => setTimeout(resolve, 500));
-			set({ loading: { isLoading: false } });
-			return true;
-		} catch (error) {
+			const { data, error } = await admin.quids.updateQuidStatus(
+				quidId.toString(),
+				{
+					status,
+				}
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data) {
+				// Refresh the list
+				get().fetchQuids();
+				set({ loading: { isLoading: false } });
+				return true;
+			}
+			return false;
+		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Failed to update status" },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to update status",
+				},
 			});
 			return false;
 		}
@@ -597,12 +618,15 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			return null;
 		}
 		try {
-			console.log(
-				`Bulk updating ${ids.length} QUIDs to status ${status}`
-			);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Note: You might need to implement bulk operations in your backend
+			// For now, update individually
+			for (const id of ids) {
+				await admin.quids.updateQuidStatus(id.toString(), { status });
+			}
+
 			set({ selectedQuids: [], loading: { isLoading: false } });
 			get().fetchQuids();
+
 			return {
 				success: true,
 				message: "Update successful",
@@ -611,7 +635,10 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Bulk update failed" },
+				error: {
+					hasError: true,
+					message: error.message || "Bulk update failed",
+				},
 			});
 			return null;
 		}
@@ -619,20 +646,17 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
 	exportQuids: async (format: ExportFormat) => {
 		set({ loading: { isLoading: true, message: "Exporting QUIDs..." } });
-		const { filters, sort } = get().quidListParams;
-		const params: ExportParams<AdminQuidFilters> = {
-			format,
-			filters,
-			sort,
-		};
 		try {
-			console.log("Exporting QUIDs with params:", params);
-			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate export time
+			// TODO: Implement actual export when backend supports it
+			console.log("Exporting QUIDs in format:", format);
 			set({ loading: { isLoading: false } });
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Export failed" },
+				error: {
+					hasError: true,
+					message: error.message || "Export failed",
+				},
 			});
 		}
 	},
@@ -645,77 +669,54 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 		try {
 			const currentParams = get().transactionListParams;
-			console.log("Fetching transactions with params:", currentParams);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			const mockTransactions: PaginatedResponse<AdminTransaction> = {
-				data: [
-					{
-						id: 1,
-						email: "test1@example.com",
-						amount: 50000,
-						currency: "NGN",
-						quid: "QUID123ABC",
-						reference: "ref_123",
-						transactionId: "txn_abc123",
-						status: "SUCCESS",
-						blocked: false,
-						createdAt: new Date().toISOString(),
-						updatedAt: new Date().toISOString(),
-						quidAmount: 50000,
-						quidCurrency: "NGN",
-					},
-					{
-						id: 2,
-						email: "test2@example.com",
-						amount: 25000,
-						currency: "GHS",
-						quid: "QUID456DEF",
-						reference: "ref_456",
-						transactionId: "txn_def456",
-						status: "PENDING",
-						blocked: false,
-						createdAt: new Date(Date.now() - 3600000).toISOString(),
-						updatedAt: new Date(Date.now() - 3600000).toISOString(),
-						quidAmount: 25000,
-						quidCurrency: "GHS",
-					},
-					{
-						id: 3,
-						email: "test3@example.com",
-						amount: 10000,
-						currency: "NGN",
-						quid: "QUID789GHI",
-						reference: "ref_789",
-						transactionId: "txn_ghi789",
-						status: "FAILED",
-						blocked: false,
-						createdAt: new Date(
-							Date.now() - 86400000
-						).toISOString(),
-						updatedAt: new Date(
-							Date.now() - 86400000
-						).toISOString(),
-						quidAmount: 10000,
-						quidCurrency: "NGN",
-					},
-				],
-				total: 3,
-				page: currentParams.page,
-				limit: currentParams.limit,
-				totalPages: 1,
-			};
-
-			set({
-				transactions: mockTransactions,
-				loading: { isLoading: false },
+			const pageable = createPageable({
+				page: currentParams.page - 1,
+				size: currentParams.limit,
 			});
+
+			const { data, error } = await admin.transactions.getTransactions(
+				pageable
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data) {
+				const transactions: PaginatedResponse<AdminTransaction> = {
+					data:
+						data.content?.map((txn: any) => ({
+							id: txn.id,
+							email: txn.email,
+							amount: txn.amount,
+							currency: txn.currency,
+							quid: txn.quid,
+							reference: txn.reference,
+							transactionId: txn.transactionId,
+							status: txn.status,
+							blocked: txn.blocked,
+							createdAt: txn.createdAt,
+							updatedAt: txn.updatedAt,
+							quidAmount: txn.quidAmount,
+							quidCurrency: txn.quidCurrency,
+						})) || [],
+					total: data.totalElements || 0,
+					page: currentParams.page,
+					limit: currentParams.limit,
+					totalPages: data.totalPages || 1,
+				};
+
+				set({
+					transactions,
+					loading: { isLoading: false },
+				});
+			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
 				error: {
 					hasError: true,
-					message: "Failed to fetch transactions",
+					message: error.message || "Failed to fetch transactions",
 				},
 			});
 		}
@@ -729,7 +730,6 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 				page: params.page || 1,
 			},
 		}));
-		// Removed the automatic fetchTransactions() call to prevent infinite loop
 	},
 
 	selectTransaction: (transactionId: number, selected: boolean) => {
@@ -760,14 +760,41 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			},
 		});
 		try {
-			console.log(`Fetching details for transaction ${transactionId}`);
-			await new Promise((resolve) => setTimeout(resolve, 700));
+			const { data, error } = await admin.transactions.getTransaction(
+				transactionId.toString()
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
 			set({ loading: { isLoading: false } });
-			return null; // Replace with 'details'
-		} catch (error) {
+
+			if (data) {
+				return <AdminTransaction> {
+					id: data.id,
+					email: data.email,
+					amount: data.amount,
+					currency: data.currency,
+					quid: data.quid,
+					reference: data.reference,
+					transactionId: data.transactionId,
+					status: data.status,
+					blocked: data.blocked,
+					createdAt: data.createdAt,
+					updatedAt: data.updatedAt,
+					quidAmount: data.amount, // Assuming same as transaction amount
+					quidCurrency: data.currency, // Assuming same as transaction currency
+				};
+			}
+			return null;
+		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Failed to fetch details" },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to fetch details",
+				},
 			});
 			return null;
 		}
@@ -784,16 +811,20 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			},
 		});
 		try {
+			// Note: You might need to implement transaction status updates in your backend
+			// For now, this is a placeholder
 			console.log(
 				`Updating transaction ${transactionId} to status ${status}`
 			);
-			await new Promise((resolve) => setTimeout(resolve, 500));
 			set({ loading: { isLoading: false } });
 			return true;
-		} catch (error) {
+		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Failed to update status" },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to update status",
+				},
 			});
 			return false;
 		}
@@ -803,20 +834,17 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		set({
 			loading: { isLoading: true, message: "Exporting transactions..." },
 		});
-		const { filters, sort } = get().transactionListParams;
-		const params: ExportParams<AdminTransactionFilters> = {
-			format,
-			filters,
-			sort,
-		};
 		try {
-			console.log("Exporting transactions with params:", params);
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			// TODO: Implement actual export when backend supports it
+			console.log("Exporting transactions in format:", format);
 			set({ loading: { isLoading: false } });
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
-				error: { hasError: true, message: "Export failed" },
+				error: {
+					hasError: true,
+					message: error.message || "Export failed",
+				},
 			});
 		}
 	},

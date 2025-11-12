@@ -31,5 +31,6 @@ export type {
 	ResolveBank,
 	UserDto,
   AuditLogDto,
-  UserDtoRoleEnum as UserRole
+  UserDtoRoleEnum as UserRole,
+  GetDashboardMetricsPeriodEnum as PERIOD
 } from "../api-sdk";

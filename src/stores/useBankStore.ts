@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { transactionAPI } from "../lib/api";
+import { transactionAPI } from "../lib/api/api";
 import type { Bank, ResolveBank, LoadingState, ErrorState } from "../types/api";
 
 interface BankStore {

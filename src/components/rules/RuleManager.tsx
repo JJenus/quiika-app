@@ -1,7 +1,7 @@
 // components/rules/RuleManager.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Settings, Calendar, Users, Split } from 'lucide-react';
-import { rulesAPI, quidAPI } from '../../lib/api';
+import { rulesAPI, quidAPI } from '../../lib/api/api';
 import { useQuidStore } from '../../stores/useQuidStore';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { ErrorMessage } from '../ui/ErrorMessage';

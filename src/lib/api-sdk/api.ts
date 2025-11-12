@@ -16,9 +16,6 @@
 import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
-// URLSearchParams not necessarily used
-// @ts-ignore
-import { URL, URLSearchParams } from 'url';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
@@ -1186,6 +1183,54 @@ export const ActuatorApiFactory = function (configuration?: Configuration, baseP
 };
 
 /**
+ * ActuatorApi - interface
+ */
+export interface ActuatorApiInterface {
+    /**
+     * 
+     * @summary Actuator web endpoint \'health\'
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    health(options?: RawAxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @summary Actuator root web endpoint
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    links(options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: { [key: string]: Link; }; }>;
+
+    /**
+     * 
+     * @summary Actuator web endpoint \'metrics\'
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listNames(options?: RawAxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @summary Actuator web endpoint \'metrics-requiredMetricName\'
+     * @param {ActuatorApiMetricRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    metric(requestParameters: ActuatorApiMetricRequest, options?: RawAxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @summary Actuator web endpoint \'prometheus\'
+     * @param {ActuatorApiScrapeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    scrape(requestParameters?: ActuatorApiScrapeRequest, options?: RawAxiosRequestConfig): AxiosPromise<object>;
+
+}
+
+/**
  * Request parameters for metric operation in ActuatorApi.
  */
 export interface ActuatorApiMetricRequest {
@@ -1206,7 +1251,7 @@ export interface ActuatorApiScrapeRequest {
 /**
  * ActuatorApi - object-oriented interface
  */
-export class ActuatorApi extends BaseAPI {
+export class ActuatorApi extends BaseAPI implements ActuatorApiInterface {
     /**
      * 
      * @summary Actuator web endpoint \'health\'
@@ -1423,6 +1468,30 @@ export const AdminDashboardApiFactory = function (configuration?: Configuration,
 };
 
 /**
+ * AdminDashboardApi - interface
+ */
+export interface AdminDashboardApiInterface {
+    /**
+     * Provides key metrics for the dashboard over a specified period.
+     * @summary Get dashboard metrics
+     * @param {AdminDashboardApiGetDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDashboardMetrics(requestParameters: AdminDashboardApiGetDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<DashboardMetricsDto>;
+
+    /**
+     * Provides time series data for key metrics over a specified period.
+     * @summary Get dashboard time series data
+     * @param {AdminDashboardApiGetDashboardTimeSeriesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig): AxiosPromise<TimeSeriesDataDto>;
+
+}
+
+/**
  * Request parameters for getDashboardMetrics operation in AdminDashboardApi.
  */
 export interface AdminDashboardApiGetDashboardMetricsRequest {
@@ -1445,7 +1514,7 @@ export interface AdminDashboardApiGetDashboardTimeSeriesRequest {
 /**
  * AdminDashboardApi - object-oriented interface
  */
-export class AdminDashboardApi extends BaseAPI {
+export class AdminDashboardApi extends BaseAPI implements AdminDashboardApiInterface {
     /**
      * Provides key metrics for the dashboard over a specified period.
      * @summary Get dashboard metrics
@@ -1665,6 +1734,29 @@ export const AdminLoggingApiFactory = function (configuration?: Configuration, b
 };
 
 /**
+ * AdminLoggingApi - interface
+ */
+export interface AdminLoggingApiInterface {
+    /**
+     * Downloads the application log file. Only accessible by admins.
+     * @summary Download application log
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    downloadApplicationLog(options?: RawAxiosRequestConfig): AxiosPromise<File>;
+
+    /**
+     * Retrieves a paginated list of audit logs with optional filters.
+     * @summary Get audit logs
+     * @param {AdminLoggingApiGetAuditLogsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getAuditLogs(requestParameters: AdminLoggingApiGetAuditLogsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageAuditLogDto>;
+
+}
+
+/**
  * Request parameters for getAuditLogs operation in AdminLoggingApi.
  */
 export interface AdminLoggingApiGetAuditLogsRequest {
@@ -1699,7 +1791,7 @@ export interface AdminLoggingApiGetAuditLogsRequest {
 /**
  * AdminLoggingApi - object-oriented interface
  */
-export class AdminLoggingApi extends BaseAPI {
+export class AdminLoggingApi extends BaseAPI implements AdminLoggingApiInterface {
     /**
      * Downloads the application log file. Only accessible by admins.
      * @summary Download application log
@@ -2182,6 +2274,66 @@ export const AdminQuidManagementApiFactory = function (configuration?: Configura
 };
 
 /**
+ * AdminQuidManagementApi - interface
+ */
+export interface AdminQuidManagementApiInterface {
+    /**
+     * Creates a new Quid. Only accessible by admins.
+     * @summary Create a new Quid
+     * @param {AdminQuidManagementApiCreateQuidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createQuid(requestParameters: AdminQuidManagementApiCreateQuidRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuidDto>;
+
+    /**
+     * Retrieves a paginated list of claim attempts for a specific Quid.
+     * @summary Get claim attempts for a Quid
+     * @param {AdminQuidManagementApiGetClaimAttemptsForQuidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClaimAttemptsForQuid(requestParameters: AdminQuidManagementApiGetClaimAttemptsForQuidRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageClaimAttemptDto>;
+
+    /**
+     * Retrieves Quid details using its code.
+     * @summary Find Quid by code
+     * @param {AdminQuidManagementApiGetQuid1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getQuid1(requestParameters: AdminQuidManagementApiGetQuid1Request, options?: RawAxiosRequestConfig): AxiosPromise<QuidDetailDto>;
+
+    /**
+     * Retrieves a paginated list of all Quids, with optional filters.
+     * @summary Get all Quids
+     * @param {AdminQuidManagementApiGetQuidsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getQuids(requestParameters: AdminQuidManagementApiGetQuidsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageQuidDto>;
+
+    /**
+     * Retrieves a paginated list of winners for a specific Quid.
+     * @summary Get winners for a Quid
+     * @param {AdminQuidManagementApiGetWinnersForQuidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWinnersForQuid(requestParameters: AdminQuidManagementApiGetWinnersForQuidRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageWinnerDto>;
+
+    /**
+     * Updates the status of an existing Quid.
+     * @summary Update Quid status
+     * @param {AdminQuidManagementApiUpdateQuidStatus1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateQuidStatus1(requestParameters: AdminQuidManagementApiUpdateQuidStatus1Request, options?: RawAxiosRequestConfig): AxiosPromise<QuidDto>;
+
+}
+
+/**
  * Request parameters for createQuid operation in AdminQuidManagementApi.
  */
 export interface AdminQuidManagementApiCreateQuidRequest {
@@ -2259,7 +2411,7 @@ export interface AdminQuidManagementApiUpdateQuidStatus1Request {
 /**
  * AdminQuidManagementApi - object-oriented interface
  */
-export class AdminQuidManagementApi extends BaseAPI {
+export class AdminQuidManagementApi extends BaseAPI implements AdminQuidManagementApiInterface {
     /**
      * Creates a new Quid. Only accessible by admins.
      * @summary Create a new Quid
@@ -2577,6 +2729,39 @@ export const AdminTransactionManagementApiFactory = function (configuration?: Co
 };
 
 /**
+ * AdminTransactionManagementApi - interface
+ */
+export interface AdminTransactionManagementApiInterface {
+    /**
+     * Retrieves transaction details using its ID.
+     * @summary Find transaction by ID
+     * @param {AdminTransactionManagementApiGetTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTransaction(requestParameters: AdminTransactionManagementApiGetTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDetailDto>;
+
+    /**
+     * Retrieves a paginated list of all transactions, with optional filters.
+     * @summary Get all transactions
+     * @param {AdminTransactionManagementApiGetTransactionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTransactions(requestParameters: AdminTransactionManagementApiGetTransactionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageTransactionDto>;
+
+    /**
+     * Refunds a transaction by its ID. Only accessible by admins.
+     * @summary Refund a transaction
+     * @param {AdminTransactionManagementApiRefundTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    refundTransaction(requestParameters: AdminTransactionManagementApiRefundTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDetailDto>;
+
+}
+
+/**
  * Request parameters for getTransaction operation in AdminTransactionManagementApi.
  */
 export interface AdminTransactionManagementApiGetTransactionRequest {
@@ -2626,7 +2811,7 @@ export interface AdminTransactionManagementApiRefundTransactionRequest {
 /**
  * AdminTransactionManagementApi - object-oriented interface
  */
-export class AdminTransactionManagementApi extends BaseAPI {
+export class AdminTransactionManagementApi extends BaseAPI implements AdminTransactionManagementApiInterface {
     /**
      * Retrieves transaction details using its ID.
      * @summary Find transaction by ID
@@ -2983,6 +3168,48 @@ export const AdminUsersApiFactory = function (configuration?: Configuration, bas
 };
 
 /**
+ * AdminUsersApi - interface
+ */
+export interface AdminUsersApiInterface {
+    /**
+     * Retrieve detailed information about a specific user. Note: Will be expanded with transaction history and audit logs.
+     * @summary Get user details by ID
+     * @param {AdminUsersApiGetUserDetailsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserDetails(requestParameters: AdminUsersApiGetUserDetailsRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserDto>;
+
+    /**
+     * Retrieve a paginated list of users with optional filters by email, status, or role.
+     * @summary List and filter users
+     * @param {AdminUsersApiListUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listUsers(requestParameters: AdminUsersApiListUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<Page>;
+
+    /**
+     * Assign a new role to a user. Only accessible to ADMIN.
+     * @summary Update user role
+     * @param {AdminUsersApiUpdateUserRoleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateUserRole(requestParameters: AdminUsersApiUpdateUserRoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserDto>;
+
+    /**
+     * Enable, disable, or lock a user account.
+     * @summary Update user account status
+     * @param {AdminUsersApiUpdateUserStatusRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateUserStatus(requestParameters: AdminUsersApiUpdateUserStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserDto>;
+
+}
+
+/**
  * Request parameters for getUserDetails operation in AdminUsersApi.
  */
 export interface AdminUsersApiGetUserDetailsRequest {
@@ -3044,7 +3271,7 @@ export interface AdminUsersApiUpdateUserStatusRequest {
 /**
  * AdminUsersApi - object-oriented interface
  */
-export class AdminUsersApi extends BaseAPI {
+export class AdminUsersApi extends BaseAPI implements AdminUsersApiInterface {
     /**
      * Retrieve detailed information about a specific user. Note: Will be expanded with transaction history and audit logs.
      * @summary Get user details by ID
@@ -3399,6 +3626,48 @@ export const AdminWithdrawalManagementApiFactory = function (configuration?: Con
 };
 
 /**
+ * AdminWithdrawalManagementApi - interface
+ */
+export interface AdminWithdrawalManagementApiInterface {
+    /**
+     * Approves a withdrawal request by its ID. Only accessible by admins.
+     * @summary Approve a withdrawal request
+     * @param {AdminWithdrawalManagementApiApproveWithdrawalRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    approveWithdrawal(requestParameters: AdminWithdrawalManagementApiApproveWithdrawalRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalRequestDetailDto>;
+
+    /**
+     * Retrieves withdrawal request details using its ID.
+     * @summary Get withdrawal by ID
+     * @param {AdminWithdrawalManagementApiGetWithdrawalRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWithdrawal(requestParameters: AdminWithdrawalManagementApiGetWithdrawalRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalRequestDetailDto>;
+
+    /**
+     * Retrieves a paginated list of all withdrawal requests, with optional filters.
+     * @summary Get all withdrawal requests
+     * @param {AdminWithdrawalManagementApiGetWithdrawalsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWithdrawals(requestParameters: AdminWithdrawalManagementApiGetWithdrawalsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageWithdrawalRequestDto>;
+
+    /**
+     * Rejects a withdrawal request by its ID. Only accessible by admins.
+     * @summary Reject a withdrawal request
+     * @param {AdminWithdrawalManagementApiRejectWithdrawalRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    rejectWithdrawal(requestParameters: AdminWithdrawalManagementApiRejectWithdrawalRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalRequestDetailDto>;
+
+}
+
+/**
  * Request parameters for approveWithdrawal operation in AdminWithdrawalManagementApi.
  */
 export interface AdminWithdrawalManagementApiApproveWithdrawalRequest {
@@ -3455,7 +3724,7 @@ export interface AdminWithdrawalManagementApiRejectWithdrawalRequest {
 /**
  * AdminWithdrawalManagementApi - object-oriented interface
  */
-export class AdminWithdrawalManagementApi extends BaseAPI {
+export class AdminWithdrawalManagementApi extends BaseAPI implements AdminWithdrawalManagementApiInterface {
     /**
      * Approves a withdrawal request by its ID. Only accessible by admins.
      * @summary Approve a withdrawal request
@@ -3862,6 +4131,57 @@ export const AuthenticationApiFactory = function (configuration?: Configuration,
 };
 
 /**
+ * AuthenticationApi - interface
+ */
+export interface AuthenticationApiInterface {
+    /**
+     * Initiates the password reset process for a user\'s email address.
+     * @summary Request a password reset
+     * @param {AuthenticationApiForgotPasswordRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    forgotPassword(requestParameters: AuthenticationApiForgotPasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Logs in a user and returns a JWT token.
+     * @summary Authenticate user
+     * @param {AuthenticationApiLoginRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    login(requestParameters: AuthenticationApiLoginRequest, options?: RawAxiosRequestConfig): AxiosPromise<JwtAuthenticationResponse>;
+
+    /**
+     * Registers a new user using an invite token and returns a JWT token.
+     * @summary Register a new user
+     * @param {AuthenticationApiRegisterRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    register(requestParameters: AuthenticationApiRegisterRequest, options?: RawAxiosRequestConfig): AxiosPromise<JwtAuthenticationResponse>;
+
+    /**
+     * Resets the user\'s password using a valid reset token.
+     * @summary Reset user password
+     * @param {AuthenticationApiResetPasswordRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    resetPassword(requestParameters: AuthenticationApiResetPasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Checks if an invite token is valid.
+     * @summary Validate an invite token
+     * @param {AuthenticationApiValidateInviteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    validateInvite(requestParameters: AuthenticationApiValidateInviteRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for forgotPassword operation in AuthenticationApi.
  */
 export interface AuthenticationApiForgotPasswordRequest {
@@ -3902,7 +4222,7 @@ export interface AuthenticationApiValidateInviteRequest {
 /**
  * AuthenticationApi - object-oriented interface
  */
-export class AuthenticationApi extends BaseAPI {
+export class AuthenticationApi extends BaseAPI implements AuthenticationApiInterface {
     /**
      * Initiates the password reset process for a user\'s email address.
      * @summary Request a password reset
@@ -4106,6 +4426,29 @@ export const DynamicAPIKeyApiFactory = function (configuration?: Configuration, 
 };
 
 /**
+ * DynamicAPIKeyApi - interface
+ */
+export interface DynamicAPIKeyApiInterface {
+    /**
+     * Completes the ECDH key exchange and returns the shared secret (API key).
+     * @summary Complete key exchange
+     * @param {DynamicAPIKeyApiCompleteKeyExchangeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    completeKeyExchange(requestParameters: DynamicAPIKeyApiCompleteKeyExchangeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiKeyResponse>;
+
+    /**
+     * Starts the ECDH key exchange process by generating a server key pair.
+     * @summary Initialize key exchange
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    initKeyExchange(options?: RawAxiosRequestConfig): AxiosPromise<EcdhInitResponse>;
+
+}
+
+/**
  * Request parameters for completeKeyExchange operation in DynamicAPIKeyApi.
  */
 export interface DynamicAPIKeyApiCompleteKeyExchangeRequest {
@@ -4115,7 +4458,7 @@ export interface DynamicAPIKeyApiCompleteKeyExchangeRequest {
 /**
  * DynamicAPIKeyApi - object-oriented interface
  */
-export class DynamicAPIKeyApi extends BaseAPI {
+export class DynamicAPIKeyApi extends BaseAPI implements DynamicAPIKeyApiInterface {
     /**
      * Completes the ECDH key exchange and returns the shared secret (API key).
      * @summary Complete key exchange
@@ -4395,6 +4738,43 @@ export const InviteUserApiFactory = function (configuration?: Configuration, bas
 };
 
 /**
+ * InviteUserApi - interface
+ */
+export interface InviteUserApiInterface {
+    /**
+     * 
+     * @param {InviteUserApiCreateInviteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createInvite(requestParameters: InviteUserApiCreateInviteRequest, options?: RawAxiosRequestConfig): AxiosPromise<InviteDto>;
+
+    /**
+     * 
+     * @param {InviteUserApiDeleteInviteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteInvite(requestParameters: InviteUserApiDeleteInviteRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getAllInvites(options?: RawAxiosRequestConfig): AxiosPromise<Array<InviteDto>>;
+
+    /**
+     * 
+     * @param {InviteUserApiResendInviteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    resendInvite(requestParameters: InviteUserApiResendInviteRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for createInvite operation in InviteUserApi.
  */
 export interface InviteUserApiCreateInviteRequest {
@@ -4418,7 +4798,7 @@ export interface InviteUserApiResendInviteRequest {
 /**
  * InviteUserApi - object-oriented interface
  */
-export class InviteUserApi extends BaseAPI {
+export class InviteUserApi extends BaseAPI implements InviteUserApiInterface {
     /**
      * 
      * @param {InviteUserApiCreateInviteRequest} requestParameters Request parameters.
@@ -4628,6 +5008,30 @@ export const PaymentWebhooksApiFactory = function (configuration?: Configuration
 };
 
 /**
+ * PaymentWebhooksApi - interface
+ */
+export interface PaymentWebhooksApiInterface {
+    /**
+     * Receives and processes webhook notifications from Flutterwave to update payment statuses.
+     * @summary Handles Flutterwave webhook events
+     * @param {PaymentWebhooksApiHandleFlutterwaveWebhookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    handleFlutterwaveWebhook(requestParameters: PaymentWebhooksApiHandleFlutterwaveWebhookRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Receives and processes webhook notifications from Paystack to update payment statuses.
+     * @summary Handles Paystack webhook events
+     * @param {PaymentWebhooksApiHandlePaystackWebhookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    handlePaystackWebhook(requestParameters: PaymentWebhooksApiHandlePaystackWebhookRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for handleFlutterwaveWebhook operation in PaymentWebhooksApi.
  */
 export interface PaymentWebhooksApiHandleFlutterwaveWebhookRequest {
@@ -4660,7 +5064,7 @@ export interface PaymentWebhooksApiHandlePaystackWebhookRequest {
 /**
  * PaymentWebhooksApi - object-oriented interface
  */
-export class PaymentWebhooksApi extends BaseAPI {
+export class PaymentWebhooksApi extends BaseAPI implements PaymentWebhooksApiInterface {
     /**
      * Receives and processes webhook notifications from Flutterwave to update payment statuses.
      * @summary Handles Flutterwave webhook events
@@ -4837,6 +5241,29 @@ export const PaymentsApiFactory = function (configuration?: Configuration, baseP
 };
 
 /**
+ * PaymentsApi - interface
+ */
+export interface PaymentsApiInterface {
+    /**
+     * Retrieves a list of all supported banks for payments.
+     * @summary Get list of supported banks
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getBanks(options?: RawAxiosRequestConfig): AxiosPromise<Array<BankDto>>;
+
+    /**
+     * Initializes a new payment transaction with the specified provider or the default provider if none is specified.
+     * @summary Initialize a payment
+     * @param {PaymentsApiInitializePaymentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    initializePayment(requestParameters: PaymentsApiInitializePaymentRequest, options?: RawAxiosRequestConfig): AxiosPromise<InitializePaymentResponse>;
+
+}
+
+/**
  * Request parameters for initializePayment operation in PaymentsApi.
  */
 export interface PaymentsApiInitializePaymentRequest {
@@ -4851,7 +5278,7 @@ export interface PaymentsApiInitializePaymentRequest {
 /**
  * PaymentsApi - object-oriented interface
  */
-export class PaymentsApi extends BaseAPI {
+export class PaymentsApi extends BaseAPI implements PaymentsApiInterface {
     /**
      * Retrieves a list of all supported banks for payments.
      * @summary Get list of supported banks
@@ -5093,6 +5520,39 @@ export const QuidApiFactory = function (configuration?: Configuration, basePath?
 };
 
 /**
+ * QuidApi - interface
+ */
+export interface QuidApiInterface {
+    /**
+     * Retrieves the details of a specific Quid.
+     * @summary Get Quid details
+     * @param {QuidApiGetQuidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getQuid(requestParameters: QuidApiGetQuidRequest, options?: RawAxiosRequestConfig): AxiosPromise<Quid>;
+
+    /**
+     * Sets a Quid\'s status to active. Requires ADMIN role.
+     * @summary Activate a Quid
+     * @param {QuidApiSetQuidActiveRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    setQuidActive(requestParameters: QuidApiSetQuidActiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuiikaResponse>;
+
+    /**
+     * Updates the status of a specific Quid.
+     * @summary Update Quid status
+     * @param {QuidApiUpdateQuidStatusRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateQuidStatus(requestParameters: QuidApiUpdateQuidStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuiikaResponse>;
+
+}
+
+/**
  * Request parameters for getQuid operation in QuidApi.
  */
 export interface QuidApiGetQuidRequest {
@@ -5127,7 +5587,7 @@ export interface QuidApiUpdateQuidStatusRequest {
 /**
  * QuidApi - object-oriented interface
  */
-export class QuidApi extends BaseAPI {
+export class QuidApi extends BaseAPI implements QuidApiInterface {
     /**
      * Retrieves the details of a specific Quid.
      * @summary Get Quid details
@@ -5434,6 +5894,47 @@ export const RulesApiFactory = function (configuration?: Configuration, basePath
 };
 
 /**
+ * RulesApi - interface
+ */
+export interface RulesApiInterface {
+    /**
+     * Retrieves a list of all existing claim rules.
+     * @summary Get all rules
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    allRules(options?: RawAxiosRequestConfig): AxiosPromise<Array<Rule>>;
+
+    /**
+     * Attempts to claim a Quid based on its associated rules.
+     * @summary Attempt to claim a Quid
+     * @param {RulesApiClaimRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    claim(requestParameters: RulesApiClaimRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuiikaResponse>;
+
+    /**
+     * Creates a new claim rule with specified conditions and splits.
+     * @summary Create a new rule
+     * @param {RulesApiCreateRuleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createRule(requestParameters: RulesApiCreateRuleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Rule>;
+
+    /**
+     * Retrieves the details of a rule associated with a specific Quid.
+     * @summary Get a rule by Quid
+     * @param {RulesApiGetRuleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getRule(requestParameters: RulesApiGetRuleRequest, options?: RawAxiosRequestConfig): AxiosPromise<Rule>;
+
+}
+
+/**
  * Request parameters for claim operation in RulesApi.
  */
 export interface RulesApiClaimRequest {
@@ -5463,7 +5964,7 @@ export interface RulesApiGetRuleRequest {
 /**
  * RulesApi - object-oriented interface
  */
-export class RulesApi extends BaseAPI {
+export class RulesApi extends BaseAPI implements RulesApiInterface {
     /**
      * Retrieves a list of all existing claim rules.
      * @summary Get all rules
@@ -5731,6 +6232,39 @@ export const ServerSentEventsApiFactory = function (configuration?: Configuratio
 };
 
 /**
+ * ServerSentEventsApi - interface
+ */
+export interface ServerSentEventsApiInterface {
+    /**
+     * Establishes a Server-Sent Events (SSE) connection for a given session ID to receive real-time updates.
+     * @summary Subscribe to an event stream
+     * @param {ServerSentEventsApiConnectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    connect(requestParameters: ServerSentEventsApiConnectRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Removes the Server-Sent Events (SSE) connection for the given session ID and cleans up resources.
+     * @summary Disconnect SSE connection
+     * @param {ServerSentEventsApiDisconnectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    disconnect(requestParameters: ServerSentEventsApiDisconnectRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Sends a message to a specific user via SSE. This endpoint is intended for internal testing and debugging purposes.
+     * @summary Send a message to a user (For internal testing)
+     * @param {ServerSentEventsApiSendMessageToUserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendMessageToUser(requestParameters: ServerSentEventsApiSendMessageToUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuiikaResponse>;
+
+}
+
+/**
  * Request parameters for connect operation in ServerSentEventsApi.
  */
 export interface ServerSentEventsApiConnectRequest {
@@ -5768,7 +6302,7 @@ export interface ServerSentEventsApiSendMessageToUserRequest {
 /**
  * ServerSentEventsApi - object-oriented interface
  */
-export class ServerSentEventsApi extends BaseAPI {
+export class ServerSentEventsApi extends BaseAPI implements ServerSentEventsApiInterface {
     /**
      * Establishes a Server-Sent Events (SSE) connection for a given session ID to receive real-time updates.
      * @summary Subscribe to an event stream
@@ -6176,6 +6710,62 @@ export const SessionManagementApiFactory = function (configuration?: Configurati
 };
 
 /**
+ * SessionManagementApi - interface
+ */
+export interface SessionManagementApiInterface {
+    /**
+     * 
+     * @summary Get active sessions for current user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getActiveSessions(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserSessionDetails>>;
+
+    /**
+     * 
+     * @summary Get active session count for current user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSessionCount(options?: RawAxiosRequestConfig): AxiosPromise<SessionCountResponse>;
+
+    /**
+     * 
+     * @summary Get all active sessions for current user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserSessions(options?: RawAxiosRequestConfig): AxiosPromise<Array<UserSessionDetails>>;
+
+    /**
+     * 
+     * @summary Revoke all sessions for current user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    revokeAllSessions(options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @summary Revoke all other sessions except current one
+     * @param {SessionManagementApiRevokeOtherSessionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    revokeOtherSessions(requestParameters: SessionManagementApiRevokeOtherSessionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @summary Revoke a specific session
+     * @param {SessionManagementApiRevokeSessionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    revokeSession(requestParameters: SessionManagementApiRevokeSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for revokeOtherSessions operation in SessionManagementApi.
  */
 export interface SessionManagementApiRevokeOtherSessionsRequest {
@@ -6198,7 +6788,7 @@ export interface SessionManagementApiRevokeSessionRequest {
 /**
  * SessionManagementApi - object-oriented interface
  */
-export class SessionManagementApi extends BaseAPI {
+export class SessionManagementApi extends BaseAPI implements SessionManagementApiInterface {
     /**
      * 
      * @summary Get active sessions for current user
@@ -6832,6 +7422,91 @@ export const TransactionsApiFactory = function (configuration?: Configuration, b
 };
 
 /**
+ * TransactionsApi - interface
+ */
+export interface TransactionsApiInterface {
+    /**
+     * Retrieves a list of supported banks for payments.
+     * @summary Get list of banks
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    banks(options?: RawAxiosRequestConfig): AxiosPromise<BankDto<any>>;
+
+    /**
+     * Retrieves a list of all transactions.
+     * @summary Find all transactions
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    findAll(options?: RawAxiosRequestConfig): AxiosPromise<TransactionDto<any>>;
+
+    /**
+     * Retrieves transaction details using its ID.
+     * @summary Find transaction by ID
+     * @param {TransactionsApiFindTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    findTransaction(requestParameters: TransactionsApiFindTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDto>;
+
+    /**
+     * Retrieves transaction details using its reference.
+     * @summary Find transaction by reference
+     * @param {TransactionsApiFindTransactionByRefRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    findTransactionByRef(requestParameters: TransactionsApiFindTransactionByRefRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDto>;
+
+    /**
+     * Creates and initializes a new transaction.
+     * @summary Initialize a transaction
+     * @param {TransactionsApiInitTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    initTransaction(requestParameters: TransactionsApiInitTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDto>;
+
+    /**
+     * Verifies bank account details and returns the account holder\'s name.
+     * @summary Resolve bank account name
+     * @param {TransactionsApiResolveBankRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    resolveBank(requestParameters: TransactionsApiResolveBankRequest, options?: RawAxiosRequestConfig): AxiosPromise<ResolveBank>;
+
+    /**
+     * Verifies the transaction associated with a Quid.
+     * @summary Verify a Quid transaction
+     * @param {TransactionsApiVerifyQuidTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    verifyQuidTransaction(requestParameters: TransactionsApiVerifyQuidTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuidClaimResponse>;
+
+    /**
+     * Retrieves transaction details using a Quid.
+     * @summary Find transaction by Quid
+     * @param {TransactionsApiVerifyTransactionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    verifyTransaction(requestParameters: TransactionsApiVerifyTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDto>;
+
+    /**
+     * Initiates a withdrawal process for a given Quid.
+     * @summary Withdraw from a Quid
+     * @param {TransactionsApiWithdrawRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    withdraw(requestParameters: TransactionsApiWithdrawRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for findTransaction operation in TransactionsApi.
  */
 export interface TransactionsApiFindTransactionRequest {
@@ -6898,7 +7573,7 @@ export interface TransactionsApiWithdrawRequest {
 /**
  * TransactionsApi - object-oriented interface
  */
-export class TransactionsApi extends BaseAPI {
+export class TransactionsApi extends BaseAPI implements TransactionsApiInterface {
     /**
      * Retrieves a list of supported banks for payments.
      * @summary Get list of banks
@@ -7081,9 +7756,23 @@ export const WelcomeApiFactory = function (configuration?: Configuration, basePa
 };
 
 /**
+ * WelcomeApi - interface
+ */
+export interface WelcomeApiInterface {
+    /**
+     * Displays a simple HTML welcome page with application info.
+     * @summary Show welcome page
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    welcome(options?: RawAxiosRequestConfig): AxiosPromise<string>;
+
+}
+
+/**
  * WelcomeApi - object-oriented interface
  */
-export class WelcomeApi extends BaseAPI {
+export class WelcomeApi extends BaseAPI implements WelcomeApiInterface {
     /**
      * Displays a simple HTML welcome page with application info.
      * @summary Show welcome page
@@ -7366,6 +8055,47 @@ export const WithdrawalRequestsApiFactory = function (configuration?: Configurat
 };
 
 /**
+ * WithdrawalRequestsApi - interface
+ */
+export interface WithdrawalRequestsApiInterface {
+    /**
+     * Retrieves a list of all withdrawal requests.
+     * @summary Get all withdrawal requests
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchAllRequest(options?: RawAxiosRequestConfig): AxiosPromise<Array<WithdrawalRequest>>;
+
+    /**
+     * Retrieves a specific withdrawal request using its associated Quid.
+     * @summary Get a withdrawal request by Quid
+     * @param {WithdrawalRequestsApiFetchRequestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchRequest(requestParameters: WithdrawalRequestsApiFetchRequestRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalRequest>;
+
+    /**
+     * Creates a new withdrawal request for a user.
+     * @summary Initiate a withdrawal request
+     * @param {WithdrawalRequestsApiInitiateRequestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    initiateRequest(requestParameters: WithdrawalRequestsApiInitiateRequestRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuiikaResponse>;
+
+    /**
+     * Updates an existing withdrawal request.
+     * @summary Update a withdrawal request
+     * @param {WithdrawalRequestsApiInitiateRequest1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    initiateRequest1(requestParameters: WithdrawalRequestsApiInitiateRequest1Request, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
  * Request parameters for fetchRequest operation in WithdrawalRequestsApi.
  */
 export interface WithdrawalRequestsApiFetchRequestRequest {
@@ -7392,7 +8122,7 @@ export interface WithdrawalRequestsApiInitiateRequest1Request {
 /**
  * WithdrawalRequestsApi - object-oriented interface
  */
-export class WithdrawalRequestsApi extends BaseAPI {
+export class WithdrawalRequestsApi extends BaseAPI implements WithdrawalRequestsApiInterface {
     /**
      * Retrieves a list of all withdrawal requests.
      * @summary Get all withdrawal requests
