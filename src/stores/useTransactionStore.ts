@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { transactionAPI, paystackAPI } from "../lib/api";
+import { transactionAPI, paystackAPI } from "../lib/api/api";
 import type {
 	Transaction,
 	TransactionDto,

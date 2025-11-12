@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { withdrawalAPI } from "../lib/api";
+import { withdrawalAPI } from "../lib/api/api";
 import {
 	QuiikaResponse,
 	WithdrawalData,

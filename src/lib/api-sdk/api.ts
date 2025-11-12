@@ -79,6 +79,16 @@ export interface CreateQuidRequest {
     'amount'?: number;
     'currency': string;
 }
+export interface DashboardMetricsDto {
+    'totalUsers'?: MetricLong;
+    'totalQuids'?: MetricLong;
+    'totalQuidValue'?: MetricBigDecimal;
+    'totalTransactions'?: MetricLong;
+    'totalSuccessfulTransactionValue'?: MetricBigDecimal;
+    'withdrawalRequestsByStatus'?: { [key: string]: number; };
+    'totalApprovedWithdrawalValue'?: MetricBigDecimal;
+    'systemHealth'?: { [key: string]: any; };
+}
 /**
  * Client\'s public key and session ID
  */
@@ -145,17 +155,25 @@ export interface LoginRequest {
     'email': string;
     'password': string;
 }
+export interface MetricBigDecimal {
+    'value'?: number;
+    'growth'?: number;
+}
+export interface MetricLong {
+    'value'?: number;
+    'growth'?: number;
+}
 export interface Page {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<any>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageAuditLogDto {
@@ -163,12 +181,12 @@ export interface PageAuditLogDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<AuditLogDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageClaimAttemptDto {
@@ -176,12 +194,12 @@ export interface PageClaimAttemptDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<ClaimAttemptDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageQuidDto {
@@ -189,12 +207,12 @@ export interface PageQuidDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<QuidDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageTransactionDto {
@@ -202,12 +220,12 @@ export interface PageTransactionDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<TransactionDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageWinnerDto {
@@ -215,12 +233,12 @@ export interface PageWinnerDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<WinnerDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageWithdrawalRequestDto {
@@ -228,12 +246,12 @@ export interface PageWithdrawalRequestDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'first'?: boolean;
-    'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<WithdrawalRequestDto>;
+    'number'?: number;
+    'first'?: boolean;
+    'last'?: boolean;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface Pageable {
@@ -246,8 +264,8 @@ export interface PageableObject {
     'pageNumber'?: number;
     'pageSize'?: number;
     'sort'?: SortObject;
-    'unpaged'?: boolean;
     'offset'?: number;
+    'unpaged'?: boolean;
 }
 export interface Quid {
     'id'?: number;
@@ -499,8 +517,8 @@ export interface SessionCountResponse {
 }
 export interface SortObject {
     'sorted'?: boolean;
-    'unsorted'?: boolean;
     'empty'?: boolean;
+    'unsorted'?: boolean;
 }
 export interface Split {
     'id'?: number;
@@ -510,6 +528,16 @@ export interface Split {
 }
 export interface SplitDTO {
     'percentage'?: number;
+}
+export interface TimeSeriesDataDto {
+    'userSignups'?: Array<TimeSeriesDataPoint>;
+    'quidsCreated'?: Array<TimeSeriesDataPoint>;
+    'transactionsCompleted'?: Array<TimeSeriesDataPoint>;
+    'withdrawalsProcessed'?: Array<TimeSeriesDataPoint>;
+}
+export interface TimeSeriesDataPoint {
+    'date'?: string;
+    'value'?: number;
 }
 export interface Transaction {
     'id'?: number;
@@ -1237,6 +1265,221 @@ export const ScrapeFormatEnum = {
     ContentTypeProtobuf: 'CONTENT_TYPE_PROTOBUF'
 } as const;
 export type ScrapeFormatEnum = typeof ScrapeFormatEnum[keyof typeof ScrapeFormatEnum];
+
+
+/**
+ * AdminDashboardApi - axios parameter creator
+ */
+export const AdminDashboardApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Provides key metrics for the dashboard over a specified period.
+         * @summary Get dashboard metrics
+         * @param {GetDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDashboardMetrics: async (period: GetDashboardMetricsPeriodEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'period' is not null or undefined
+            assertParamExists('getDashboardMetrics', 'period', period)
+            const localVarPath = `/admin/dashboard/metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (period !== undefined) {
+                localVarQueryParameter['period'] = period;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Provides time series data for key metrics over a specified period.
+         * @summary Get dashboard time series data
+         * @param {GetDashboardTimeSeriesPeriodEnum} period The period for which to retrieve time series data (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDashboardTimeSeries: async (period: GetDashboardTimeSeriesPeriodEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'period' is not null or undefined
+            assertParamExists('getDashboardTimeSeries', 'period', period)
+            const localVarPath = `/admin/dashboard/timeseries`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (period !== undefined) {
+                localVarQueryParameter['period'] = period;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AdminDashboardApi - functional programming interface
+ */
+export const AdminDashboardApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AdminDashboardApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Provides key metrics for the dashboard over a specified period.
+         * @summary Get dashboard metrics
+         * @param {GetDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDashboardMetrics(period: GetDashboardMetricsPeriodEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardMetricsDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDashboardMetrics(period, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getDashboardMetrics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Provides time series data for key metrics over a specified period.
+         * @summary Get dashboard time series data
+         * @param {GetDashboardTimeSeriesPeriodEnum} period The period for which to retrieve time series data (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDashboardTimeSeries(period: GetDashboardTimeSeriesPeriodEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TimeSeriesDataDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDashboardTimeSeries(period, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getDashboardTimeSeries']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AdminDashboardApi - factory interface
+ */
+export const AdminDashboardApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AdminDashboardApiFp(configuration)
+    return {
+        /**
+         * Provides key metrics for the dashboard over a specified period.
+         * @summary Get dashboard metrics
+         * @param {AdminDashboardApiGetDashboardMetricsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDashboardMetrics(requestParameters: AdminDashboardApiGetDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<DashboardMetricsDto> {
+            return localVarFp.getDashboardMetrics(requestParameters.period, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Provides time series data for key metrics over a specified period.
+         * @summary Get dashboard time series data
+         * @param {AdminDashboardApiGetDashboardTimeSeriesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig): AxiosPromise<TimeSeriesDataDto> {
+            return localVarFp.getDashboardTimeSeries(requestParameters.period, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for getDashboardMetrics operation in AdminDashboardApi.
+ */
+export interface AdminDashboardApiGetDashboardMetricsRequest {
+    /**
+     * The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+     */
+    readonly period: GetDashboardMetricsPeriodEnum
+}
+
+/**
+ * Request parameters for getDashboardTimeSeries operation in AdminDashboardApi.
+ */
+export interface AdminDashboardApiGetDashboardTimeSeriesRequest {
+    /**
+     * The period for which to retrieve time series data (WEEKLY, MONTHLY, YEARLY)
+     */
+    readonly period: GetDashboardTimeSeriesPeriodEnum
+}
+
+/**
+ * AdminDashboardApi - object-oriented interface
+ */
+export class AdminDashboardApi extends BaseAPI {
+    /**
+     * Provides key metrics for the dashboard over a specified period.
+     * @summary Get dashboard metrics
+     * @param {AdminDashboardApiGetDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getDashboardMetrics(requestParameters: AdminDashboardApiGetDashboardMetricsRequest, options?: RawAxiosRequestConfig) {
+        return AdminDashboardApiFp(this.configuration).getDashboardMetrics(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Provides time series data for key metrics over a specified period.
+     * @summary Get dashboard time series data
+     * @param {AdminDashboardApiGetDashboardTimeSeriesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig) {
+        return AdminDashboardApiFp(this.configuration).getDashboardTimeSeries(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+export const GetDashboardMetricsPeriodEnum = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Yearly: 'YEARLY'
+} as const;
+export type GetDashboardMetricsPeriodEnum = typeof GetDashboardMetricsPeriodEnum[keyof typeof GetDashboardMetricsPeriodEnum];
+export const GetDashboardTimeSeriesPeriodEnum = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Yearly: 'YEARLY'
+} as const;
+export type GetDashboardTimeSeriesPeriodEnum = typeof GetDashboardTimeSeriesPeriodEnum[keyof typeof GetDashboardTimeSeriesPeriodEnum];
 
 
 /**

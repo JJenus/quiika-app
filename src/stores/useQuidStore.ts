@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { quidAPI, rulesAPI, transactionAPI } from '../lib/api';
+import { quidAPI, rulesAPI, transactionAPI } from '../lib/api/api';
 import type { 
   Quid, 
   QuidClaimResponse, 

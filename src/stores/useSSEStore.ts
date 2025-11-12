@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { sseAPI } from "../lib/api";
+import { sseAPI } from "../lib/api/api";
 import type { SSEMessage } from "../types/api";
 
 interface SSEStore {

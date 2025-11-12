@@ -56,6 +56,8 @@ Class | Method | HTTP request | Description
 *ActuatorApi* | [**listNames**](docs/ActuatorApi.md#listnames) | **GET** /actuator/metrics | Actuator web endpoint \&#39;metrics\&#39;
 *ActuatorApi* | [**metric**](docs/ActuatorApi.md#metric) | **GET** /actuator/metrics/{requiredMetricName} | Actuator web endpoint \&#39;metrics-requiredMetricName\&#39;
 *ActuatorApi* | [**scrape**](docs/ActuatorApi.md#scrape) | **GET** /actuator/prometheus | Actuator web endpoint \&#39;prometheus\&#39;
+*AdminDashboardApi* | [**getDashboardMetrics**](docs/AdminDashboardApi.md#getdashboardmetrics) | **GET** /admin/dashboard/metrics | Get dashboard metrics
+*AdminDashboardApi* | [**getDashboardTimeSeries**](docs/AdminDashboardApi.md#getdashboardtimeseries) | **GET** /admin/dashboard/timeseries | Get dashboard time series data
 *AdminLoggingApi* | [**downloadApplicationLog**](docs/AdminLoggingApi.md#downloadapplicationlog) | **GET** /admin/logs/application | Download application log
 *AdminLoggingApi* | [**getAuditLogs**](docs/AdminLoggingApi.md#getauditlogs) | **GET** /admin/logs/audit | Get audit logs
 *AdminQuidManagementApi* | [**createQuid**](docs/AdminQuidManagementApi.md#createquid) | **POST** /admin/quids | Create a new Quid
@@ -129,6 +131,7 @@ Class | Method | HTTP request | Description
  - [BankDto](docs/BankDto.md)
  - [ClaimAttemptDto](docs/ClaimAttemptDto.md)
  - [CreateQuidRequest](docs/CreateQuidRequest.md)
+ - [DashboardMetricsDto](docs/DashboardMetricsDto.md)
  - [EcdhCompleteRequest](docs/EcdhCompleteRequest.md)
  - [EcdhInitResponse](docs/EcdhInitResponse.md)
  - [ForgotPasswordRequest](docs/ForgotPasswordRequest.md)
@@ -139,6 +142,8 @@ Class | Method | HTTP request | Description
  - [JwtAuthenticationResponse](docs/JwtAuthenticationResponse.md)
  - [Link](docs/Link.md)
  - [LoginRequest](docs/LoginRequest.md)
+ - [MetricBigDecimal](docs/MetricBigDecimal.md)
+ - [MetricLong](docs/MetricLong.md)
  - [Page](docs/Page.md)
  - [PageAuditLogDto](docs/PageAuditLogDto.md)
  - [PageClaimAttemptDto](docs/PageClaimAttemptDto.md)
@@ -167,6 +172,8 @@ Class | Method | HTTP request | Description
  - [SortObject](docs/SortObject.md)
  - [Split](docs/Split.md)
  - [SplitDTO](docs/SplitDTO.md)
+ - [TimeSeriesDataDto](docs/TimeSeriesDataDto.md)
+ - [TimeSeriesDataPoint](docs/TimeSeriesDataPoint.md)
  - [Transaction](docs/Transaction.md)
  - [TransactionDetailDto](docs/TransactionDetailDto.md)
  - [TransactionDto](docs/TransactionDto.md)

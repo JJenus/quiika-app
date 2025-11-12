@@ -1,12 +1,12 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 README.md
 api.ts
 base.ts
 common.ts
 configuration.ts
 docs/ActuatorApi.md
+docs/AdminDashboardApi.md
 docs/AdminLoggingApi.md
 docs/AdminQuidManagementApi.md
 docs/AdminTransactionManagementApi.md
@@ -18,6 +18,7 @@ docs/AuthenticationApi.md
 docs/BankDto.md
 docs/ClaimAttemptDto.md
 docs/CreateQuidRequest.md
+docs/DashboardMetricsDto.md
 docs/DynamicAPIKeyApi.md
 docs/EcdhCompleteRequest.md
 docs/EcdhInitResponse.md
@@ -30,6 +31,8 @@ docs/InviteUserApi.md
 docs/JwtAuthenticationResponse.md
 docs/Link.md
 docs/LoginRequest.md
+docs/MetricBigDecimal.md
+docs/MetricLong.md
 docs/Page.md
 docs/PageAuditLogDto.md
 docs/PageClaimAttemptDto.md
@@ -64,6 +67,8 @@ docs/SessionManagementApi.md
 docs/SortObject.md
 docs/Split.md
 docs/SplitDTO.md
+docs/TimeSeriesDataDto.md
+docs/TimeSeriesDataPoint.md
 docs/Transaction.md
 docs/TransactionDetailDto.md
 docs/TransactionDto.md
