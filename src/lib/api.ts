@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import type {
   Transaction,
   TransactionDto,
@@ -38,47 +38,47 @@ api.interceptors.request.use(
 );
 
 // Response interceptor for handling errors
-const MAX_RETRIES = 3;
-const INITIAL_RETRY_DELAY_MS = 1000;
+// const MAX_RETRIES = 3;
+// const INITIAL_RETRY_DELAY_MS = 1000;
 
-api.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const { config } = error;
+// api.interceptors.response.use(
+//   (response) => response,
+//   async (error: AxiosError) => {
+//     const { config } = error;
 
-    // Reject if no config is available, as we can't retry.
-    if (!config) {
-      return Promise.reject(error);
-    }
+//     // Reject if no config is available, as we can't retry.
+//     if (!config) {
+//       return Promise.reject(error);
+//     }
 
-    // Use a custom property to track retries.
-    const configWithRetry = config as typeof config & { _retryCount?: number };
+//     // Use a custom property to track retries.
+//     const configWithRetry = config as typeof config & { _retryCount?: number };
 
-    // Only retry on network errors/timeouts, where no response was received from the server.
-    if (!error.response) {
-      configWithRetry._retryCount = configWithRetry._retryCount || 0;
+//     // Only retry on network errors/timeouts, where no response was received from the server.
+//     if (!error.response) {
+//       configWithRetry._retryCount = configWithRetry._retryCount || 0;
 
-      if (configWithRetry._retryCount < MAX_RETRIES) {
-        configWithRetry._retryCount += 1;
+//       if (configWithRetry._retryCount < MAX_RETRIES) {
+//         configWithRetry._retryCount += 1;
 
-        // Implement exponential backoff.
-        const delay =
-          INITIAL_RETRY_DELAY_MS * Math.pow(2, configWithRetry._retryCount - 1);
+//         // Implement exponential backoff.
+//         const delay =
+//           INITIAL_RETRY_DELAY_MS * Math.pow(2, configWithRetry._retryCount - 1);
 
-        await new Promise((resolve) => setTimeout(resolve, delay));
+//         await new Promise((resolve) => setTimeout(resolve, delay));
 
-        // Attempt to resend the request.
-        return api(configWithRetry);
-      }
-    }
+//         // Attempt to resend the request.
+//         return api(configWithRetry);
+//       }
+//     }
 
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      console.error('Unauthorized access');
-    }
-    return Promise.reject(error);
-  }
-);
+//     if (error.response?.status === 401) {
+//       // Handle unauthorized access
+//       console.error('Unauthorized access');
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 // Transaction API
 export const transactionAPI = {

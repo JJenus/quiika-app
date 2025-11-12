@@ -1,0 +1,258 @@
+import { apiClient } from './api-client';
+import {
+  // Import all the API classes you need
+  TransactionsApi,
+  WithdrawalRequestsApi,
+  QuidApi,
+  RulesApi,
+  PaymentsApi,
+  AuthenticationApi,
+  AdminUsersApi,
+  AdminTransactionManagementApi,
+  AdminQuidManagementApi,
+  AdminWithdrawalManagementApi,
+  // Import types as needed
+  TransactionDto,
+  ResolveBank,
+  WithdrawalRequest,
+  WithdrawalUpdateDto,
+  QuidStatusDto,
+  RuleDTO,
+  InitializePaymentRequest,
+  LoginRequest,
+  RegisterRequest,
+} from './api-sdk';
+
+// Initialize API instances with our configured client
+const config = apiClient.getConfig();
+const axiosInstance = apiClient.getAxiosInstance();
+
+// Create API instances - this is where we leverage the generated SDK
+export const transactionsApi = new TransactionsApi(config, config.basePath, axiosInstance);
+export const withdrawalRequestsApi = new WithdrawalRequestsApi(config, config.basePath, axiosInstance);
+export const quidApi = new QuidApi(config, config.basePath, axiosInstance);
+export const rulesApi = new RulesApi(config, config.basePath, axiosInstance);
+export const paymentsApi = new PaymentsApi(config, config.basePath, axiosInstance);
+export const authenticationApi = new AuthenticationApi(config, config.basePath, axiosInstance);
+export const adminUsersApi = new AdminUsersApi(config, config.basePath, axiosInstance);
+export const adminTransactionManagementApi = new AdminTransactionManagementApi(config, config.basePath, axiosInstance);
+export const adminQuidManagementApi = new AdminQuidManagementApi(config, config.basePath, axiosInstance);
+export const adminWithdrawalManagementApi = new AdminWithdrawalManagementApi(config, config.basePath, axiosInstance);
+
+// Generic response handler
+export type ApiResponse<T> = {
+  data: T | null;
+  error: string | null;
+  status?: number;
+};
+
+export const handleApiCall = async <T>(
+  apiCall: Promise<{ data: T }>,
+): Promise<ApiResponse<T>> => {
+  try {
+    const response = await apiCall;
+    return { 
+      data: response.data, 
+      error: null 
+    };
+  } catch (error: any) {
+    console.error('API Call failed:', error);
+    
+    const errorMessage = 
+      error.response?.data?.message || 
+      error.response?.data?.error ||
+      error.message || 
+      'An unexpected error occurred';
+    
+    return { 
+      data: null, 
+      error: errorMessage,
+      status: error.response?.status 
+    };
+  }
+};
+
+// Service layer that mirrors your current API structure but uses the generated SDK
+export const apiService = {
+  // Transaction services
+  transaction: {
+    initTransaction: (data: TransactionDto) => 
+      handleApiCall(transactionsApi.initTransaction({ transactionDto: data })),
+
+    findAll: () => 
+      handleApiCall(transactionsApi.findAll()),
+
+    findTransaction: (transactionId: string) => 
+      handleApiCall(transactionsApi.findTransaction({ transactionId })),
+
+    verifyTransactionRef: (ref: string) => 
+      handleApiCall(transactionsApi.findTransactionByRef({ ref })),
+
+    verifyTransaction: (quid: string) => 
+      handleApiCall(transactionsApi.verifyTransaction({ quid })),
+
+    verifyQuidTransaction: (quid: string) => 
+      handleApiCall(transactionsApi.verifyQuidTransaction({ quid })),
+
+    getBanks: () => 
+      handleApiCall(transactionsApi.banks()),
+
+    resolveBank: (data: ResolveBank) => 
+      handleApiCall(transactionsApi.resolveBank({ resolveBank: data })),
+
+    withdraw: (quid: string) => 
+      handleApiCall(transactionsApi.withdraw({ quid })),
+  },
+
+  // Withdrawal services
+  withdrawal: {
+    fetchAllRequests: () => 
+      handleApiCall(withdrawalRequestsApi.fetchAllRequest()),
+
+    fetchRequest: (quid: string) => 
+      handleApiCall(withdrawalRequestsApi.fetchRequest({ quid })),
+
+    initiateRequest: (data: WithdrawalRequest) => 
+      handleApiCall(withdrawalRequestsApi.initiateRequest({ withdrawalRequest: data })),
+
+    updateRequest: (data: WithdrawalUpdateDto) => 
+      handleApiCall(withdrawalRequestsApi.initiateRequest1({ withdrawalUpdateDto: data })),
+  },
+
+  // Quid services
+  quid: {
+    getQuid: (quid: string) => 
+      handleApiCall(quidApi.getQuid({ quid })),
+
+    updateQuidStatus: (quid: string, data: QuidStatusDto) => 
+      handleApiCall(quidApi.updateQuidStatus({ quid, quidStatusDto: data })),
+
+    setQuidActive: (quid: string) => 
+      handleApiCall(quidApi.setQuidActive({ quid })),
+  },
+
+  // Rules services
+  rules: {
+    allRules: () => 
+      handleApiCall(rulesApi.allRules()),
+
+    getRule: (quid: string) => 
+      handleApiCall(rulesApi.getRule({ quid })),
+
+    createRule: (data: RuleDTO) => 
+      handleApiCall(rulesApi.createRule({ ruleDTO: data })),
+
+    claim: (quid: string) => 
+      handleApiCall(rulesApi.claim({ quid })),
+  },
+
+  // Payment services
+  payment: {
+    initializePayment: (data: InitializePaymentRequest, provider?: string) => 
+      handleApiCall(paymentsApi.initializePayment({ 
+        initializePaymentRequest: data, 
+        provider 
+      })),
+
+    getBanks: () => 
+      handleApiCall(paymentsApi.getBanks()),
+  },
+
+  // Auth services
+  auth: {
+    login: (data: LoginRequest) => 
+      handleApiCall(authenticationApi.login({ loginRequest: data })),
+
+    register: (data: RegisterRequest) => 
+      handleApiCall(authenticationApi.register({ registerRequest: data })),
+
+    forgotPassword: (email: string) => 
+      handleApiCall(authenticationApi.forgotPassword({ 
+        forgotPasswordRequest: { email } 
+      })),
+
+    resetPassword: (token: string, newPassword: string) => 
+      handleApiCall(authenticationApi.resetPassword({ 
+        resetPasswordRequest: { token, newPassword } 
+      })),
+
+    validateInvite: (token: string) => 
+      handleApiCall(authenticationApi.validateInvite({ token })),
+  },
+
+  // Admin services
+  admin: {
+    // User management
+    users: {
+      listUsers: (pageable: any, email?: string, status?: string, role?: any) => 
+        handleApiCall(adminUsersApi.listUsers({ pageable, email, status, role })),
+
+      getUserDetails: (userId: number) => 
+        handleApiCall(adminUsersApi.getUserDetails({ userId })),
+
+      updateUserRole: (userId: number, roleData: any) => 
+        handleApiCall(adminUsersApi.updateUserRole({ userId, userRoleUpdateDto: roleData })),
+
+      updateUserStatus: (userId: number, statusData: any) => 
+        handleApiCall(adminUsersApi.updateUserStatus({ userId, userStatusUpdateDto: statusData })),
+    },
+
+    // Transaction management
+    transactions: {
+      getTransactions: (pageable: any, status?: any, paymentProvider?: string, currency?: string, search?: string) => 
+        handleApiCall(adminTransactionManagementApi.getTransactions({ 
+          pageable, status, paymentProvider, currency, search 
+        })),
+
+      getTransaction: (transactionId: string) => 
+        handleApiCall(adminTransactionManagementApi.getTransaction({ transactionId })),
+
+      refundTransaction: (transactionId: string) => 
+        handleApiCall(adminTransactionManagementApi.refundTransaction({ transactionId })),
+    },
+
+    // Quid management
+    quids: {
+      getQuids: (pageable: any, quid?: string, status?: any, currency?: string) => 
+        handleApiCall(adminQuidManagementApi.getQuids({ pageable, quid, status, currency })),
+
+      getQuid: (quidCode: string) => 
+        handleApiCall(adminQuidManagementApi.getQuid1({ quidCode })),
+
+      createQuid: (createQuidRequest: any) => 
+        handleApiCall(adminQuidManagementApi.createQuid({ createQuidRequest })),
+
+      updateQuidStatus: (quidCode: string, statusData: any) => 
+        handleApiCall(adminQuidManagementApi.updateQuidStatus1({ quidCode, quidStatusUpdateRequest: statusData })),
+    },
+
+    // Withdrawal management
+    withdrawals: {
+      getWithdrawals: (pageable: any, status?: any, currency?: any, search?: string) => 
+        handleApiCall(adminWithdrawalManagementApi.getWithdrawals({ pageable, status, currency, search })),
+
+      getWithdrawal: (withdrawalId: number) => 
+        handleApiCall(adminWithdrawalManagementApi.getWithdrawal({ withdrawalId })),
+
+      approveWithdrawal: (withdrawalId: number) => 
+        handleApiCall(adminWithdrawalManagementApi.approveWithdrawal({ withdrawalId })),
+
+      rejectWithdrawal: (withdrawalId: number, reason: string) => 
+        handleApiCall(adminWithdrawalManagementApi.rejectWithdrawal({ 
+          withdrawalId, 
+          rejectWithdrawalRequestDto: { reason } 
+        })),
+    },
+  },
+};
+
+// Export individual services for more granular imports
+export const {
+  transaction,
+  withdrawal,
+  quid,
+  rules,
+  payment,
+  auth,
+  admin,
+} = apiService;
