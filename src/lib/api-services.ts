@@ -11,6 +11,9 @@ import {
   AdminTransactionManagementApi,
   AdminQuidManagementApi,
   AdminWithdrawalManagementApi,
+  AdminDashboardApi,
+  AdminLoggingApi,
+  InviteUserApi,
   // Import types as needed
   TransactionDto,
   ResolveBank,
@@ -21,6 +24,10 @@ import {
   InitializePaymentRequest,
   LoginRequest,
   RegisterRequest,
+  GetDashboardMetricsPeriodEnum,
+  GetDashboardTimeSeriesPeriodEnum,
+  Pageable,
+  InviteRequest,
 } from './api-sdk';
 
 // Initialize API instances with our configured client
@@ -38,6 +45,9 @@ export const adminUsersApi = new AdminUsersApi(config, config.basePath, axiosIns
 export const adminTransactionManagementApi = new AdminTransactionManagementApi(config, config.basePath, axiosInstance);
 export const adminQuidManagementApi = new AdminQuidManagementApi(config, config.basePath, axiosInstance);
 export const adminWithdrawalManagementApi = new AdminWithdrawalManagementApi(config, config.basePath, axiosInstance);
+export const adminDashboardApi = new AdminDashboardApi(config, config.basePath, axiosInstance);
+export const adminLoggingApi = new AdminLoggingApi(config, config.basePath, axiosInstance);
+export const inviteUserApi = new InviteUserApi(config, config.basePath, axiosInstance);
 
 // Generic response handler
 export type ApiResponse<T> = {
@@ -182,9 +192,42 @@ export const apiService = {
 
   // Admin services
   admin: {
+    // Dashboard
+    dashboard: {
+      getMetrics: (period: GetDashboardMetricsPeriodEnum) =>
+        handleApiCall(adminDashboardApi.getDashboardMetrics({ period })),
+
+      getTimeSeries: (period: GetDashboardTimeSeriesPeriodEnum) =>
+        handleApiCall(adminDashboardApi.getDashboardTimeSeries({ period })),
+    },
+
+    // Logging
+    logging: {
+      getAuditLogs: (pageable: Pageable, adminUserId?: number, actionType?: any, startDate?: string, endDate?: string, targetEntityId?: string) =>
+        handleApiCall(adminLoggingApi.getAuditLogs({ pageable, adminUserId, actionType, startDate, endDate, targetEntityId })),
+      
+      downloadApplicationLog: () =>
+        handleApiCall(adminLoggingApi.downloadApplicationLog()),
+    },
+
+    // Invites
+    invites: {
+      createInvite: (data: InviteRequest) =>
+        handleApiCall(inviteUserApi.createInvite({ inviteRequest: data })),
+
+      getAllInvites: () =>
+        handleApiCall(inviteUserApi.getAllInvites()),
+
+      resendInvite: (id: number) =>
+        handleApiCall(inviteUserApi.resendInvite({ id })),
+
+      deleteInvite: (id: number) =>
+        handleApiCall(inviteUserApi.deleteInvite({ id })),
+    },
+
     // User management
     users: {
-      listUsers: (pageable: any, email?: string, status?: string, role?: any) => 
+      listUsers: (pageable: Pageable, email?: string, status?: string, role?: any) => 
         handleApiCall(adminUsersApi.listUsers({ pageable, email, status, role })),
 
       getUserDetails: (userId: number) => 
@@ -218,6 +261,12 @@ export const apiService = {
 
       getQuid: (quidCode: string) => 
         handleApiCall(adminQuidManagementApi.getQuid1({ quidCode })),
+
+      getClaimAttempts: (quidCode: string, pageable: Pageable) =>
+        handleApiCall(adminQuidManagementApi.getClaimAttemptsForQuid({ quidCode, pageable })),
+
+      getWinners: (quidCode: string, pageable: Pageable) =>
+        handleApiCall(adminQuidManagementApi.getWinnersForQuid({ quidCode, pageable })),
 
       createQuid: (createQuidRequest: any) => 
         handleApiCall(adminQuidManagementApi.createQuid({ createQuidRequest })),
