@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **accessToken** | **string** |  | [optional] [default to undefined]
 **refreshToken** | **string** |  | [optional] [default to undefined]
 **sessionId** | **string** |  | [optional] [default to undefined]
+**user** | [**UserDto**](UserDto.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -18,6 +19,7 @@ const instance: JwtAuthenticationResponse = {
     accessToken,
     refreshToken,
     sessionId,
+    user,
 };
 ```
 

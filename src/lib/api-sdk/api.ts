@@ -143,6 +143,7 @@ export interface JwtAuthenticationResponse {
     'accessToken'?: string;
     'refreshToken'?: string;
     'sessionId'?: string;
+    'user'?: UserDto;
 }
 export interface Link {
     'href'?: string;
@@ -168,12 +169,12 @@ export interface Page {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<any>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<any>;
     'empty'?: boolean;
 }
 export interface PageAuditLogDto {
@@ -181,12 +182,12 @@ export interface PageAuditLogDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<AuditLogDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<AuditLogDto>;
     'empty'?: boolean;
 }
 export interface PageClaimAttemptDto {
@@ -194,12 +195,12 @@ export interface PageClaimAttemptDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<ClaimAttemptDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<ClaimAttemptDto>;
     'empty'?: boolean;
 }
 export interface PageQuidDto {
@@ -207,12 +208,12 @@ export interface PageQuidDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<QuidDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<QuidDto>;
     'empty'?: boolean;
 }
 export interface PageTransactionDto {
@@ -220,12 +221,12 @@ export interface PageTransactionDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<TransactionDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<TransactionDto>;
     'empty'?: boolean;
 }
 export interface PageWinnerDto {
@@ -233,12 +234,12 @@ export interface PageWinnerDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<WinnerDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<WinnerDto>;
     'empty'?: boolean;
 }
 export interface PageWithdrawalRequestDto {
@@ -246,12 +247,12 @@ export interface PageWithdrawalRequestDto {
     'totalPages'?: number;
     'pageable'?: PageableObject;
     'sort'?: SortObject;
-    'size'?: number;
-    'content'?: Array<WithdrawalRequestDto>;
-    'number'?: number;
     'first'?: boolean;
     'last'?: boolean;
+    'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<WithdrawalRequestDto>;
     'empty'?: boolean;
 }
 export interface Pageable {
@@ -264,8 +265,8 @@ export interface PageableObject {
     'pageNumber'?: number;
     'pageSize'?: number;
     'sort'?: SortObject;
-    'offset'?: number;
     'unpaged'?: boolean;
+    'offset'?: number;
 }
 export interface Quid {
     'id'?: number;
@@ -517,8 +518,8 @@ export interface SessionCountResponse {
 }
 export interface SortObject {
     'sorted'?: boolean;
-    'empty'?: boolean;
     'unsorted'?: boolean;
+    'empty'?: boolean;
 }
 export interface Split {
     'id'?: number;

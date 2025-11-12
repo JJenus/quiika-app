@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { auth, admin, UserRole } from '../lib/api';
 
 export interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: 'SUPER_ADMIN' | 'ADMIN' | 'SUPPORT';
+  role: UserRole;
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
@@ -46,32 +47,37 @@ const useAuthStore = create<AuthStore>()(
         });
 
         try {
-          // Mock authentication - replace with actual API call
-          if (email === 'admin@quiika.com' && password === 'admin123') {
-            const mockUser: User = {
-              id: '1',
-              email: 'admin@quiika.com',
-              firstName: 'Admin',
-              lastName: 'User',
-              role: 'SUPER_ADMIN',
+          const { data, error } = await auth.login({ email, password });
+
+          if (error) {
+            throw new Error(error);
+          }
+
+          if (data) {
+            const { accessToken, user: userData } = data;
+            const iUser = userData!;
+            // Transform API response to match your User type
+            const user: User = {
+              id: iUser.id?.toString() || '',
+              email: iUser.email || '',
+              firstName: iUser.firstName || '',
+              lastName: iUser.lastName || '',
+              role: iUser.role! || 'SUPPORT',
               isActive: true,
               lastLogin: new Date().toISOString(),
-              createdAt: '2024-01-01T00:00:00Z'
+              createdAt: iUser.createdAt || new Date().toISOString(),
             };
-
-            const mockToken = 'mock-jwt-token-' + Date.now();
 
             set({
               isAuthenticated: true,
-              user: mockUser,
-              token: mockToken,
+              user,
+              token: accessToken,
               loading: { isLoading: false }
             });
 
             return true;
-          } else {
-            throw new Error('Invalid credentials');
           }
+          return false;
         } catch (error: any) {
           set({
             loading: { isLoading: false },
@@ -85,6 +91,9 @@ const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        // Optional: Call logout API if needed
+        // await auth.logout();
+        
         set({
           isAuthenticated: false,
           user: null,

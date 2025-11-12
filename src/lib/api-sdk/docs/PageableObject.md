@@ -9,8 +9,8 @@ Name | Type | Description | Notes
 **pageNumber** | **number** |  | [optional] [default to undefined]
 **pageSize** | **number** |  | [optional] [default to undefined]
 **sort** | [**SortObject**](SortObject.md) |  | [optional] [default to undefined]
-**offset** | **number** |  | [optional] [default to undefined]
 **unpaged** | **boolean** |  | [optional] [default to undefined]
+**offset** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -22,8 +22,8 @@ const instance: PageableObject = {
     pageNumber,
     pageSize,
     sort,
-    offset,
     unpaged,
+    offset,
 };
 ```
 
