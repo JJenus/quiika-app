@@ -14,6 +14,7 @@ export type {
     QuiikaResponse,
     UserDto,
     Pageable,
+    EcdhCompleteRequest
   } from './api-sdk';
   
   // Custom types that match your existing structure

@@ -2,6 +2,8 @@ import React from 'react';
 import { useAdminStore } from '../../../stores/useAdminStore';
 import { Users, UserPlus, Shield, UserCheck } from 'lucide-react';
 import { Card } from '../../ui/Card';
+import { getColorClasses } from '@/utils/statusHelpers';
+import { StatCardType } from '@/stores/card';
 
 export const UserStatsCards: React.FC = () => {
   const { users } = useAdminStore();
@@ -24,7 +26,7 @@ export const UserStatsCards: React.FC = () => {
     };
   }, [users]);
 
-  const statCards = [
+  const statCards: StatCardType[] = [
     {
       title: 'Total Users',
       value: stats.totalUsers,
@@ -54,16 +56,6 @@ export const UserStatsCards: React.FC = () => {
       description: 'Admin privileges',
     },
   ];
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-      green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-      yellow: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
-      purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

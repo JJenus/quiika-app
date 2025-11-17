@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { admin, auth, createPageable, PERIOD } from "../lib/api";
+import { admin, createPageable, PERIOD } from "../lib/api";
 import type {
 	Transaction,
 	WithdrawalRequest,
@@ -259,12 +259,12 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		});
 
 		try {
-			const pageable = createPageable({
+			const pageAble = createPageable({
 				page: 0,
 				size: 50,
 				sort: ["createdAt,desc"],
 			});
-			const { data, error } = await admin.users.listUsers(pageable);
+			const { data, error } = await admin.users.listUsers(pageAble);
 
 			if (error) {
 				throw new Error(error);

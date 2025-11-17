@@ -11,10 +11,10 @@ Name | Type | Description | Notes
 **sort** | [**SortObject**](SortObject.md) |  | [optional] [default to undefined]
 **first** | **boolean** |  | [optional] [default to undefined]
 **last** | **boolean** |  | [optional] [default to undefined]
-**number** | **number** |  | [optional] [default to undefined]
-**numberOfElements** | **number** |  | [optional] [default to undefined]
 **size** | **number** |  | [optional] [default to undefined]
 **content** | [**Array&lt;ClaimAttemptDto&gt;**](ClaimAttemptDto.md) |  | [optional] [default to undefined]
+**number** | **number** |  | [optional] [default to undefined]
+**numberOfElements** | **number** |  | [optional] [default to undefined]
 **empty** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
@@ -29,10 +29,10 @@ const instance: PageClaimAttemptDto = {
     sort,
     first,
     last,
-    number,
-    numberOfElements,
     size,
     content,
+    number,
+    numberOfElements,
     empty,
 };
 ```

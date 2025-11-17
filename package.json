@@ -4,7 +4,8 @@
 	"version": "0.0.5",
 	"type": "module",
 	"scripts": {
-		"dev": "npm run generate-seo:dev && vite",
+		"dev": "vite",
+		"dev:seo": "npm run generate-seo:dev && vite",
 		"build": "npm run generate-seo && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",

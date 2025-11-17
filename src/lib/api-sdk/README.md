@@ -58,6 +58,9 @@ Class | Method | HTTP request | Description
 *ActuatorApi* | [**scrape**](docs/ActuatorApi.md#scrape) | **GET** /actuator/prometheus | Actuator web endpoint \&#39;prometheus\&#39;
 *AdminDashboardApi* | [**getDashboardMetrics**](docs/AdminDashboardApi.md#getdashboardmetrics) | **GET** /admin/dashboard/metrics | Get dashboard metrics
 *AdminDashboardApi* | [**getDashboardTimeSeries**](docs/AdminDashboardApi.md#getdashboardtimeseries) | **GET** /admin/dashboard/timeseries | Get dashboard time series data
+*AdminDashboardApi* | [**getQuidDashboardMetrics**](docs/AdminDashboardApi.md#getquiddashboardmetrics) | **GET** /admin/dashboard/quids/metrics | Get Quid dashboard metrics
+*AdminDashboardApi* | [**getTransactionDashboardMetrics**](docs/AdminDashboardApi.md#gettransactiondashboardmetrics) | **GET** /admin/dashboard/transactions/metrics | Get Transaction dashboard metrics
+*AdminDashboardApi* | [**getWithdrawalDashboardMetrics**](docs/AdminDashboardApi.md#getwithdrawaldashboardmetrics) | **GET** /admin/dashboard/withdrawals/metrics | Get Withdrawal dashboard metrics
 *AdminLoggingApi* | [**downloadApplicationLog**](docs/AdminLoggingApi.md#downloadapplicationlog) | **GET** /admin/logs/application | Download application log
 *AdminLoggingApi* | [**getAuditLogs**](docs/AdminLoggingApi.md#getauditlogs) | **GET** /admin/logs/audit | Get audit logs
 *AdminQuidManagementApi* | [**createQuid**](docs/AdminQuidManagementApi.md#createquid) | **POST** /admin/quids | Create a new Quid
@@ -155,6 +158,7 @@ Class | Method | HTTP request | Description
  - [PageableObject](docs/PageableObject.md)
  - [Quid](docs/Quid.md)
  - [QuidClaimResponse](docs/QuidClaimResponse.md)
+ - [QuidDashboardMetricsDto](docs/QuidDashboardMetricsDto.md)
  - [QuidDetailDto](docs/QuidDetailDto.md)
  - [QuidDto](docs/QuidDto.md)
  - [QuidStatusDto](docs/QuidStatusDto.md)
@@ -175,6 +179,7 @@ Class | Method | HTTP request | Description
  - [TimeSeriesDataDto](docs/TimeSeriesDataDto.md)
  - [TimeSeriesDataPoint](docs/TimeSeriesDataPoint.md)
  - [Transaction](docs/Transaction.md)
+ - [TransactionDashboardMetricsDto](docs/TransactionDashboardMetricsDto.md)
  - [TransactionDetailDto](docs/TransactionDetailDto.md)
  - [TransactionDto](docs/TransactionDto.md)
  - [UserDto](docs/UserDto.md)
@@ -182,6 +187,7 @@ Class | Method | HTTP request | Description
  - [UserSessionDetails](docs/UserSessionDetails.md)
  - [UserStatusUpdateDto](docs/UserStatusUpdateDto.md)
  - [WinnerDto](docs/WinnerDto.md)
+ - [WithdrawalDashboardMetricsDto](docs/WithdrawalDashboardMetricsDto.md)
  - [WithdrawalRequest](docs/WithdrawalRequest.md)
  - [WithdrawalRequestDetailDto](docs/WithdrawalRequestDetailDto.md)
  - [WithdrawalRequestDto](docs/WithdrawalRequestDto.md)

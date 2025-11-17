@@ -47,6 +47,7 @@ docs/PaymentsApi.md
 docs/Quid.md
 docs/QuidApi.md
 docs/QuidClaimResponse.md
+docs/QuidDashboardMetricsDto.md
 docs/QuidDetailDto.md
 docs/QuidDto.md
 docs/QuidStatusDto.md
@@ -70,6 +71,7 @@ docs/SplitDTO.md
 docs/TimeSeriesDataDto.md
 docs/TimeSeriesDataPoint.md
 docs/Transaction.md
+docs/TransactionDashboardMetricsDto.md
 docs/TransactionDetailDto.md
 docs/TransactionDto.md
 docs/TransactionsApi.md
@@ -79,6 +81,7 @@ docs/UserSessionDetails.md
 docs/UserStatusUpdateDto.md
 docs/WelcomeApi.md
 docs/WinnerDto.md
+docs/WithdrawalDashboardMetricsDto.md
 docs/WithdrawalRequest.md
 docs/WithdrawalRequestDetailDto.md
 docs/WithdrawalRequestDto.md

@@ -168,10 +168,10 @@ export interface Page {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<any>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageAuditLogDto {
@@ -181,10 +181,10 @@ export interface PageAuditLogDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<AuditLogDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageClaimAttemptDto {
@@ -194,10 +194,10 @@ export interface PageClaimAttemptDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<ClaimAttemptDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageQuidDto {
@@ -207,10 +207,10 @@ export interface PageQuidDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<QuidDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageTransactionDto {
@@ -220,10 +220,10 @@ export interface PageTransactionDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<TransactionDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageWinnerDto {
@@ -233,10 +233,10 @@ export interface PageWinnerDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<WinnerDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface PageWithdrawalRequestDto {
@@ -246,10 +246,10 @@ export interface PageWithdrawalRequestDto {
     'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'number'?: number;
-    'numberOfElements'?: number;
     'size'?: number;
     'content'?: Array<WithdrawalRequestDto>;
+    'number'?: number;
+    'numberOfElements'?: number;
     'empty'?: boolean;
 }
 export interface Pageable {
@@ -262,8 +262,8 @@ export interface PageableObject {
     'pageNumber'?: number;
     'pageSize'?: number;
     'sort'?: SortObject;
-    'unpaged'?: boolean;
     'offset'?: number;
+    'unpaged'?: boolean;
 }
 export interface Quid {
     'id'?: number;
@@ -292,6 +292,11 @@ export interface QuidClaimResponse {
     'allowAccess'?: boolean;
     'message'?: string;
     'accessKey'?: string;
+}
+export interface QuidDashboardMetricsDto {
+    'totalQuids'?: MetricLong;
+    'totalQuidValue'?: MetricBigDecimal;
+    'quidsByStatus'?: { [key: string]: number; };
 }
 export interface QuidDetailDto {
     'quid'?: QuidDto;
@@ -515,8 +520,8 @@ export interface SessionCountResponse {
 }
 export interface SortObject {
     'sorted'?: boolean;
-    'unsorted'?: boolean;
     'empty'?: boolean;
+    'unsorted'?: boolean;
 }
 export interface Split {
     'id'?: number;
@@ -566,6 +571,11 @@ export const TransactionStatusEnum = {
 
 export type TransactionStatusEnum = typeof TransactionStatusEnum[keyof typeof TransactionStatusEnum];
 
+export interface TransactionDashboardMetricsDto {
+    'totalTransactions'?: MetricLong;
+    'totalSuccessfulTransactionValue'?: MetricBigDecimal;
+    'transactionsByStatus'?: { [key: string]: number; };
+}
 export interface TransactionDetailDto {
     'id'?: number;
     'email'?: string;
@@ -718,6 +728,11 @@ export interface WinnerDto {
     'userId'?: string;
     'order'?: number;
     'claimedAt'?: string;
+}
+export interface WithdrawalDashboardMetricsDto {
+    'totalWithdrawals'?: MetricLong;
+    'totalApprovedWithdrawalValue'?: MetricBigDecimal;
+    'withdrawalsByStatus'?: { [key: string]: number; };
 }
 export interface WithdrawalRequest {
     'id'?: number;
@@ -1400,6 +1415,129 @@ export const AdminDashboardApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Provides key metrics for Quids over a specified period.
+         * @summary Get Quid dashboard metrics
+         * @param {GetQuidDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getQuidDashboardMetrics: async (period: GetQuidDashboardMetricsPeriodEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'period' is not null or undefined
+            assertParamExists('getQuidDashboardMetrics', 'period', period)
+            const localVarPath = `/admin/dashboard/quids/metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (period !== undefined) {
+                localVarQueryParameter['period'] = period;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Provides key metrics for Transactions over a specified period.
+         * @summary Get Transaction dashboard metrics
+         * @param {GetTransactionDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionDashboardMetrics: async (period: GetTransactionDashboardMetricsPeriodEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'period' is not null or undefined
+            assertParamExists('getTransactionDashboardMetrics', 'period', period)
+            const localVarPath = `/admin/dashboard/transactions/metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (period !== undefined) {
+                localVarQueryParameter['period'] = period;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Provides key metrics for Withdrawals over a specified period.
+         * @summary Get Withdrawal dashboard metrics
+         * @param {GetWithdrawalDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWithdrawalDashboardMetrics: async (period: GetWithdrawalDashboardMetricsPeriodEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'period' is not null or undefined
+            assertParamExists('getWithdrawalDashboardMetrics', 'period', period)
+            const localVarPath = `/admin/dashboard/withdrawals/metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (period !== undefined) {
+                localVarQueryParameter['period'] = period;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1435,6 +1573,45 @@ export const AdminDashboardApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getDashboardTimeSeries']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Provides key metrics for Quids over a specified period.
+         * @summary Get Quid dashboard metrics
+         * @param {GetQuidDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getQuidDashboardMetrics(period: GetQuidDashboardMetricsPeriodEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuidDashboardMetricsDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getQuidDashboardMetrics(period, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getQuidDashboardMetrics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Provides key metrics for Transactions over a specified period.
+         * @summary Get Transaction dashboard metrics
+         * @param {GetTransactionDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTransactionDashboardMetrics(period: GetTransactionDashboardMetricsPeriodEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionDashboardMetricsDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionDashboardMetrics(period, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getTransactionDashboardMetrics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Provides key metrics for Withdrawals over a specified period.
+         * @summary Get Withdrawal dashboard metrics
+         * @param {GetWithdrawalDashboardMetricsPeriodEnum} period The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWithdrawalDashboardMetrics(period: GetWithdrawalDashboardMetricsPeriodEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WithdrawalDashboardMetricsDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWithdrawalDashboardMetrics(period, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminDashboardApi.getWithdrawalDashboardMetrics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1464,6 +1641,36 @@ export const AdminDashboardApiFactory = function (configuration?: Configuration,
         getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig): AxiosPromise<TimeSeriesDataDto> {
             return localVarFp.getDashboardTimeSeries(requestParameters.period, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Provides key metrics for Quids over a specified period.
+         * @summary Get Quid dashboard metrics
+         * @param {AdminDashboardApiGetQuidDashboardMetricsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getQuidDashboardMetrics(requestParameters: AdminDashboardApiGetQuidDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuidDashboardMetricsDto> {
+            return localVarFp.getQuidDashboardMetrics(requestParameters.period, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Provides key metrics for Transactions over a specified period.
+         * @summary Get Transaction dashboard metrics
+         * @param {AdminDashboardApiGetTransactionDashboardMetricsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionDashboardMetrics(requestParameters: AdminDashboardApiGetTransactionDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDashboardMetricsDto> {
+            return localVarFp.getTransactionDashboardMetrics(requestParameters.period, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Provides key metrics for Withdrawals over a specified period.
+         * @summary Get Withdrawal dashboard metrics
+         * @param {AdminDashboardApiGetWithdrawalDashboardMetricsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWithdrawalDashboardMetrics(requestParameters: AdminDashboardApiGetWithdrawalDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalDashboardMetricsDto> {
+            return localVarFp.getWithdrawalDashboardMetrics(requestParameters.period, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -1489,6 +1696,33 @@ export interface AdminDashboardApiInterface {
      */
     getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig): AxiosPromise<TimeSeriesDataDto>;
 
+    /**
+     * Provides key metrics for Quids over a specified period.
+     * @summary Get Quid dashboard metrics
+     * @param {AdminDashboardApiGetQuidDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getQuidDashboardMetrics(requestParameters: AdminDashboardApiGetQuidDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<QuidDashboardMetricsDto>;
+
+    /**
+     * Provides key metrics for Transactions over a specified period.
+     * @summary Get Transaction dashboard metrics
+     * @param {AdminDashboardApiGetTransactionDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTransactionDashboardMetrics(requestParameters: AdminDashboardApiGetTransactionDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransactionDashboardMetricsDto>;
+
+    /**
+     * Provides key metrics for Withdrawals over a specified period.
+     * @summary Get Withdrawal dashboard metrics
+     * @param {AdminDashboardApiGetWithdrawalDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWithdrawalDashboardMetrics(requestParameters: AdminDashboardApiGetWithdrawalDashboardMetricsRequest, options?: RawAxiosRequestConfig): AxiosPromise<WithdrawalDashboardMetricsDto>;
+
 }
 
 /**
@@ -1509,6 +1743,36 @@ export interface AdminDashboardApiGetDashboardTimeSeriesRequest {
      * The period for which to retrieve time series data (WEEKLY, MONTHLY, YEARLY)
      */
     readonly period: GetDashboardTimeSeriesPeriodEnum
+}
+
+/**
+ * Request parameters for getQuidDashboardMetrics operation in AdminDashboardApi.
+ */
+export interface AdminDashboardApiGetQuidDashboardMetricsRequest {
+    /**
+     * The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+     */
+    readonly period: GetQuidDashboardMetricsPeriodEnum
+}
+
+/**
+ * Request parameters for getTransactionDashboardMetrics operation in AdminDashboardApi.
+ */
+export interface AdminDashboardApiGetTransactionDashboardMetricsRequest {
+    /**
+     * The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+     */
+    readonly period: GetTransactionDashboardMetricsPeriodEnum
+}
+
+/**
+ * Request parameters for getWithdrawalDashboardMetrics operation in AdminDashboardApi.
+ */
+export interface AdminDashboardApiGetWithdrawalDashboardMetricsRequest {
+    /**
+     * The period for which to retrieve metrics (WEEKLY, MONTHLY, YEARLY)
+     */
+    readonly period: GetWithdrawalDashboardMetricsPeriodEnum
 }
 
 /**
@@ -1536,6 +1800,39 @@ export class AdminDashboardApi extends BaseAPI implements AdminDashboardApiInter
     public getDashboardTimeSeries(requestParameters: AdminDashboardApiGetDashboardTimeSeriesRequest, options?: RawAxiosRequestConfig) {
         return AdminDashboardApiFp(this.configuration).getDashboardTimeSeries(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * Provides key metrics for Quids over a specified period.
+     * @summary Get Quid dashboard metrics
+     * @param {AdminDashboardApiGetQuidDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getQuidDashboardMetrics(requestParameters: AdminDashboardApiGetQuidDashboardMetricsRequest, options?: RawAxiosRequestConfig) {
+        return AdminDashboardApiFp(this.configuration).getQuidDashboardMetrics(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Provides key metrics for Transactions over a specified period.
+     * @summary Get Transaction dashboard metrics
+     * @param {AdminDashboardApiGetTransactionDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getTransactionDashboardMetrics(requestParameters: AdminDashboardApiGetTransactionDashboardMetricsRequest, options?: RawAxiosRequestConfig) {
+        return AdminDashboardApiFp(this.configuration).getTransactionDashboardMetrics(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Provides key metrics for Withdrawals over a specified period.
+     * @summary Get Withdrawal dashboard metrics
+     * @param {AdminDashboardApiGetWithdrawalDashboardMetricsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getWithdrawalDashboardMetrics(requestParameters: AdminDashboardApiGetWithdrawalDashboardMetricsRequest, options?: RawAxiosRequestConfig) {
+        return AdminDashboardApiFp(this.configuration).getWithdrawalDashboardMetrics(requestParameters.period, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 export const GetDashboardMetricsPeriodEnum = {
@@ -1550,6 +1847,24 @@ export const GetDashboardTimeSeriesPeriodEnum = {
     Yearly: 'YEARLY'
 } as const;
 export type GetDashboardTimeSeriesPeriodEnum = typeof GetDashboardTimeSeriesPeriodEnum[keyof typeof GetDashboardTimeSeriesPeriodEnum];
+export const GetQuidDashboardMetricsPeriodEnum = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Yearly: 'YEARLY'
+} as const;
+export type GetQuidDashboardMetricsPeriodEnum = typeof GetQuidDashboardMetricsPeriodEnum[keyof typeof GetQuidDashboardMetricsPeriodEnum];
+export const GetTransactionDashboardMetricsPeriodEnum = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Yearly: 'YEARLY'
+} as const;
+export type GetTransactionDashboardMetricsPeriodEnum = typeof GetTransactionDashboardMetricsPeriodEnum[keyof typeof GetTransactionDashboardMetricsPeriodEnum];
+export const GetWithdrawalDashboardMetricsPeriodEnum = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Yearly: 'YEARLY'
+} as const;
+export type GetWithdrawalDashboardMetricsPeriodEnum = typeof GetWithdrawalDashboardMetricsPeriodEnum[keyof typeof GetWithdrawalDashboardMetricsPeriodEnum];
 
 
 /**

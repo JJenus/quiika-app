@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -33,7 +33,10 @@ import { UserManagementPage } from "./pages/admin/UserManagementPage";
 import { TransactionManagementPage } from "./pages/admin/TransactionManagementPage";
 import { RulesEnginePage } from "./pages/admin/RulesEnginePage";
 import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";
+
 import useAuthStore from "./stores/useAuthStore";
+import { initializeApiKeyManager } from "./utils/apiKeyManager";
+import { useDynamicApiKey } from "./hooks/useDynamicApiKey";
 
 const PublicLayout = () => (
 	<Layout>
@@ -47,6 +50,12 @@ function App() {
 	const { initializeAuth } = useAuthStore();
 
 	useEffect(() => {
+		const initialize = async () => {
+			// Initialize API key
+			await initializeApiKeyManager();
+		};
+
+		initialize();
 		initializeTheme();
 		initializeAuth();
 	}, [initializeTheme, initializeAuth]);
@@ -60,8 +69,14 @@ function App() {
 						<Route path="/" element={<HomePage />} />
 						<Route path="/create" element={<CreateGiftPage />} />
 						<Route path="/claim" element={<ClaimGiftPage />} />
-						<Route path="/claim/:quid" element={<ClaimGiftPage />} />
-						<Route path="/transactions" element={<TransactionsPage />} />
+						<Route
+							path="/claim/:quid"
+							element={<ClaimGiftPage />}
+						/>
+						<Route
+							path="/transactions"
+							element={<TransactionsPage />}
+						/>
 						<Route path="/rules" element={<RulesPage />} />
 						<Route
 							path="/payment/callback"
@@ -69,8 +84,14 @@ function App() {
 						/>
 						<Route path="/withdraw" element={<WithdrawPage />} />
 						<Route path="/help" element={<HelpPage />} />
-						<Route path="/privacy" element={<PrivacyPolicyPage />} />
-						<Route path="/terms" element={<TermsConditionsPage />} />
+						<Route
+							path="/privacy"
+							element={<PrivacyPolicyPage />}
+						/>
+						<Route
+							path="/terms"
+							element={<TermsConditionsPage />}
+						/>
 						<Route path="/cookies" element={<CookiePolicyPage />} />
 					</Route>
 
@@ -80,15 +101,42 @@ function App() {
 					{/* Protected Admin Routes */}
 					<Route path="/admin" element={<AdminLayout />}>
 						<Route element={<ProtectedRoute />}>
-							<Route path="dashboard" element={<DashboardPage />} />
-							<Route path="financial" element={<FinancialPage />} />
-							<Route path="quids" element={<QuidManagementPage />} />
-							<Route path="transactions" element={<TransactionManagementPage />} />
-							<Route path="withdrawals" element={<WithdrawalsPage />} />
+							<Route
+								path="dashboard"
+								element={<DashboardPage />}
+							/>
+							<Route
+								path="financial"
+								element={<FinancialPage />}
+							/>
+							<Route
+								path="quids"
+								element={<QuidManagementPage />}
+							/>
+							<Route
+								path="transactions"
+								element={<TransactionManagementPage />}
+							/>
+							<Route
+								path="withdrawals"
+								element={<WithdrawalsPage />}
+							/>
 							<Route path="rules" element={<RulesEnginePage />} />
-							<Route element={<ProtectedRoute requiredRoles={['SUPER_ADMIN', 'ADMIN']} />}>
-								<Route path="users" element={<UserManagementPage />} />
-								<Route path="invite-user" element={<ComingSoon />} />
+							<Route
+								element={
+									<ProtectedRoute
+										requiredRoles={["SUPER_ADMIN", "ADMIN"]}
+									/>
+								}
+							>
+								<Route
+									path="users"
+									element={<UserManagementPage />}
+								/>
+								<Route
+									path="invite-user"
+									element={<ComingSoon />}
+								/>
 							</Route>
 							<Route path="workload" element={<ComingSoon />} />
 							<Route path="reports" element={<ComingSoon />} />

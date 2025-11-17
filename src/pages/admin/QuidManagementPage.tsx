@@ -17,7 +17,6 @@ export const QuidManagementPage: React.FC = () => {
     selectedQuids, 
     clearQuidSelection,
     exportQuids,
-    bulkUpdateQuidStatus 
   } = useAdminStore();
 
   // Fetch quids on mount and when dependencies change
