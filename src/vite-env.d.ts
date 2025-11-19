@@ -6,7 +6,7 @@ interface ImportMetaEnv {
     readonly VITE_API_KEY: string;
     readonly VITE_AUTH_SECRET: string;
     readonly VITE_TEST_ENV: string
-    readonly VITE_ENABLE_RETRY_LOGIC: boolean;
+    readonly VITE_ENABLE_RETRY_LOGIC: string;
   }
   
   interface ImportMeta {

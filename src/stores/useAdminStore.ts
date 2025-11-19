@@ -1,5 +1,12 @@
 import { create } from "zustand";
-import { admin, createPageable, PERIOD } from "../lib/api";
+import {
+	admin,
+	createPageable,
+	PERIOD,
+	QuidMetrics,
+	TransactionMetrics,
+	DashboardMetricsDto,
+} from "../lib/api";
 import type {
 	Transaction,
 	WithdrawalRequest,
@@ -12,14 +19,11 @@ import type {
 	ExportFormat,
 	QuidStatus,
 	TransactionStatus,
-	AdminQuidFilters,
-	AdminTransactionFilters,
-	ExportParams,
 } from "../types/api";
 import { AdminStats, AdminUser, FinancialData } from "../types/admin";
 
 interface AdminState {
-	stats: AdminStats;
+	stats: DashboardMetricsDto;
 	financialData: FinancialData;
 	users: AdminUser[];
 	recentTransactions: Transaction[];
@@ -29,11 +33,13 @@ interface AdminState {
 	quids: PaginatedResponse<AdminQuid> | null;
 	quidListParams: AdminQuidListParams;
 	selectedQuids: number[];
+	quidMetrics: QuidMetrics;
 
 	// Transaction Management
 	transactions: PaginatedResponse<AdminTransaction> | null;
 	transactionListParams: AdminTransactionListParams;
 	selectedTransactions: number[];
+	transactionMetrics: TransactionMetrics;
 
 	loading: { isLoading: boolean; message?: string };
 	error: { hasError: boolean; message?: string };
@@ -67,6 +73,7 @@ interface AdminActions {
 		status: QuidStatus
 	) => Promise<BulkActionResponse | null>;
 	exportQuids: (format: ExportFormat) => Promise<void>;
+	fetchQuidMetrics: (period: PERIOD) => Promise<void>;
 
 	// Transaction Management
 	fetchTransactions: () => Promise<void>;
@@ -84,6 +91,7 @@ interface AdminActions {
 		status: TransactionStatus
 	) => Promise<boolean>;
 	exportTransactions: (format: ExportFormat) => Promise<void>;
+	fetchTransactionMetrics: (period?: PERIOD) => Promise<void>;
 
 	clearError: () => void;
 
@@ -122,11 +130,13 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 	quids: null,
 	quidListParams: { page: 1, limit: 10 },
 	selectedQuids: [],
+	quidMetrics: {},
 
 	// Transaction Management state
 	transactions: null,
 	transactionListParams: { page: 1, limit: 10 },
 	selectedTransactions: [],
+	transactionMetrics: {},
 
 	loading: { isLoading: false },
 	error: { hasError: false },
@@ -180,19 +190,19 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
 			if (data) {
 				// Transform API response to match your AdminStats type
-				const stats: AdminStats = {
-					totalUsers: data.totalUsers?.value || 0,
-					totalTransactions: data.totalTransactions?.value || 0,
-					totalRevenue: data.totalQuidValue?.value || 0,
-					totalWithdrawals:
-						data.totalApprovedWithdrawalValue?.value || 0,
-					activeQuids: data.totalQuids?.value || 0,
-					pendingWithdrawals:
-						data.withdrawalRequestsByStatus!["pending"] || 0,
-					monthlyGrowth: data.totalQuidValue?.growth || 0,
-					conversionRate: 0,
-				};
-
+				// const stats: AdminStats = {
+				// 	totalUsers: data.totalUsers?.value || 0,
+				// 	totalTransactions: data.totalTransactions?.value || 0,
+				// 	totalRevenue: data.totalQuidValue?.value || 0,
+				// 	totalWithdrawals:
+				// 		data.totalApprovedWithdrawalValue?.value || 0,
+				// 	activeQuids: data.totalQuids?.value || 0,
+				// 	pendingWithdrawals:
+				// 		data.withdrawalRequestsByStatus!["pending"] || 0,
+				// 	monthlyGrowth: data.totalQuidValue?.growth || 0,
+				// 	conversionRate: 0,
+				// };
+				const stats = data!;
 				set({
 					stats,
 					loading: { isLoading: false },
@@ -661,6 +671,33 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		}
 	},
 
+	fetchQuidMetrics: async (period: PERIOD) => {
+		set({
+			loading: { isLoading: true, message: "Updating QUID status..." },
+		});
+		try {
+			const { data, error } = await admin.dashboard.getQuidMetrics(
+				period
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data) {
+				set({ loading: { isLoading: false }, quidMetrics: data });
+			}
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to update status",
+				},
+			});
+		}
+	},
+
 	// Transaction Management
 	fetchTransactions: async () => {
 		set({
@@ -771,7 +808,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			set({ loading: { isLoading: false } });
 
 			if (data) {
-				return <AdminTransaction> {
+				return <AdminTransaction>{
 					id: data.id,
 					email: data.email,
 					amount: data.amount,
@@ -844,6 +881,33 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 				error: {
 					hasError: true,
 					message: error.message || "Export failed",
+				},
+			});
+		}
+	},
+
+	fetchTransactionMetrics: async (period: PERIOD = "MONTHLY") => {
+		set({
+			loading: { isLoading: true, message: "Updating QUID status..." },
+		});
+		try {
+			const { data, error } = await admin.dashboard.getTransactionMetrics(
+				period
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data) {
+				set({ loading: { isLoading: false }, transactionMetrics: data });
+			}
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to fetch transaction metrics",
 				},
 			});
 		}

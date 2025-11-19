@@ -18,7 +18,7 @@ export const PaymentCallbackPage: React.FC = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const [paymentStatus, setPaymentStatus] = useState<
-		"loading" | "success" | "failed"
+		"loading" | "success" | "failed" | "error"
 	>("loading");
 	const [quid, setQuid] = useState<string>("");
 	const [copied, setCopied] = useState(false);
@@ -28,6 +28,28 @@ export const PaymentCallbackPage: React.FC = () => {
 
 	const reference = searchParams.get("reference");
 	const trxref = searchParams.get("trxref");
+
+	const verifyTransaction = async () => {
+		const sessionId = reference || trxref || "";
+
+		try {
+			const result = await verifyTransactionRef(sessionId);
+			if (result && result.quid) {
+				setQuid(result.quid);
+				setPaymentStatus("success");
+			} else if (
+				error.hasError &&
+				(error.message?.toLocaleUpperCase().includes("API") ||
+					error.message?.includes("headers"))
+			) {
+				setPaymentStatus("error");
+			} else {
+				setPaymentStatus("failed");
+			}
+		} catch {
+			setPaymentStatus("failed");
+		}
+	};
 
 	useEffect(() => {
 		if (!reference && !trxref) {
@@ -42,18 +64,8 @@ export const PaymentCallbackPage: React.FC = () => {
 
 		// Verify transaction after a short delay
 		const verifyTimer = setTimeout(async () => {
-			try {
-				const result = await verifyTransactionRef(sessionId);
-				if (result && result.quid) {
-					setQuid(result.quid);
-					setPaymentStatus("success");
-				} else {
-					setPaymentStatus("failed");
-				}
-			} catch {
-				setPaymentStatus("failed");
-			}
-		}, 2000);
+			await verifyTransaction();
+		}, 3000);
 
 		return () => clearTimeout(verifyTimer);
 	}, [reference, trxref]);
@@ -143,10 +155,7 @@ export const PaymentCallbackPage: React.FC = () => {
 
 						{error.hasError && (
 							<ErrorMessage
-								message={
-									error.message ||
-									"Payment verification failed"
-								}
+								message={"Payment verification failed"}
 								className="mb-6"
 							/>
 						)}
@@ -157,6 +166,53 @@ export const PaymentCallbackPage: React.FC = () => {
 								className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
 							>
 								Try Again
+							</Button>
+							<Button
+								onClick={() => navigate("/")}
+								variant="ghost"
+								className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
+							>
+								Go Home
+							</Button>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (paymentStatus === "error") {
+		return (
+			<div className="min-h-screen py-8 px-4">
+				<div className="max-w-2xl mx-auto">
+					<div className="card p-6 sm:p-8 text-center">
+						<div className="bg-error/10 p-4 rounded-xl mx-auto w-fit mb-6">
+							<XCircle className="h-10 w-10 sm:h-12 sm:w-12 text-error" />
+						</div>
+
+						<h1 className="text-xl sm:text-2xl font-bold text-text-primary dark:text-text-primary-dark mb-4">
+							Error Occurred
+						</h1>
+
+						<p className="text-sm sm:text-base text-text-secondary dark:text-text-secondary-dark mb-6">
+							We couldn't process your payment. This might be due
+							to terminated session, a network error, or a
+							cancelled transaction. Try refreshing.
+						</p>
+
+						{error.hasError && (
+							<ErrorMessage
+								message={"Payment verification failed"}
+								className="mb-6"
+							/>
+						)}
+
+						<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+							<Button
+								onClick={verifyTransaction}
+								className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
+							>
+								Refresh
 							</Button>
 							<Button
 								onClick={() => navigate("/")}

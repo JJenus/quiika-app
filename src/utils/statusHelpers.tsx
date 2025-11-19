@@ -27,7 +27,7 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-export const getColorClasses = (color: "blue" | "green" | "yellow" | "purple" | "red") => {
+export const getColorClasses = (color: string | "blue" | "green" | "yellow" | "purple" | "red") => {
   const colors = {
     blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
     green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
@@ -36,5 +36,6 @@ export const getColorClasses = (color: "blue" | "green" | "yellow" | "purple" | 
     red: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
 
   };
-  return colors[color as keyof typeof colors] || colors.blue;
+  // return colors[color as keyof typeof colors] || colors.blue;
+  return `bg-${color}-50 text-${color}-600 dark:bg-${color}-900/20 dark:text-${color}-400`
 };

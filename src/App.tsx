@@ -36,7 +36,6 @@ import { WithdrawalsPage } from "./pages/admin/WithdrawalsPage";
 
 import useAuthStore from "./stores/useAuthStore";
 import { initializeApiKeyManager } from "./utils/apiKeyManager";
-import { useDynamicApiKey } from "./hooks/useDynamicApiKey";
 
 const PublicLayout = () => (
 	<Layout>
@@ -48,13 +47,12 @@ const PublicLayout = () => (
 function App() {
 	const { initializeTheme } = useThemeStore();
 	const { initializeAuth } = useAuthStore();
+	const initialize = async () => {
+		// Initialize API key
+		await initializeApiKeyManager();
+	};
 
 	useEffect(() => {
-		const initialize = async () => {
-			// Initialize API key
-			await initializeApiKeyManager();
-		};
-
 		initialize();
 		initializeTheme();
 		initializeAuth();

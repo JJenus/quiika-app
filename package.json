@@ -17,6 +17,7 @@
 		"@tanstack/react-table": "^8.21.3",
 		"@types/react-router-dom": "^5.3.3",
 		"axios": "^1.12.2",
+		"currency.js": "^2.0.4",
 		"date-fns": "^4.1.0",
 		"framer-motion": "^12.23.12",
 		"lucide-react": "^0.544.0",

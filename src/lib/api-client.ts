@@ -3,7 +3,7 @@ import { Configuration } from "./api-sdk";
 
 const BASE_URL =
 	import.meta.env.VITE_API_BASE_URL || "https://quiika.alwaysdata.net";
-const ENABLE_RETRY_LOGIC = import.meta.env.VITE_ENABLE_RETRY_LOGIC || false; // Default to true if not set
+const ENABLE_RETRY_LOGIC = import.meta.env.VITE_ENABLE_RETRY_LOGIC || "false"; // Default to true if not set
 
 // Define authentication strategies
 export enum AuthStrategy {
@@ -17,10 +17,10 @@ const ENDPOINT_AUTH_STRATEGIES: Record<string, AuthStrategy> = {
 	// Bearer token endpoints (protected user/admin routes)
 	"/auth/": AuthStrategy.NONE,
 	"/admin/": AuthStrategy.BEARER_TOKEN,
-	"/withdrawal/": AuthStrategy.API_KEY,
+	"/withdrawal": AuthStrategy.API_KEY,
 	"/quid/": AuthStrategy.API_KEY,
 	"/rules/": AuthStrategy.API_KEY,
-	"/transactions/": AuthStrategy.BEARER_TOKEN,
+	"/transactions": AuthStrategy.API_KEY,
 
 	// API key endpoints (public but rate-limited)
 	"/payment/": AuthStrategy.API_KEY,
@@ -42,7 +42,7 @@ class ApiClient {
 	private enableRetry: boolean;
 
 	private constructor() {
-		this.enableRetry = ENABLE_RETRY_LOGIC;
+		this.enableRetry = ENABLE_RETRY_LOGIC === "true";
 
 		this.axiosInstance = axios.create({
 			baseURL: BASE_URL,
@@ -82,6 +82,7 @@ class ApiClient {
 				if (!config.url) return config;
 
 				const authStrategy = this.getAuthStrategy(config.url);
+				console.log(config.url);
 
 				switch (authStrategy) {
 					case AuthStrategy.BEARER_TOKEN:
@@ -92,9 +93,14 @@ class ApiClient {
 
 					case AuthStrategy.API_KEY:
 						if (this.apiKey) {
-							config.headers["X-API-Key"] = this.apiKey;
+							console.log(
+								"API Key and challenge added: ",
+								this.apiKey,
+								this.challenge
+							);
+							config.headers["X-Api-Key"] = this.apiKey;
 							config.headers["X-Challenge"] = this.challenge;
-						}
+						} else console.log("No API Key");
 						break;
 
 					case AuthStrategy.NONE:

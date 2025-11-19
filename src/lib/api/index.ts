@@ -30,7 +30,11 @@ export type {
 	BankDto as Bank,
 	ResolveBank,
 	UserDto,
-  AuditLogDto,
-  UserDtoRoleEnum as UserRole,
-  GetDashboardMetricsPeriodEnum as PERIOD
+	AuditLogDto,
+	UserDtoRoleEnum as UserRole,
+	GetDashboardMetricsPeriodEnum as PERIOD,
+	QuidDashboardMetricsDto as QuidMetrics,
+	WithdrawalDashboardMetricsDto as WithdrawalMetrics,
+	TransactionDashboardMetricsDto as TransactionMetrics,
+	DashboardMetricsDto
 } from "../api-sdk";

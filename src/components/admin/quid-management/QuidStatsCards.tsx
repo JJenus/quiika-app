@@ -1,78 +1,83 @@
 import React from 'react';
-import { Card } from '../../ui/Card';
 import { DollarSign, Hash, ShieldOff, CheckCircle } from 'lucide-react';
+import { useAdminStore } from '@/stores/useAdminStore';
+import { StatsCards } from '@/components/admin/shared/StatsCards';
 
 export const QuidStatsCards: React.FC = () => {
-	// In a real app, you'd get these stats from the store
-	const stats = {
-		totalValue: 1250000,
-		totalQuids: 580,
-		activeQuids: 450,
-		blockedQuids: 15,
-	};
+  const { quidMetrics } = useAdminStore();
 
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'NGN', // Assuming NGN, should be dynamic
-			minimumFractionDigits: 2,
-		}).format(amount / 100);
-	};
+  const stats = React.useMemo(() => {
+    const totalValue = quidMetrics?.totalQuidValue?.value || 0;
+    const totalValueGrowth = quidMetrics?.totalQuidValue?.growth || 0;
+    
+    const totalQuids = quidMetrics?.totalQuids?.value || 0;
+    const totalQuidsGrowth = quidMetrics?.totalQuids?.growth || 0;
+    
+    const activeQuids = quidMetrics?.quidsByStatus?.['ACTIVE'] || 0;
+    const blockedQuids = quidMetrics?.quidsByStatus?.['BLOCKED'] || 0;
 
-	return (
-		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-			<Card>
-				<div className="flex items-center">
-					<div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
-						<DollarSign className="h-6 w-6 text-blue-500" />
-					</div>
-					<div>
-						<p className="text-sm text-text-secondary dark:text-text-secondary-dark">Total Value</p>
-						<p className="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
-							{formatCurrency(stats.totalValue)}
-						</p>
-					</div>
-				</div>
-			</Card>
-			<Card>
-				<div className="flex items-center">
-					<div className="bg-green-100 dark:bg-green-900/50 p-3 rounded-full mr-4">
-						<Hash className="h-6 w-6 text-green-500" />
-					</div>
-					<div>
-						<p className="text-sm text-text-secondary dark:text-text-secondary-dark">Total QUIDs</p>
-						<p className="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
-							{stats.totalQuids}
-						</p>
-					</div>
-				</div>
-			</Card>
-			<Card>
-				<div className="flex items-center">
-					<div className="bg-teal-100 dark:bg-teal-900/50 p-3 rounded-full mr-4">
-						<CheckCircle className="h-6 w-6 text-teal-500" />
-					</div>
-					<div>
-						<p className="text-sm text-text-secondary dark:text-text-secondary-dark">Active QUIDs</p>
-						<p className="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
-							{stats.activeQuids}
-						</p>
-					</div>
-				</div>
-			</Card>
-			<Card>
-				<div className="flex items-center">
-					<div className="bg-red-100 dark:bg-red-900/50 p-3 rounded-full mr-4">
-						<ShieldOff className="h-6 w-6 text-red-500" />
-					</div>
-					<div>
-						<p className="text-sm text-text-secondary dark:text-text-secondary-dark">Blocked QUIDs</p>
-						<p className="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
-							{stats.blockedQuids}
-						</p>
-					</div>
-				</div>
-			</Card>
-		</div>
-	);
+    return {
+      totalValue: {
+        value: totalValue,
+        growth: totalValueGrowth
+      },
+      totalQuids: {
+        value: totalQuids,
+        growth: totalQuidsGrowth
+      },
+      activeQuids: {
+        value: activeQuids,
+        growth: 0
+      },
+      blockedQuids: {
+        value: blockedQuids,
+        growth: 0
+      }
+    };
+  }, [quidMetrics]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 2,
+    }).format(amount / 100);
+  };
+
+  const cards = [
+    {
+      title: 'Total Value',
+      value: formatCurrency(stats.totalValue.value),
+      icon: <DollarSign className="h-6 w-6 text-blue-500" />,
+      gradient: 'blue',
+      description: 'Total QUID value',
+      growth: stats.totalValue.growth,
+    },
+    {
+      title: 'Total QUIDs',
+      value: stats.totalQuids.value.toLocaleString(),
+      icon: <Hash className="h-6 w-6" />,
+      gradient: 'green',
+      description: 'All QUIDs created',
+      growth: stats.totalQuids.growth,
+    },
+    {
+      title: 'Active QUIDs',
+      value: stats.activeQuids.value.toLocaleString(),
+      icon: <CheckCircle className="h-6 w-6" />,
+      gradient: 'purple',
+      description: 'Currently active',
+      growth: stats.activeQuids.growth,
+    },
+    {
+      title: 'Blocked QUIDs',
+      value: stats.blockedQuids.value.toLocaleString(),
+      icon: <ShieldOff className="h-6 w-6" />,
+      gradient: 'red',
+      description: 'Suspended QUIDs',
+      growth: stats.blockedQuids.growth,
+    },
+  ];
+
+  return <StatsCards cards={cards} columns={4} />;
 };

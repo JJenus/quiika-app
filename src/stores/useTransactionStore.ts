@@ -1,12 +1,8 @@
 import { create } from "zustand";
-import { transactionAPI, paystackAPI } from "../lib/api/api";
-import type {
-	Transaction,
-	TransactionDto,
-	PayStackTransactionDto,
-	LoadingState,
-	ErrorState,
-} from "../types/api";
+import type { Transaction, LoadingState, ErrorState } from "../types/api";
+import { transaction } from "@/lib/api-services";
+import { TransactionDto } from "@/lib/api";
+import { withApiKey } from "@/utils/apiKeyManager";
 
 interface TransactionStore {
 	transactions: Transaction[];
@@ -14,13 +10,9 @@ interface TransactionStore {
 	loading: LoadingState;
 	error: ErrorState;
 
-	// Actions
 	initializeTransaction: (
 		data: TransactionDto
 	) => Promise<TransactionDto | null>;
-	initializePayStackTransaction: (
-		data: Omit<PayStackTransactionDto, "reference">
-	) => Promise<string | null>;
 	fetchTransactions: () => Promise<void>;
 	fetchTransaction: (transactionId: string) => Promise<void>;
 	verifyTransaction: (quid: string) => Promise<TransactionDto | null>;
@@ -35,189 +27,185 @@ export const useTransactionStore = create<TransactionStore>((set, get) => ({
 	loading: { isLoading: false },
 	error: { hasError: false },
 
-	initializePayStackTransaction: async (data) => {
-		set({
-			loading: { isLoading: true, message: "Initializing payment..." },
-			error: { hasError: false },
-		});
+	initializeTransaction: async (data) =>
+		withApiKey(async () => {
+			set({
+				loading: {
+					isLoading: true,
+					message: "Initializing payment...",
+				},
+				error: { hasError: false },
+			});
 
-		try {
-			const paymentData = {
-				...data,
-				callback_url: `${window.location.origin}/payment/callback`,
-			};
+			try {
+				data.authorizationUrl = `${window.location.origin}/payment/callback`;
+				const response = await transaction.initTransaction(data);
 
-			const response = await paystackAPI.initializePayment(paymentData);
+				if (!response.data) {
+					throw new Error(
+						response.error || "Failed to initialize payment"
+					);
+				}
 
-			if (response.data.status) {
 				set({ loading: { isLoading: false } });
-				return response.data.data.authorization_url;
-			} else {
-				throw new Error(
-					response.data.message || "Failed to initialize payment"
+				return response.data;
+			} catch (error: any) {
+				console.log(error);
+				set({
+					loading: { isLoading: false },
+					error: {
+						hasError: true,
+						message:
+							error.message || "Payment initialization failed",
+					},
+				});
+				return null;
+			}
+		}),
+
+	fetchTransactions: async () =>
+		withApiKey(async () => {
+			set({
+				loading: {
+					isLoading: true,
+					message: "Loading transactions...",
+				},
+				error: { hasError: false },
+			});
+
+			try {
+				const response = await transaction.findAll();
+				if (!response.data) {
+					throw new Error(
+						response.error || "Failed to fetch transactions"
+					);
+				}
+
+				set({
+					transactions: response.data,
+					loading: { isLoading: false },
+				});
+			} catch (error: any) {
+				console.log(error);
+				set({
+					loading: { isLoading: false },
+					error: {
+						hasError: true,
+						message:
+							error.message || "Failed to fetch transactions",
+					},
+				});
+			}
+		}),
+
+	fetchTransaction: async (transactionId) =>
+		withApiKey(async () => {
+			set({
+				loading: { isLoading: true, message: "Loading transaction..." },
+				error: { hasError: false },
+			});
+
+			try {
+				const response = await transaction.findTransaction(
+					transactionId
 				);
+				if (!response.data) {
+					throw new Error(
+						response.error || "Failed to fetch transaction"
+					);
+				}
+
+				set({
+					currentTransaction: response.data,
+					loading: { isLoading: false },
+				});
+			} catch (error: any) {
+				console.log(error);
+				set({
+					loading: { isLoading: false },
+					error: {
+						hasError: true,
+						message: error.message || "Failed to fetch transaction",
+					},
+				});
 			}
-		} catch (error: any) {
+		}),
+
+	verifyTransaction: async (quid) =>
+		withApiKey(async () => {
 			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Payment initialization failed",
+				loading: {
+					isLoading: true,
+					message: "Verifying transaction...",
 				},
+				error: { hasError: false },
 			});
-			return null;
-		}
-	},
 
-	initializeTransaction: async (data) => {
-		set({
-			loading: { isLoading: true, message: "Initializing payment..." },
-			error: { hasError: false },
-		});
+			try {
+				const response = await transaction.verifyTransaction(quid);
+				if (!response.data) {
+					throw new Error(
+						response.error || "Transaction verification failed"
+					);
+				}
 
-		try {
-			data.authorizationUrl = `${window.location.origin}/payment/callback`;
-			const response = await transactionAPI.initTransaction(data);
+				set({
+					currentTransaction: response.data,
+					loading: { isLoading: false },
+				});
 
-			if (response.data.status) {
-				set({ loading: { isLoading: false } });
-				return response.data!;
-			} else {
-				throw new Error("Failed to initialize payment");
+				return response.data;
+			} catch (error: any) {
+				console.log(error);
+				set({
+					loading: { isLoading: false },
+					error: {
+						hasError: true,
+						message:
+							error.message || "Transaction verification failed",
+					},
+				});
+				return null;
 			}
-		} catch (error: any) {
-			console.log(error);
+		}),
+
+	verifyTransactionRef: async (ref) =>
+		withApiKey(async () => {
 			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Payment initialization failed",
+				loading: {
+					isLoading: true,
+					message: "Verifying transaction...",
 				},
+				error: { hasError: false },
 			});
-			return null;
-		}
-	},
 
-	fetchTransactions: async () => {
-		set({
-			loading: { isLoading: true, message: "Loading transactions..." },
-			error: { hasError: false },
-		});
+			try {
+				const response = await transaction.verifyTransactionRef(ref);
+				if (!response.data) {
+					throw new Error(
+						response.error || "Transaction verification failed"
+					);
+				}
 
-		try {
-			const response = await transactionAPI.findAll();
-			set({
-				transactions: response.data,
-				loading: { isLoading: false },
-			});
-		} catch (error: any) {
-			console.log(error);
-			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Failed to fetch transactions",
-				},
-			});
-		}
-	},
+				set({
+					currentTransaction: response.data,
+					loading: { isLoading: false },
+				});
 
-	fetchTransaction: async (transactionId) => {
-		set({
-			loading: { isLoading: true, message: "Loading transaction..." },
-			error: { hasError: false },
-		});
-
-		try {
-			const response = await transactionAPI.findTransaction(
-				transactionId
-			);
-			set({
-				currentTransaction: response.data,
-				loading: { isLoading: false },
-			});
-		} catch (error: any) {
-			console.log(error);
-			console.log(error);
-			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Failed to fetch transaction",
-				},
-			});
-		}
-	},
-
-	verifyTransaction: async (quid) => {
-		set({
-			loading: { isLoading: true, message: "Verifying transaction..." },
-			error: { hasError: false },
-		});
-
-		try {
-			const response = await transactionAPI.verifyTransaction(quid);
-			set({
-				currentTransaction: response.data,
-				loading: { isLoading: false },
-			});
-			return response.data;
-		} catch (error: any) {
-			console.log(error);
-			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Transaction verification failed",
-				},
-			});
-			return null;
-		}
-	},
-
-	verifyTransactionRef: async (ref) => {
-		set({
-			loading: { isLoading: true, message: "Verifying transaction..." },
-			error: { hasError: false },
-		});
-
-		try {
-			const response = await transactionAPI.verifyTransactionRef(ref);
-			set({
-				currentTransaction: response.data,
-				loading: { isLoading: false },
-			});
-			return response.data;
-		} catch (error: any) {
-			console.log(error);
-			set({
-				loading: { isLoading: false },
-				error: {
-					hasError: true,
-					message:
-						error.response?.data?.message ||
-						error.message ||
-						"Transaction verification failed",
-				},
-			});
-			return null;
-		}
-	},
+				return response.data;
+			} catch (error: any) {
+				console.log(error);
+				set({
+					loading: { isLoading: false },
+					error: {
+						hasError: true,
+						message:
+							error.message || "Transaction verification failed",
+					},
+				});
+				return null;
+			}
+		}),
 
 	clearError: () => set({ error: { hasError: false } }),
 

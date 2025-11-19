@@ -1,3 +1,4 @@
+//src/lib/api-service
 import { apiClient } from "./api-client";
 import {
 	// Import all the API classes you need
@@ -270,6 +271,21 @@ export const apiService = {
 				handleApiCall(
 					adminDashboardApi.getDashboardTimeSeries({ period })
 				),
+
+			getQuidMetrics: (period: GetDashboardTimeSeriesPeriodEnum) =>
+				handleApiCall(
+					adminDashboardApi.getQuidDashboardMetrics({ period })
+				),
+
+			getTransactionMetrics: (period: GetDashboardTimeSeriesPeriodEnum) =>
+				handleApiCall(
+					adminDashboardApi.getTransactionDashboardMetrics({ period })
+				),
+				
+			getWithdrawalMetrics: (period: GetDashboardTimeSeriesPeriodEnum) =>
+				handleApiCall(
+					adminDashboardApi.getWithdrawalDashboardMetrics({ period })
+				),
 		},
 
 		// Logging
@@ -481,5 +497,13 @@ export const apiService = {
 };
 
 // Export individual services for more granular imports
-export const { transaction, withdrawal, quid, rules, payment, auth, admin, apiKey } =
-	apiService;
+export const {
+	transaction,
+	withdrawal,
+	quid,
+	rules,
+	payment,
+	auth,
+	admin,
+	apiKey,
+} = apiService;

@@ -1,77 +1,50 @@
-import React from 'react';
-import { Card } from '../../ui/Card';
-import { DollarSign, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { getColorClasses } from '@/utils/statusHelpers';
-import { StatCardType } from '@/stores/card';
+import React from "react";
+import { DollarSign, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { StatCardProps, StatsCards } from "../shared/StatsCards";
+import { formatCurrency } from "@/utils/numberFormatter";
+import { useAdminStore } from "@/stores/useAdminStore";
 
 export const TransactionStatsCards: React.FC = () => {
-  const stats = {
-    totalVolume: 56789000, // in kobo
-    successfulTransactions: 1250,
-    failedTransactions: 45,
-    pendingTransactions: 12,
-  };
+	const { transactionMetrics: stats } = useAdminStore();
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'NGN',
-    }).format(amount / 100);
-  };
+	const statCards: StatCardProps[] = [
+		{
+			title: "Total Volume",
+			value: stats.totalTransactions?.value || 0,
+			icon: <DollarSign className="h-4 w-4" />,
+			gradient: "blue",
+			description: "All transactions",
+			growth: stats.totalTransactions?.growth,
+		},
+		{
+			title: "Successful",
+			value: formatCurrency(
+				stats.totalSuccessfulTransactionValue?.value || 0,
+				"NGN",
+				true
+			),
+			icon: <CheckCircle className="h-4 w-4" />,
+			gradient: "green",
+			description: "Completed transactions",
+			growth: stats.totalSuccessfulTransactionValue?.growth,
+		},
+		{
+			title: "Failed",
+			value: stats.transactionsByStatus!["FAILED"] || 0,
+			icon: <AlertCircle className="h-4 w-4" />,
+			gradient: "red",
+			description: "Failed transactions",
+			growth: 0,
+		},
+		{
+			title: "Pending",
+			value: stats.transactionsByStatus!["PROCESSING"] || 0,
+			icon: <Clock className="h-4 w-4" />,
+			gradient: "yellow",
+			description: "Awaiting processing",
+			growth: 0,
+		},
+	];
 
-  const statCards: StatCardType[] = [
-    {
-      title: 'Total Volume',
-      value: formatCurrency(stats.totalVolume),
-      icon: DollarSign,
-      color: 'blue',
-      description: 'All transactions',
-    },
-    {
-      title: 'Successful',
-      value: stats.successfulTransactions,
-      icon: CheckCircle,
-      color: 'green',
-      description: 'Completed transactions',
-    },
-    {
-      title: 'Failed',
-      value: stats.failedTransactions,
-      icon: AlertCircle,
-      color: 'red',
-      description: 'Failed transactions',
-    },
-    {
-      title: 'Pending',
-      value: stats.pendingTransactions,
-      icon: Clock,
-      color: 'yellow',
-      description: 'Awaiting processing',
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {statCards.map((stat, index) => (
-        <Card key={index} className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-secondary dark:text-text-secondary-dark mb-1">
-                {stat.title}
-              </p>
-              <p className="text-2xl font-bold text-text-primary dark:text-text-primary-dark">
-                {stat.value}
-              </p>
-              <p className="text-xs text-text-secondary dark:text-text-secondary-dark mt-1">
-                {stat.description}
-              </p>
-            </div>
-            <div className={`p-3 rounded-lg ${getColorClasses(stat.color)}`}>
-              <stat.icon className="h-6 w-6" />
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
+	return <StatsCards cards={statCards} columns={4} />;
 };
