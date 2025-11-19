@@ -1,3 +1,9 @@
+/**
+ * @deprecated This API client is deprecated and will be removed in version 3.0.0.
+ * Please use the new API client from '@/lib/api-services' instead.
+ * 
+ * Migration guide: https://not-available.com/migration-guide
+ */
 import axios, { AxiosResponse } from 'axios';
 import type {
   Transaction,
@@ -19,7 +25,20 @@ import type {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://quiika.alwaysdata.net";
 
-// Create axios instance with default config
+// Deprecation warning utility
+const showDeprecationWarning = (methodName: string = '') => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(
+      `DEPRECATED: ${methodName ? `Method ${methodName} is` : 'This API client is'} deprecated.\n` +
+      'Please migrate to the new API client from "../../api/v2".\n' +
+      'Migration guide: https://example.com/migration-guide'
+    );
+  }
+};
+
+/**
+ * @deprecated This axios instance is deprecated. Use the new client from '@/lib/api-services'
+ */
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -31,7 +50,7 @@ const api = axios.create({
 // Request interceptor for adding auth tokens if needed
 api.interceptors.request.use(
   (config) => {
-    // Add any auth headers here if needed
+    showDeprecationWarning();
     return config;
   },
   (error) => Promise.reject(error)
@@ -80,99 +99,185 @@ api.interceptors.request.use(
 //   }
 // );
 
-// Transaction API
+/**
+ * @deprecated TransactionAPI is deprecated. Use TransactionService from '@/lib/api-services'
+ */
 export const transactionAPI = {
-  initTransaction: (data: TransactionDto): Promise<AxiosResponse<TransactionDto>> =>
-    api.post('/transactions', data),
+  /** @deprecated */
+  initTransaction: (data: TransactionDto): Promise<AxiosResponse<TransactionDto>> => {
+    showDeprecationWarning('transactionAPI.initTransaction');
+    return api.post('/transactions', data);
+  },
 
-  findAll: (): Promise<AxiosResponse<Transaction[]>> =>
-    api.get('/transactions'),
+  /** @deprecated */
+  findAll: (): Promise<AxiosResponse<Transaction[]>> => {
+    showDeprecationWarning('transactionAPI.findAll');
+    return api.get('/transactions');
+  },
 
-  findTransaction: (transactionId: string): Promise<AxiosResponse<TransactionDto>> =>
-    api.get(`/transactions/${transactionId}`),
+  /** @deprecated */
+  findTransaction: (transactionId: string): Promise<AxiosResponse<TransactionDto>> => {
+    showDeprecationWarning('transactionAPI.findTransaction');
+    return api.get(`/transactions/${transactionId}`);
+  },
 
-  verifyTransactionRef: (ref: string): Promise<AxiosResponse<TransactionDto>> =>
-    api.get(`/transactions/reference/${ref}`),
+  /** @deprecated */
+  verifyTransactionRef: (ref: string): Promise<AxiosResponse<TransactionDto>> => {
+    showDeprecationWarning('transactionAPI.verifyTransactionRef');
+    return api.get(`/transactions/reference/${ref}`);
+  },
 
-  verifyTransaction: (quid: string): Promise<AxiosResponse<TransactionDto>> =>
-    api.get(`/transactions/verify/${quid}`),
+  /** @deprecated */
+  verifyTransaction: (quid: string): Promise<AxiosResponse<TransactionDto>> => {
+    showDeprecationWarning('transactionAPI.verifyTransaction');
+    return api.get(`/transactions/verify/${quid}`);
+  },
 
-  verifyQuidTransaction: (quid: string): Promise<AxiosResponse<QuidClaimResponse>> =>
-    api.get(`/transactions/quid/${quid}/verify`),
+  /** @deprecated */
+  verifyQuidTransaction: (quid: string): Promise<AxiosResponse<QuidClaimResponse>> => {
+    showDeprecationWarning('transactionAPI.verifyQuidTransaction');
+    return api.get(`/transactions/quid/${quid}/verify`);
+  },
 
-  getBanks: (): Promise<AxiosResponse<Bank[]>> =>
-    api.get('/transactions/banks'),
+  /** @deprecated */
+  getBanks: (): Promise<AxiosResponse<Bank[]>> => {
+    showDeprecationWarning('transactionAPI.getBanks');
+    return api.get('/transactions/banks');
+  },
 
-  resolveBank: (data: ResolveBank): Promise<AxiosResponse<ResolveBank>> =>
-    api.post('/transactions/banks/resolve-name', data),
+  /** @deprecated */
+  resolveBank: (data: ResolveBank): Promise<AxiosResponse<ResolveBank>> => {
+    showDeprecationWarning('transactionAPI.resolveBank');
+    return api.post('/transactions/banks/resolve-name', data);
+  },
 
-  withdraw: (): Promise<AxiosResponse<void>> =>
-    api.get('/transactions/withdraw'),
+  /** @deprecated */
+  withdraw: (): Promise<AxiosResponse<void>> => {
+    showDeprecationWarning('transactionAPI.withdraw');
+    return api.get('/transactions/withdraw');
+  },
 };
 
-// Withdrawal API
+/**
+ * @deprecated WithdrawalAPI is deprecated. Use WithdrawalService from '@/lib/api-services'
+ */
 export const withdrawalAPI = {
-  fetchAllRequests: (): Promise<AxiosResponse<WithdrawalRequest[]>> =>
-    api.get('/withdrawal-request'),
+  /** @deprecated */
+  fetchAllRequests: (): Promise<AxiosResponse<WithdrawalRequest[]>> => {
+    showDeprecationWarning('withdrawalAPI.fetchAllRequests');
+    return api.get('/withdrawal-request');
+  },
 
-  fetchRequest: (quid: string): Promise<AxiosResponse<WithdrawalRequest>> =>
-    api.get(`/withdrawal-request/${quid}`),
+  /** @deprecated */
+  fetchRequest: (quid: string): Promise<AxiosResponse<WithdrawalRequest>> => {
+    showDeprecationWarning('withdrawalAPI.fetchRequest');
+    return api.get(`/withdrawal-request/${quid}`);
+  },
 
-  initiateRequest: (data: WithdrawalData): Promise<AxiosResponse<QuiikaResponse>> =>
-    api.post('/withdrawal-request', data),
+  /** @deprecated */
+  initiateRequest: (data: WithdrawalData): Promise<AxiosResponse<QuiikaResponse>> => {
+    showDeprecationWarning('withdrawalAPI.initiateRequest');
+    return api.post('/withdrawal-request', data);
+  },
 
-  updateRequest: (data: WithdrawalUpdateDto): Promise<AxiosResponse<void>> =>
-    api.put('/withdrawal-request', data),
+  /** @deprecated */
+  updateRequest: (data: WithdrawalUpdateDto): Promise<AxiosResponse<void>> => {
+    showDeprecationWarning('withdrawalAPI.updateRequest');
+    return api.put('/withdrawal-request', data);
+  },
 };
 
-// Quid API
+/**
+ * @deprecated QuidAPI is deprecated. Use QuidService from '@/lib/api-services'
+ */
 export const quidAPI = {
-  getQuid: (quid: string): Promise<AxiosResponse<Quid>> =>
-    api.get(`/quid/${quid}`),
+  /** @deprecated */
+  getQuid: (quid: string): Promise<AxiosResponse<Quid>> => {
+    showDeprecationWarning('quidAPI.getQuid');
+    return api.get(`/quid/${quid}`);
+  },
 
-  updateQuidStatus: (quid: string, data: QuidStatusDto): Promise<AxiosResponse<QuiikaResponse>> =>
-    api.put(`/quid/${quid}/status`, data),
+  /** @deprecated */
+  updateQuidStatus: (quid: string, data: QuidStatusDto): Promise<AxiosResponse<QuiikaResponse>> => {
+    showDeprecationWarning('quidAPI.updateQuidStatus');
+    return api.put(`/quid/${quid}/status`, data);
+  },
 
-  setQuidActive: (quid: string): Promise<AxiosResponse<QuiikaResponse>> =>
-    api.put(`/quid/${quid}/status/activate`),
+  /** @deprecated */
+  setQuidActive: (quid: string): Promise<AxiosResponse<QuiikaResponse>> => {
+    showDeprecationWarning('quidAPI.setQuidActive');
+    return api.put(`/quid/${quid}/status/activate`);
+  },
 };
 
-// Rules API
+/**
+ * @deprecated RulesAPI is deprecated. Use RuleService from '@/lib/api-services'
+ */
 export const rulesAPI = {
-  allRules: (): Promise<AxiosResponse<Rule[]>> =>
-    api.get('/rules'),
+  /** @deprecated */
+  allRules: (): Promise<AxiosResponse<Rule[]>> => {
+    showDeprecationWarning('rulesAPI.allRules');
+    return api.get('/rules');
+  },
 
-  getRule: (quid: string): Promise<AxiosResponse<Rule>> =>
-    api.get(`/rules/${quid}`),
+  /** @deprecated */
+  getRule: (quid: string): Promise<AxiosResponse<Rule>> => {
+    showDeprecationWarning('rulesAPI.getRule');
+    return api.get(`/rules/${quid}`);
+  },
 
-  createRule: (data: RuleDTO): Promise<AxiosResponse<Rule>> =>
-    api.post('/rules', data),
+  /** @deprecated */
+  createRule: (data: RuleDTO): Promise<AxiosResponse<Rule>> => {
+    showDeprecationWarning('rulesAPI.createRule');
+    return api.post('/rules', data);
+  },
 
-  claim: (quid: string): Promise<AxiosResponse<QuiikaResponse>> =>
-    api.post(`/rules/claim?quid=${quid}`),
+  /** @deprecated */
+  claim: (quid: string): Promise<AxiosResponse<QuiikaResponse>> => {
+    showDeprecationWarning('rulesAPI.claim');
+    return api.post(`/rules/claim?quid=${quid}`);
+  },
 };
 
-// Paystack API
+/**
+ * @deprecated PaystackAPI is deprecated. Use PaymentService from '@/lib/api-services'
+ */
 export const paystackAPI = {
-  initializePayment: (data: PayStackTransactionDto): Promise<AxiosResponse<PayStackAuthorizationResponse>> =>
-    api.post('/paystack/transaction/initialize', data),
+  /** @deprecated */
+  initializePayment: (data: PayStackTransactionDto): Promise<AxiosResponse<PayStackAuthorizationResponse>> => {
+    showDeprecationWarning('paystackAPI.initializePayment');
+    return api.post('/paystack/transaction/initialize', data);
+  },
 
-  handleWebhook: (signature: string, data: any): Promise<AxiosResponse<void>> =>
-    api.post('/paystack/webhook', data, {
+  /** @deprecated */
+  handleWebhook: (signature: string, data: any): Promise<AxiosResponse<void>> => {
+    showDeprecationWarning('paystackAPI.handleWebhook');
+    return api.post('/paystack/webhook', data, {
       headers: {
         'x-paystack-signature': signature,
       },
-    }),
+    });
+  },
 };
 
-// SSE API
+/**
+ * @deprecated SSE API is deprecated. Use EventService from '@/lib/api-services'
+ */
 export const sseAPI = {
+  /** @deprecated */
   connect: (sessionId: string) => {
+    showDeprecationWarning('sseAPI.connect');
     return new EventSource(`${BASE_URL}/sse/connect/${sessionId}`);
   },
 
-  sendMessage: (userId: string, message: string): Promise<AxiosResponse<string>> =>
-    api.get(`/sse/send?userId=${userId}&message=${message}`),
+  /** @deprecated */
+  sendMessage: (userId: string, message: string): Promise<AxiosResponse<string>> => {
+    showDeprecationWarning('sseAPI.sendMessage');
+    return api.get(`/sse/send?userId=${userId}&message=${message}`);
+  },
 };
 
+/**
+ * @deprecated Default export is deprecated. Use the new client from '@/lib/api-services'
+ */
 export default api;
