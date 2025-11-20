@@ -20,7 +20,7 @@ import type {
 	QuidStatus,
 	TransactionStatus,
 } from "../types/api";
-import { AdminStats, AdminUser, FinancialData } from "../types/admin";
+import { AdminUser, FinancialData } from "../types/admin";
 
 interface AdminState {
 	stats: DashboardMetricsDto;
@@ -900,14 +900,18 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 			}
 
 			if (data) {
-				set({ loading: { isLoading: false }, transactionMetrics: data });
+				set({
+					loading: { isLoading: false },
+					transactionMetrics: data,
+				});
 			}
 		} catch (error: any) {
 			set({
 				loading: { isLoading: false },
 				error: {
 					hasError: true,
-					message: error.message || "Failed to fetch transaction metrics",
+					message:
+						error.message || "Failed to fetch transaction metrics",
 				},
 			});
 		}

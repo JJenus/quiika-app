@@ -2,13 +2,16 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuthStore from '../../stores/useAuthStore';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
+import { UserRole } from '@/lib/api';
 
 interface ProtectedRouteProps {
-  requiredRoles?: Array<'SUPER_ADMIN' | 'ADMIN' | 'SUPPORT'>;
+  requiredRoles?: UserRole[];
+  children?: React.ReactNode; // Add children prop
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  requiredRoles = ['SUPER_ADMIN', 'ADMIN', 'SUPPORT'] 
+  requiredRoles = ['ADMIN'],
+  children 
 }) => {
   const { isAuthenticated, user, loading } = useAuthStore();
 
@@ -37,5 +40,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  return <Outlet />;
+  // Return children if provided, otherwise Outlet for nested routes
+  return children ? <>{children}</> : <Outlet />;
 };

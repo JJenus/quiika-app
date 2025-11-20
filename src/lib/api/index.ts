@@ -36,5 +36,5 @@ export type {
 	QuidDashboardMetricsDto as QuidMetrics,
 	WithdrawalDashboardMetricsDto as WithdrawalMetrics,
 	TransactionDashboardMetricsDto as TransactionMetrics,
-	DashboardMetricsDto
+	DashboardMetricsDto,
 } from "../api-sdk";

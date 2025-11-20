@@ -1,7 +1,7 @@
 // src/stores/useAuthStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { auth, admin, UserRole } from "../lib/api";
+import { auth, UserRole } from "../lib/api";
 import { apiClient } from "../lib/api-client";
 
 export interface User {

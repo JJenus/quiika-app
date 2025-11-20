@@ -16,6 +16,7 @@ import {
 	AdminLoggingApi,
 	InviteUserApi,
 	DynamicAPIKeyApi,
+	AuditLogDto,
 	// Import types as needed
 	TransactionDto,
 	ResolveBank,
