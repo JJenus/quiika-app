@@ -11,6 +11,7 @@ import { RulesEnginePage } from "@/pages/admin/RulesEnginePage";
 import { UserManagementPage } from "@/pages/admin/UserManagementPage";
 import { ComingSoon } from "@/pages/admin/ComingSoon";
 import AuditPage from "@/pages/admin/AuditPage";
+import SettingsPage from "@/pages/admin/SettingsPage";
 
 // Admin routes configuration
 export const adminRoutes: RouteConfig[] = [
@@ -75,6 +76,12 @@ export const adminRoutes: RouteConfig[] = [
 		layout: "admin",
 		protected: true,
 		requiredRoles: ["ADMIN"],
+	},
+	{
+		path: "/admin/settings",
+		element: <SettingsPage />,
+		layout: "admin",
+		protected: true,
 	},
 	// {
 	//   path: '/admin/reports',

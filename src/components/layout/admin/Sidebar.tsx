@@ -13,7 +13,7 @@ import {
 	Banknote,
 	Users,
 	Gavel,
-	DollarSign,
+	Settings,
 } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";
 import useAuthStore from "../../../stores/useAuthStore";
@@ -34,11 +34,17 @@ const menuItems = [
 		icon: Users,
 		roles: ["SUPER_ADMIN", "ADMIN"],
 	},
-	{ 
-		id: "/admin/audit", 
-		label: "Audit", 
+	{
+		id: "/admin/audit",
+		label: "Audit",
 		icon: FileText,
-		roles: ["SUPER_ADMIN", "ADMIN"] 
+		roles: ["SUPER_ADMIN", "ADMIN"],
+	},
+	{
+		id: "/admin/settings",
+		label: "Settings",
+		icon: Settings,
+		roles: ["SUPER_ADMIN", "ADMIN", "SUPPORT"],
 	},
 ];
 
@@ -132,11 +138,7 @@ export const Sidebar: React.FC = () => {
 											? "bg-gradient-to-r from-primary-50 to-secondary-50 text-primary-700 border border-blue-200 dark:text-text-primary-dark dark:gradient-bg dark:border-secondary"
 											: "text-gray-600 dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-secondary/5 hover:text-gray-900 dark:hover:text-text-primary-dark"
 									}
-									${
-										sidebarCollapsed
-											? "justify-center p-3"
-											: "justify-start gap-3 px-3 py-2.5"
-									}
+									${sidebarCollapsed ? "justify-center p-3" : "justify-start gap-3 px-3 py-2.5"}
 								`}
 								title={
 									sidebarCollapsed ? item.label : undefined
