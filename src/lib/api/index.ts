@@ -37,4 +37,6 @@ export type {
 	WithdrawalDashboardMetricsDto as WithdrawalMetrics,
 	TransactionDashboardMetricsDto as TransactionMetrics,
 	DashboardMetricsDto,
+	PageWithdrawalRequestDto,
+	WithdrawalRequestDto
 } from "../api-sdk";

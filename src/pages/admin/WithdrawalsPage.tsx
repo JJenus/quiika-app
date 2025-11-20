@@ -1,4 +1,3 @@
-// src/pages/admin/WithdrawalsPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePagination } from "@/hooks/usePagination";
@@ -9,27 +8,29 @@ import { FilterPanel } from "@/components/admin/shared/FilterPanel";
 import { SearchBar } from "@/components/admin/shared/SearchBar";
 import { Pagination } from "@/components/admin/shared/Pagination";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { useWithdrawalStore } from "@/stores/useWithdrawalStore";
+import { useAdminStore } from "@/stores/useAdminStore";
 import { ApproveModal } from "@/components/admin/withdrawals/modals/ApproveModal";
 import { DetailsModal } from "@/components/admin/withdrawals/modals/DetailsModal";
 import { RejectModal } from "@/components/admin/withdrawals/modals/RejectModal";
-import { WithdrawalRequest } from "@/types/api";
+import { WithdrawalRequestDto } from "@/lib/api";
 
 export const WithdrawalsPage = () => {
   const {
     withdrawals,
+    withdrawalMetrics,
     loading,
     error,
     fetchWithdrawals,
-    approve,
-    reject,
+    fetchWithdrawalMetrics,
+    approveWithdrawal,
+    rejectWithdrawal,
     clearError,
-  } = useWithdrawalStore();
+  } = useAdminStore();
 
   // UI state
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [selected, setSelected] = useState<WithdrawalRequest | null>(null);
+  const [selected, setSelected] = useState<WithdrawalRequestDto | null>(null);
   const [showApprove, setShowApprove] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -40,17 +41,19 @@ export const WithdrawalsPage = () => {
   // Load data
   useEffect(() => {
     fetchWithdrawals();
-  }, [fetchWithdrawals]);
+    fetchWithdrawalMetrics();
+  }, []);
 
   // Filtering
   const filtered = useMemo(() => {
-    return withdrawals.filter((w) => {
-      const matchesFilter = filter === "all" || w.status.toLowerCase() === filter;
+    const content = withdrawals?.content || [];
+    return content.filter((w) => {
+      const matchesFilter = filter === "all" || w.status?.toLowerCase() === filter;
       const matchesSearch =
         debouncedSearch === "" ||
-        w.quid.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        w.accountName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        w.transaction.email.toLowerCase().includes(debouncedSearch.toLowerCase());
+        w.reference?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        w.accountName?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        w.email?.toLowerCase().includes(debouncedSearch.toLowerCase());
       return matchesFilter && matchesSearch;
     });
   }, [withdrawals, filter, debouncedSearch]);
@@ -58,51 +61,64 @@ export const WithdrawalsPage = () => {
   // Pagination
   const { page, setPage, totalPages, paginated } = usePagination(filtered, 10);
 
-  // Stats
-  const pending = withdrawals.filter((w) => w.status === "PENDING");
-  const pendingAmount = pending.reduce((s, w) => s + w.amount, 0);
-  const today = new Date().toISOString().split("T")[0];
-  const processedToday = withdrawals.filter(
-    (w) => w.status === "COMPLETED" && w.updatedAt.startsWith(today)
-  ).length;
-
   // Handlers
-  const openDetails = (w: WithdrawalRequest) => {
+  const openDetails = (w: WithdrawalRequestDto) => {
     setSelected(w);
     setShowDetails(true);
   };
-  const openApprove = (w: WithdrawalRequest) => {
+  
+  const openApprove = (w: WithdrawalRequestDto) => {
     setSelected(w);
     setShowApprove(true);
   };
-  const openReject = (w: WithdrawalRequest) => {
+  
+  const openReject = (w: WithdrawalRequestDto) => {
     setSelected(w);
     setShowReject(true);
   };
+  
   const confirmApprove = async () => {
-    if (selected) await approve(selected.id.toString());
+    if (selected?.id) {
+      await approveWithdrawal(selected.id.toString());
+      // Refresh data after action
+      fetchWithdrawals();
+      fetchWithdrawalMetrics();
+    }
     setShowApprove(false);
     setSelected(null);
   };
+  
   const confirmReject = async () => {
-    if (selected && rejectReason.trim()) {
-      await reject(selected.id.toString(), rejectReason);
-      setShowReject(false);
-      setSelected(null);
-      setRejectReason("");
+    if (selected?.id && rejectReason.trim()) {
+      await rejectWithdrawal(selected.id.toString(), rejectReason);
+      // Refresh data after action
+      fetchWithdrawals();
+      fetchWithdrawalMetrics();
     }
+    setShowReject(false);
+    setSelected(null);
+    setRejectReason("");
   };
+
+  const isWithdrawalLoading = loading.isLoading && loading.message?.includes("withdrawal");
+  const isMetricsLoading = loading.isLoading && loading.message?.includes("metrics");
+  const isApproveLoading = loading.isLoading && loading.message?.includes("approve");
+  const isRejectLoading = loading.isLoading && loading.message?.includes("reject");
 
   return (
     <div className="space-y-6">
       {/* Header + Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Withdrawal Management</h1>
-          <p className="text-text-secondary mt-1">Review and process withdrawal requests</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Withdrawal Management</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Review and process withdrawal requests</p>
         </div>
         <div className="flex items-center gap-3">
-          <SearchBar value={search} onChange={setSearch} placeholder="QUID, name, email…" />
+          <SearchBar 
+            value={search} 
+            onChange={setSearch} 
+            placeholder="Reference, name, email…" 
+          />
           <FilterPanel
             value={filter}
             onChange={setFilter}
@@ -116,19 +132,23 @@ export const WithdrawalsPage = () => {
         </div>
       </div>
 
-      {error.hasError && <ErrorMessage message={error.message!} onDismiss={clearError} />}
+      {error.hasError && (
+        <ErrorMessage 
+          message={error.message!} 
+          onDismiss={clearError} 
+        />
+      )}
 
       {/* Stats */}
       <WithdrawalStats
-        pendingCount={pending.length}
-        pendingAmount={pendingAmount}
-        processedToday={processedToday}
+        metrics={withdrawalMetrics}
+        loading={isMetricsLoading}
       />
 
       {/* Table */}
       <DataTable
         data={paginated}
-        loading={loading.isLoading && loading.action === "fetch"}
+        loading={isWithdrawalLoading}
         loadingText={loading.message}
         renderRow={(w, idx) => (
           <WithdrawalRow
@@ -138,8 +158,8 @@ export const WithdrawalsPage = () => {
             onApprove={() => openApprove(w)}
             onReject={() => openReject(w)}
             loading={{
-              approve: loading.isLoading && loading.action === "approve" && loading.id === w.id.toString(),
-              reject: loading.isLoading && loading.action === "reject" && loading.id === w.id.toString(),
+              approve: isApproveLoading || false,
+              reject: isRejectLoading || false,
             }}
           />
         )}
@@ -169,7 +189,7 @@ export const WithdrawalsPage = () => {
         }}
         withdrawal={selected}
         onConfirm={confirmApprove}
-        loading={loading.isLoading && loading.action === "approve"}
+        loading={isApproveLoading || false}
       />
       <RejectModal
         open={showReject}
@@ -182,7 +202,7 @@ export const WithdrawalsPage = () => {
         reason={rejectReason}
         setReason={setRejectReason}
         onConfirm={confirmReject}
-        loading={loading.isLoading && loading.action === "reject"}
+        loading={isRejectLoading || false}
       />
       <DetailsModal
         open={showDetails}

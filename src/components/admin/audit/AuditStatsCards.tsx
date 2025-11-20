@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '../../ui/Card';
 import { Activity, UserCheck, Shield, FileText } from 'lucide-react';
 import { StatsCards } from '../shared/StatsCards';
 

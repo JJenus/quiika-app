@@ -5,7 +5,15 @@ import { formatCurrency } from "@/utils/numberFormatter";
 import { useAdminStore } from "@/stores/useAdminStore";
 
 export const TransactionStatsCards: React.FC = () => {
-	const { transactionMetrics: stats } = useAdminStore();
+	const { transactionMetrics: stats, loading } = useAdminStore();
+
+	const getStatValue = (stat: string) => {
+		if(!stats.transactionsByStatus || stats.transactionsByStatus.length === 0){
+			return 0;
+		}
+
+		return stats.transactionsByStatus[stat] || 0
+	}
 
 	const statCards: StatCardProps[] = [
 		{
@@ -30,7 +38,7 @@ export const TransactionStatsCards: React.FC = () => {
 		},
 		{
 			title: "Failed",
-			value: stats.transactionsByStatus!["FAILED"] || 0,
+			value: getStatValue("FAILED") || 0,
 			icon: <AlertCircle className="h-4 w-4" />,
 			gradient: "red",
 			description: "Failed transactions",
@@ -38,7 +46,7 @@ export const TransactionStatsCards: React.FC = () => {
 		},
 		{
 			title: "Pending",
-			value: stats.transactionsByStatus!["PROCESSING"] || 0,
+			value: getStatValue("PROCESSING") || 0,
 			icon: <Clock className="h-4 w-4" />,
 			gradient: "yellow",
 			description: "Awaiting processing",
@@ -46,5 +54,5 @@ export const TransactionStatsCards: React.FC = () => {
 		},
 	];
 
-	return <StatsCards cards={statCards} columns={4} />;
+	return <StatsCards cards={statCards} columns={4} loading={loading.isLoading} />;
 };

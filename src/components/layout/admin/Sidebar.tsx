@@ -1,3 +1,4 @@
+// @/components/layout/admin/sidebar
 import React from "react";
 import {
 	ChartBar as BarChart3,
@@ -22,7 +23,7 @@ import { Link } from "react-router-dom";
 
 const menuItems = [
 	{ id: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-	{ id: "/admin/financial", label: "Financial", icon: DollarSign },
+	// { id: "/admin/financial", label: "Financial", icon: DollarSign },
 	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
 	{ id: "/admin/withdrawals", label: "Withdrawals", icon: Banknote },

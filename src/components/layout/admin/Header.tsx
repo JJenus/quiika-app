@@ -1,3 +1,4 @@
+// @/components/layout/admin/Header
 import React from "react";
 import { Menu, Bell, User } from "lucide-react";
 import { useUIStore } from "../../../stores/uiStore";

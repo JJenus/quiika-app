@@ -22,13 +22,12 @@ export const QuidManagementPage: React.FC = () => {
 
 	// Fetch quids on mount and when dependencies change
 	useEffect(() => {
-    fetchQuidMetrics("MONTHLY")
+		fetchQuidMetrics("MONTHLY");
 		fetchQuids();
-
 	}, []);
 
 	const handleRefresh = useCallback(() => {
-    fetchQuidMetrics("MONTHLY")
+		fetchQuidMetrics("MONTHLY");
 		fetchQuids();
 	}, [fetchQuids]);
 
@@ -45,10 +44,10 @@ export const QuidManagementPage: React.FC = () => {
 		<div className="space-y-6">
 			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 				<div>
-					<h1 className="text-3xl font-bold text-text-primary dark:text-text-primary-dark">
+					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
 						QUID Management
 					</h1>
-					<p className="text-text-secondary dark:text-text-secondary-dark mt-1">
+					<p className="text-gray-600 dark:text-gray-400">
 						Monitor, filter, and manage all QUIDs in the system.
 					</p>
 				</div>

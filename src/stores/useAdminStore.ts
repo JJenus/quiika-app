@@ -6,6 +6,8 @@ import {
 	QuidMetrics,
 	TransactionMetrics,
 	DashboardMetricsDto,
+	PageWithdrawalRequestDto,
+	WithdrawalMetrics,
 } from "../lib/api";
 import type {
 	Transaction,
@@ -21,6 +23,7 @@ import type {
 	TransactionStatus,
 } from "../types/api";
 import { AdminUser, FinancialData } from "../types/admin";
+import { WithdrawalRequestDto } from "@/lib/api-sdk/api";
 
 interface AdminState {
 	stats: DashboardMetricsDto;
@@ -28,6 +31,10 @@ interface AdminState {
 	users: AdminUser[];
 	recentTransactions: Transaction[];
 	pendingWithdrawals: WithdrawalRequest[];
+
+	// Withdrawals
+	withdrawals: PageWithdrawalRequestDto;
+	withdrawalMetrics: WithdrawalMetrics;
 
 	// QUID Management
 	quids: PaginatedResponse<AdminQuid> | null;
@@ -49,6 +56,7 @@ interface AdminState {
 interface AdminActions {
 	fetchDashboardStats: (period?: PERIOD) => Promise<void>;
 	fetchFinancialData: () => Promise<void>;
+
 	fetchUsers: () => Promise<void>;
 	inviteUser: (email: string, role: AdminUser["role"]) => Promise<boolean>;
 	updateUserRole: (
@@ -56,11 +64,15 @@ interface AdminActions {
 		role: AdminUser["role"]
 	) => Promise<boolean>;
 	deactivateUser: (userId: string) => Promise<boolean>;
+
 	approveWithdrawal: (withdrawalId: string) => Promise<boolean>;
 	rejectWithdrawal: (
 		withdrawalId: string,
 		reason: string
 	) => Promise<boolean>;
+	fetchWithdrawalMetrics: (period?: PERIOD) => Promise<void>;
+
+	fetchWithdrawals: () => Promise<void>;
 
 	// QUID Management
 	fetchQuids: () => Promise<void>;
@@ -114,6 +126,11 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 		monthlyGrowth: 0,
 		conversionRate: 0,
 	},
+
+	// Withdrawal Management state
+	withdrawals: [],
+	withdrawalMetrics: {},
+
 	financialData: {
 		totalRevenue: 0,
 		totalFees: 0,
@@ -419,6 +436,105 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 				},
 			});
 			return false;
+		}
+	},
+
+	// Withdrawals update to allow paging
+	fetchWithdrawals: async () => {
+		set({
+			loading: { isLoading: true, message: "Fetching withdrawals..." },
+			error: { hasError: false },
+		});
+
+		try {
+			const currentParams = get().quidListParams;
+			const pageable = createPageable({
+				page: currentParams.page - 1,
+				size: currentParams.limit,
+			});
+			/**
+			 * (property) getWithdrawals: (pageable: any, status?: any, currency?: any, search?: string) => Promise<ApiResponse<PageWithdrawalRequestDto>>
+			 */
+
+			const { data, error } = await admin.withdrawals.getWithdrawals(
+				pageable
+			);
+
+			// const mockWithdrawals: WithdrawalRequestDto[] = [
+			// 	{
+			// 		id: 1,
+			// 		accountName: "John Doe",
+			// 		accountNumber: "1234567890",
+			// 		amount: 48500, // After fees
+			// 		bank: "First Bank",
+			// 		// bankCode: "011",
+			// 		reference: "withdraw_123",
+			// 		currency: "NGN",
+			// 		status: "PENDING",
+			// 		// accessKey: "access_key_123",
+			// 		createdAt: "2024-01-15T11:00:00Z",
+			// 		// updatedAt: "2024-01-15T11:00:00Z",
+			// 	},
+			// 	{
+			// 		id: 2,
+			// 		accountName: "Jane Smith",
+			// 		accountNumber: "9876543210",
+			// 		amount: 97000,
+			// 		bank: "GTBank",
+			// 		reference: "withdraw_456",
+			// 		currency: "NGN",
+			// 		status: "PENDING",
+			// 		createdAt: "2024-01-14T16:00:00Z",
+			// 	},
+			// ];
+
+			if (error) {
+				throw new Error(error);
+			}
+			// data!.content = mockWithdrawals;
+
+			if (data) {
+				set({ withdrawals: data, loading: { isLoading: false } });
+			}
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message: error.message || "Failed to fetch withdrawals",
+				},
+			});
+		}
+	},
+
+	fetchWithdrawalMetrics: async (period: PERIOD = "MONTHLY") => {
+		set({
+			loading: {
+				isLoading: true,
+				message: "Fetching withdrawal metrics...",
+			},
+		});
+		try {
+			const { data, error } = await admin.dashboard.getWithdrawalMetrics(
+				period
+			);
+
+			if (error) {
+				throw new Error(error);
+			}
+
+			if (data) {
+				set({ loading: { isLoading: false }, withdrawalMetrics: data });
+			}
+		} catch (error: any) {
+			set({
+				loading: { isLoading: false },
+				error: {
+					hasError: true,
+					message:
+						error.message || "Failed to fetch withdrawal metrics",
+				},
+			});
 		}
 	},
 

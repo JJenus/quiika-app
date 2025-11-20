@@ -1,14 +1,13 @@
-// src/components/admin/withdrawals/modals/RejectModal.tsx
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { AlertTriangle } from "lucide-react";
-import { formatFractionalCurrency as  formatCurrency} from "@/utils/ruleUtils"; 
-import type { WithdrawalRequest } from "@/types/api";
+import { formatFractionalCurrency as formatCurrency } from "@/utils/ruleUtils"; 
+import type { WithdrawalRequest as WithdrawalRequestDto } from "@/lib/api";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  withdrawal: WithdrawalRequest | null;
+  withdrawal: WithdrawalRequestDto | null;
   reason: string;
   setReason: (v: string) => void;
   onConfirm: () => void;
@@ -30,34 +29,34 @@ export const RejectModal = ({
     <Modal isOpen={open} onClose={onClose} title="Reject Withdrawal Request" size="md">
       <div className="space-y-6">
         <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg flex items-center">
-          <AlertTriangle className="h-5 w-5 text-error mr-2" />
-          <span className="text-sm font-medium text-error">
+          <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
+          <span className="text-sm font-medium text-red-600 dark:text-red-400">
             This action cannot be undone
           </span>
         </div>
 
         <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-1 text-sm">
-          <p>
-            <span className="text-text-secondary">Account:</span> {withdrawal.accountName}
+          <p className="text-gray-700 dark:text-gray-300">
+            <span className="text-gray-600 dark:text-gray-400">Account:</span> {withdrawal.accountName || 'N/A'}
           </p>
-          <p>
-            <span className="text-text-secondary">Amount:</span>{" "}
-            {formatCurrency(withdrawal.amount)}
+          <p className="text-gray-700 dark:text-gray-300">
+            <span className="text-gray-600 dark:text-gray-400">Amount:</span>{" "}
+            {withdrawal.amount ? formatCurrency(withdrawal.amount) : 'N/A'}
           </p>
-          <p>
-            <span className="text-text-secondary">QUID:</span> {withdrawal.quid}
+          <p className="text-gray-700 dark:text-gray-300">
+            <span className="text-gray-600 dark:text-gray-400">Reference:</span> {withdrawal.reference || 'N/A'}
           </p>
         </div>
 
         <div>
-          <label htmlFor="rejectReason" className="block text-sm font-medium mb-2">
+          <label htmlFor="rejectReason" className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
             Reason for Rejection *
           </label>
           <textarea
             id="rejectReason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="input-field min-h-[100px] resize-none w-full"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px] resize-none"
             placeholder="Provide a clear reason..."
             required
           />
@@ -71,7 +70,7 @@ export const RejectModal = ({
             onClick={onConfirm}
             loading={loading}
             disabled={!reason.trim()}
-            className="flex-1 bg-error hover:bg-error/90"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
           >
             Reject Request
           </Button>
