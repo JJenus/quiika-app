@@ -164,7 +164,7 @@ interface DataTableProps<T> {
 	keyField?: string;
 }
 
-export function DataTable<T extends { id: number }>({
+export function DataTable<T extends { id? : number }>({
 	data,
 	columns,
 	loading = false,
@@ -230,10 +230,10 @@ export function DataTable<T extends { id: number }>({
 	};
 
 	const handleSelectItem = (item: T) => {
-		onSelectItem?.(item.id);
+		onSelectItem?.(item.id!);
 	};
 
-	const isItemSelected = (item: T) => selectedItems.includes(item.id);
+	const isItemSelected = (item: T) => selectedItems.includes(item.id!);
 
 	return (
 		<div className="rounded-md border border-gray-200 dark:border-gray-800  dark:text-gray-300">

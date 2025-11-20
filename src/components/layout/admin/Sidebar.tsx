@@ -1,7 +1,7 @@
 import React from "react";
 import {
 	ChartBar as BarChart3,
-	FileDown,
+	FileText,
 	RefreshCw,
 	LayoutDashboard,
 	UserPlus,
@@ -21,7 +21,7 @@ import { Button } from "../../ui/Button";
 import { Link } from "react-router-dom";
 
 const menuItems = [
-	{ id: "/admin/dashboard", label: "Dashboard", icon:  LayoutDashboard},
+	{ id: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
 	{ id: "/admin/financial", label: "Financial", icon: DollarSign },
 	{ id: "/admin/quids", label: "QUID Management", icon: Gift },
 	{ id: "/admin/transactions", label: "Transactions", icon: RefreshCw },
@@ -33,13 +33,12 @@ const menuItems = [
 		icon: Users,
 		roles: ["SUPER_ADMIN", "ADMIN"],
 	},
-	// {
-	// 	id: "/admin/invite-user",
-	// 	label: "Invite User",
-	// 	icon: UserPlus,
-	// 	roles: ["SUPER_ADMIN", "ADMIN"],
-	// },
-	{ id: "/admin/reports", label: "Reports", icon: FileDown },
+	{ 
+		id: "/admin/audit", 
+		label: "Audit", 
+		icon: FileText,
+		roles: ["SUPER_ADMIN", "ADMIN"] 
+	},
 ];
 
 export const Sidebar: React.FC = () => {
@@ -75,12 +74,12 @@ export const Sidebar: React.FC = () => {
 
 			{/* Sidebar */}
 			<div
-				className={` bg-surface dark:bg-surface-dark backdrop-blur-md bg-opacity-95 dark:bg-opacity-95
-        fixed left-0 top-0 h-screen shadow-lg transform transition-all duration-300 ease-in-out z-50
-        md:sticky md:top-0 md:translate-x-0
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        ${sidebarCollapsed ? "w-16" : "w-64"}
-      `}
+				className={`bg-surface dark:bg-surface-dark backdrop-blur-md bg-opacity-95 dark:bg-opacity-95
+					fixed left-0 top-0 h-screen shadow-lg transform transition-all duration-300 ease-in-out z-50
+					md:sticky md:top-0 md:translate-x-0
+					${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+					${sidebarCollapsed ? "w-16" : "w-64"}
+				`}
 			>
 				<div
 					className={`p-4 lg:border-b border-gray-200 dark:border-gray-700 ${
@@ -126,18 +125,18 @@ export const Sidebar: React.FC = () => {
 									setSidebarOpen(false);
 								}}
 								className={`
-                  w-full flex items-center rounded-lg text-left transition-colors group
-                  ${
-						isActive
-							? "bg-gradient-to-r from-primary-50 to-secondary-50 text-primary-700 border border-blue-200 dark:text-text-primary-dark dark:gradient-bg dark:border-secondary"
-							: "text-gray-600 dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-secondary/5 hover:text-gray-900 dark:hover:text-text-primary-dark"
-					}
-                  ${
-						sidebarCollapsed
-							? "justify-center p-3"
-							: "justify-start gap-3 px-3 py-2.5"
-					}
-                `}
+									w-full flex items-center rounded-lg text-left transition-colors group
+									${
+										isActive
+											? "bg-gradient-to-r from-primary-50 to-secondary-50 text-primary-700 border border-blue-200 dark:text-text-primary-dark dark:gradient-bg dark:border-secondary"
+											: "text-gray-600 dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-secondary/5 hover:text-gray-900 dark:hover:text-text-primary-dark"
+									}
+									${
+										sidebarCollapsed
+											? "justify-center p-3"
+											: "justify-start gap-3 px-3 py-2.5"
+									}
+								`}
 								title={
 									sidebarCollapsed ? item.label : undefined
 								}
@@ -158,55 +157,53 @@ export const Sidebar: React.FC = () => {
 					})}
 				</nav>
 
-				{/* Collapse/Expand button at bottom */}
-				<div className="absolute bottom-4 left-0 right-0 px-3">
+				{/* Bottom section - Logout and branding */}
+				<div className="absolute bottom-4 left-0 right-0 px-3 space-y-4">
+					{/* Collapse/Expand button */}
 					<Button
 						variant="ghost"
 						onClick={toggleSidebarCollapsed}
-						className="hidden md:flex items-center justify-center w-full p-2 rounded-lg"
+						className="hidden md:flex items-center justify-center w-full p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
 					>
 						{sidebarCollapsed ? (
-							<ChevronRight className="h-5 w-5 text-gray-600" />
+							<ChevronRight className="h-5 w-5" />
 						) : (
-							<ChevronLeft className="h-5 w-5 text-gray-600" />
+							<ChevronLeft className="h-5 w-5" />
 						)}
 						{!sidebarCollapsed && (
-							<span className="ml-2 text-sm text-gray-600">
-								Collapse
-							</span>
+							<span className="ml-2 text-sm">Collapse</span>
 						)}
 					</Button>
-				</div>
 
-				<div className="absolute bottom-16 left-4 right-4">
-					<div className="mb-10">
-						<Button
-							variant="primary"
-							onClick={handleLogout}
-							className={`
-								w-full flex items-center rounded-lg text-left transition-colors group
-								${sidebarCollapsed ? "justify-center p-3" : "justify-start gap-3 px-3 py-2.5"}
-							`}
-							title="logout"
-						>
-							<DoorOpen className="h-5 w-5 flex-shrink-0" />
-							{!sidebarCollapsed && (
-								<span className="font-medium whitespace-nowrap">
-									Logout
-								</span>
-							)}
-							{sidebarCollapsed && (
-								<div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-									Logout
-								</div>
-							)}
-						</Button>
-					</div>
+					{/* Logout button */}
+					<Button
+						variant="primary"
+						onClick={handleLogout}
+						className={`
+							w-full flex items-center rounded-lg transition-colors group
+							${sidebarCollapsed ? "justify-center p-3" : "justify-start gap-3 px-3 py-2.5"}
+						`}
+						title="Logout"
+					>
+						<DoorOpen className="h-5 w-5 flex-shrink-0" />
+						{!sidebarCollapsed && (
+							<span className="font-medium whitespace-nowrap">
+								Logout
+							</span>
+						)}
+						{sidebarCollapsed && (
+							<div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+								Logout
+							</div>
+						)}
+					</Button>
+
+					{/* Branding - only show on mobile when sidebar is open */}
 					{sidebarOpen && (
-						<div className="flex items-center justify-center gap-3">
-							<Logo />
-							<div>
-								<h2 className="font-bold text-lg text-text-primary dark:text-text-primary-dark">
+						<div className="flex items-center justify-center gap-3 py-4 border-t border-gray-200 dark:border-gray-700">
+							<Logo size="sm" />
+							<div className="text-center">
+								<h2 className="font-bold text-sm text-text-primary dark:text-text-primary-dark">
 									Quiika
 								</h2>
 								<p className="text-xs text-text-secondary dark:text-text-secondary-dark">
