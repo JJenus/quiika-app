@@ -69,6 +69,16 @@ Class | Method | HTTP request | Description
 *AdminQuidManagementApi* | [**getQuids**](docs/AdminQuidManagementApi.md#getquids) | **GET** /admin/quids | Get all Quids
 *AdminQuidManagementApi* | [**getWinnersForQuid**](docs/AdminQuidManagementApi.md#getwinnersforquid) | **GET** /admin/quids/{quidCode}/winners | Get winners for a Quid
 *AdminQuidManagementApi* | [**updateQuidStatus1**](docs/AdminQuidManagementApi.md#updatequidstatus1) | **PUT** /admin/quids/{quidCode}/status | Update Quid status
+*AdminSettingsManagementApi* | [**changePassword**](docs/AdminSettingsManagementApi.md#changepassword) | **POST** /admin/settings/change-password | Change user password
+*AdminSettingsManagementApi* | [**getProfileActivities**](docs/AdminSettingsManagementApi.md#getprofileactivities) | **GET** /admin/settings/activities | Get profile activities
+*AdminSettingsManagementApi* | [**getSecurityEvents**](docs/AdminSettingsManagementApi.md#getsecurityevents) | **GET** /admin/settings/security-events | Get security events
+*AdminSettingsManagementApi* | [**getUserPreferences**](docs/AdminSettingsManagementApi.md#getuserpreferences) | **GET** /admin/settings/preferences | Get user preferences
+*AdminSettingsManagementApi* | [**getUserProfile**](docs/AdminSettingsManagementApi.md#getuserprofile) | **GET** /admin/settings/profile | Get user profile
+*AdminSettingsManagementApi* | [**updateNotificationPreferences**](docs/AdminSettingsManagementApi.md#updatenotificationpreferences) | **PATCH** /admin/settings/preferences/notifications | Update notification preferences
+*AdminSettingsManagementApi* | [**updateSecurityPreferences**](docs/AdminSettingsManagementApi.md#updatesecuritypreferences) | **PATCH** /admin/settings/preferences/security | Update security preferences
+*AdminSettingsManagementApi* | [**updateUIPreferences**](docs/AdminSettingsManagementApi.md#updateuipreferences) | **PATCH** /admin/settings/preferences/ui | Update UI preferences
+*AdminSettingsManagementApi* | [**updateUserProfile**](docs/AdminSettingsManagementApi.md#updateuserprofile) | **PATCH** /admin/settings/profile | Update user profile
+*AdminSettingsManagementApi* | [**uploadAvatar**](docs/AdminSettingsManagementApi.md#uploadavatar) | **POST** /admin/settings/avatar | Upload profile picture
 *AdminTransactionManagementApi* | [**getTransaction**](docs/AdminTransactionManagementApi.md#gettransaction) | **GET** /admin/transactions/{transactionId} | Find transaction by ID
 *AdminTransactionManagementApi* | [**getTransactions**](docs/AdminTransactionManagementApi.md#gettransactions) | **GET** /admin/transactions | Get all transactions
 *AdminTransactionManagementApi* | [**refundTransaction**](docs/AdminTransactionManagementApi.md#refundtransaction) | **POST** /admin/transactions/{transactionId}/refund | Refund a transaction
@@ -91,8 +101,8 @@ Class | Method | HTTP request | Description
 *InviteUserApi* | [**deleteInvite**](docs/InviteUserApi.md#deleteinvite) | **DELETE** /admin/invites/{id} | 
 *InviteUserApi* | [**getAllInvites**](docs/InviteUserApi.md#getallinvites) | **GET** /admin/invites/ | 
 *InviteUserApi* | [**resendInvite**](docs/InviteUserApi.md#resendinvite) | **POST** /admin/invites/{id} | 
-*PaymentWebhooksApi* | [**handleFlutterwaveWebhook**](docs/PaymentWebhooksApi.md#handleflutterwavewebhook) | **POST** /api/webhooks/flutterwave | Handles Flutterwave webhook events
-*PaymentWebhooksApi* | [**handlePaystackWebhook**](docs/PaymentWebhooksApi.md#handlepaystackwebhook) | **POST** /api/webhooks/paystack | Handles Paystack webhook events
+*PaymentWebhooksApi* | [**handleFlutterwaveWebhook**](docs/PaymentWebhooksApi.md#handleflutterwavewebhook) | **POST** /webhooks/flutterwave | Handles Flutterwave webhook events
+*PaymentWebhooksApi* | [**handlePaystackWebhook**](docs/PaymentWebhooksApi.md#handlepaystackwebhook) | **POST** /webhooks/paystack | Handles Paystack webhook events
 *PaymentsApi* | [**getBanks**](docs/PaymentsApi.md#getbanks) | **GET** /api/payments/banks | Get list of supported banks
 *PaymentsApi* | [**initializePayment**](docs/PaymentsApi.md#initializepayment) | **POST** /api/payments/initialize | Initialize a payment
 *QuidApi* | [**getQuid**](docs/QuidApi.md#getquid) | **GET** /quid/{quid} | Get Quid details
@@ -105,12 +115,12 @@ Class | Method | HTTP request | Description
 *ServerSentEventsApi* | [**connect**](docs/ServerSentEventsApi.md#connect) | **GET** /sse/connect/{sessionId} | Subscribe to an event stream
 *ServerSentEventsApi* | [**disconnect**](docs/ServerSentEventsApi.md#disconnect) | **DELETE** /sse/disconnect/{sessionId} | Disconnect SSE connection
 *ServerSentEventsApi* | [**sendMessageToUser**](docs/ServerSentEventsApi.md#sendmessagetouser) | **GET** /sse/send | Send a message to a user (For internal testing)
-*SessionManagementApi* | [**getActiveSessions**](docs/SessionManagementApi.md#getactivesessions) | **GET** /auth/sessions/active | Get active sessions for current user
-*SessionManagementApi* | [**getSessionCount**](docs/SessionManagementApi.md#getsessioncount) | **GET** /auth/sessions/count | Get active session count for current user
-*SessionManagementApi* | [**getUserSessions**](docs/SessionManagementApi.md#getusersessions) | **GET** /auth/sessions | Get all active sessions for current user
-*SessionManagementApi* | [**revokeAllSessions**](docs/SessionManagementApi.md#revokeallsessions) | **DELETE** /auth/sessions/all | Revoke all sessions for current user
-*SessionManagementApi* | [**revokeOtherSessions**](docs/SessionManagementApi.md#revokeothersessions) | **DELETE** /auth/sessions | Revoke all other sessions except current one
-*SessionManagementApi* | [**revokeSession**](docs/SessionManagementApi.md#revokesession) | **DELETE** /auth/sessions/{sessionId} | Revoke a specific session
+*SessionManagementApi* | [**getActiveSessions**](docs/SessionManagementApi.md#getactivesessions) | **GET** /sessions/active | Get active sessions for current user
+*SessionManagementApi* | [**getSessionCount**](docs/SessionManagementApi.md#getsessioncount) | **GET** /sessions/count | Get active session count for current user
+*SessionManagementApi* | [**getUserSessions**](docs/SessionManagementApi.md#getusersessions) | **GET** /sessions | Get all active sessions for current user
+*SessionManagementApi* | [**revokeAllSessions**](docs/SessionManagementApi.md#revokeallsessions) | **DELETE** /sessions/all | Revoke all sessions for current user
+*SessionManagementApi* | [**revokeOtherSessions**](docs/SessionManagementApi.md#revokeothersessions) | **DELETE** /sessions | Revoke all other sessions except current one
+*SessionManagementApi* | [**revokeSession**](docs/SessionManagementApi.md#revokesession) | **DELETE** /sessions/{sessionId} | Revoke a specific session
 *TransactionsApi* | [**banks**](docs/TransactionsApi.md#banks) | **GET** /transactions/banks | Get list of banks
 *TransactionsApi* | [**findAll**](docs/TransactionsApi.md#findall) | **GET** /transactions | Find all transactions
 *TransactionsApi* | [**findTransaction**](docs/TransactionsApi.md#findtransaction) | **GET** /transactions/{transactionId} | Find transaction by ID
@@ -129,9 +139,12 @@ Class | Method | HTTP request | Description
 
 ### Documentation For Models
 
+ - [AdminProfileResponse](docs/AdminProfileResponse.md)
+ - [AllPreferencesResponse](docs/AllPreferencesResponse.md)
  - [ApiKeyResponse](docs/ApiKeyResponse.md)
  - [AuditLogDto](docs/AuditLogDto.md)
  - [BankDto](docs/BankDto.md)
+ - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [ClaimAttemptDto](docs/ClaimAttemptDto.md)
  - [CreateQuidRequest](docs/CreateQuidRequest.md)
  - [DashboardMetricsDto](docs/DashboardMetricsDto.md)
@@ -147,15 +160,19 @@ Class | Method | HTTP request | Description
  - [LoginRequest](docs/LoginRequest.md)
  - [MetricBigDecimal](docs/MetricBigDecimal.md)
  - [MetricLong](docs/MetricLong.md)
+ - [NotificationPreferencesDto](docs/NotificationPreferencesDto.md)
  - [Page](docs/Page.md)
  - [PageAuditLogDto](docs/PageAuditLogDto.md)
  - [PageClaimAttemptDto](docs/PageClaimAttemptDto.md)
+ - [PageProfileActivityResponse](docs/PageProfileActivityResponse.md)
  - [PageQuidDto](docs/PageQuidDto.md)
+ - [PageSecurityEventResponse](docs/PageSecurityEventResponse.md)
  - [PageTransactionDto](docs/PageTransactionDto.md)
  - [PageWinnerDto](docs/PageWinnerDto.md)
  - [PageWithdrawalRequestDto](docs/PageWithdrawalRequestDto.md)
  - [Pageable](docs/Pageable.md)
  - [PageableObject](docs/PageableObject.md)
+ - [ProfileActivityResponse](docs/ProfileActivityResponse.md)
  - [Quid](docs/Quid.md)
  - [QuidClaimResponse](docs/QuidClaimResponse.md)
  - [QuidDashboardMetricsDto](docs/QuidDashboardMetricsDto.md)
@@ -172,6 +189,8 @@ Class | Method | HTTP request | Description
  - [Rule](docs/Rule.md)
  - [RuleDTO](docs/RuleDTO.md)
  - [RuleDto](docs/RuleDto.md)
+ - [SecurityEventResponse](docs/SecurityEventResponse.md)
+ - [SecurityPreferencesDto](docs/SecurityPreferencesDto.md)
  - [SessionCountResponse](docs/SessionCountResponse.md)
  - [SortObject](docs/SortObject.md)
  - [Split](docs/Split.md)
@@ -182,6 +201,9 @@ Class | Method | HTTP request | Description
  - [TransactionDashboardMetricsDto](docs/TransactionDashboardMetricsDto.md)
  - [TransactionDetailDto](docs/TransactionDetailDto.md)
  - [TransactionDto](docs/TransactionDto.md)
+ - [UIPreferencesDto](docs/UIPreferencesDto.md)
+ - [UpdateAdminProfileRequest](docs/UpdateAdminProfileRequest.md)
+ - [UploadAvatarRequest](docs/UploadAvatarRequest.md)
  - [UserDto](docs/UserDto.md)
  - [UserRoleUpdateDto](docs/UserRoleUpdateDto.md)
  - [UserSessionDetails](docs/UserSessionDetails.md)

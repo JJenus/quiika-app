@@ -57,7 +57,7 @@ export const SecurityTab: React.FC = () => {
               <Monitor className="h-5 w-5 text-blue-600" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Active Sessions</h3>
             </div>
-            {activeSessions.filter(s => !s.isCurrent).length > 0 && (
+            {activeSessions.filter(s => !s.current).length > 0 && (
               <Button
                 variant="outline"
                 onClick={() => setConfirmTerminateAll(true)}
@@ -101,17 +101,17 @@ export const SecurityTab: React.FC = () => {
 
           <div className="space-y-4">
             {activeSessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div key={session.sessionId} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                    {getDeviceIcon(session.deviceType)}
+                    {getDeviceIcon(session.deviceType!)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-medium text-gray-900 dark:text-gray-100">
                         {session.deviceName}
                       </h4>
-                      {session.isCurrent && (
+                      {session.current && (
                         <Badge variant="success">Current</Badge>
                       )}
                     </div>
@@ -119,16 +119,16 @@ export const SecurityTab: React.FC = () => {
                       {session.location} • {session.ipAddress}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Last active {formatDistanceToNow(new Date(session.lastActive), { addSuffix: true })}
+                      Last active {formatDistanceToNow(new Date(session.lastAccessed!), { addSuffix: true })}
                     </p>
                   </div>
                 </div>
                 
-                {!session.isCurrent && (
+                {!session.current && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => terminateSession(session.id)}
+                    onClick={() => terminateSession(session.sessionId!)}
                     loading={loading}
                     className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >

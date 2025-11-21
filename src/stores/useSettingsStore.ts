@@ -1,382 +1,594 @@
 import { create } from "zustand";
 import { toast } from "react-hot-toast";
-import { 
-  SettingsState, 
-  SettingsActions, 
-  AdminProfile, 
-  ProfileActivity, 
-  UserSession, 
-  SecurityEvent,
-  NotificationPreferences,
-  UIPreferences,
-  SecurityPreferences
+import {
+	SettingsState,
+	SettingsActions,
+	AdminProfile,
+	ProfileActivity,
+	UserSession,
+	SecurityEvent,
 } from "@/types/settings";
 
-// Sample data for demonstration
-const sampleProfile: AdminProfile = {
-  id: "1",
-  email: "admin@quiika.com",
-  firstName: "System",
-  lastName: "Administrator",
-  phone: "+2348012345678",
-  role: "SUPER_ADMIN",
-  status: "ACTIVE",
-  createdAt: "2024-01-01T00:00:00Z",
-  lastLogin: "2024-12-19T10:30:00Z",
-  lastPasswordChange: "2024-11-15T14:20:00Z"
+import {
+	session,
+	admin,
+	NotificationPreferences,
+	UIPreferences,
+	SecurityPreferences,
+} from "@/lib/api";
+
+// Initial empty states
+const initialProfile: AdminProfile = {
+	id: "",
+	email: "",
+	firstName: "",
+	lastName: "",
+	phone: "",
+	role: "SUPPORT",
+	status: "ACTIVE",
+	createdAt: "",
+	lastLogin: "",
+	lastPasswordChange: "",
 };
 
-const sampleActivities: ProfileActivity[] = [
-  {
-    id: "1",
-    type: "LOGIN",
-    description: "Successful login from Chrome on Windows",
-    timestamp: "2024-12-19T10:30:00Z",
-    ipAddress: "192.168.1.100",
-    location: "Lagos, Nigeria"
-  },
-  {
-    id: "2",
-    type: "PASSWORD_CHANGE",
-    description: "Password updated successfully",
-    timestamp: "2024-11-15T14:20:00Z",
-    ipAddress: "192.168.1.100"
-  },
-  {
-    id: "3",
-    type: "PROFILE_UPDATE",
-    description: "Profile information updated",
-    timestamp: "2024-10-20T09:15:00Z"
-  }
-];
-
-const sampleSessions: UserSession[] = [
-  {
-    id: "1",
-    deviceName: "Windows Chrome",
-    deviceType: "DESKTOP",
-    ipAddress: "192.168.1.100",
-    location: "Lagos, Nigeria",
-    lastActive: "2024-12-19T10:30:00Z",
-    isCurrent: true,
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-  },
-  {
-    id: "2",
-    deviceName: "iPhone Safari",
-    deviceType: "MOBILE",
-    ipAddress: "192.168.1.101",
-    location: "Abuja, Nigeria",
-    lastActive: "2024-12-18T15:45:00Z",
-    isCurrent: false,
-    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
-  }
-];
-
-const sampleSecurityEvents: SecurityEvent[] = [
-  {
-    id: "1",
-    type: "LOGIN_ATTEMPT",
-    description: "Successful login",
-    timestamp: "2024-12-19T10:30:00Z",
-    ipAddress: "192.168.1.100",
-    status: "SUCCESS"
-  },
-  {
-    id: "2",
-    type: "PASSWORD_CHANGE",
-    description: "Password changed",
-    timestamp: "2024-11-15T14:20:00Z",
-    status: "SUCCESS"
-  },
-  {
-    id: "3",
-    type: "SESSION_TERMINATED",
-    description: "Session terminated from unknown device",
-    timestamp: "2024-11-10T16:30:00Z",
-    ipAddress: "192.168.1.150",
-    status: "SUSPICIOUS"
-  }
-];
-
 const initialNotifications: NotificationPreferences = {
-  emailAlerts: true,
-  systemAlerts: true,
-  dailyDigest: false,
-  withdrawalNotifications: true,
-  securityAlerts: true
+	emailAlerts: true,
+	systemAlerts: true,
+	dailyDigest: false,
+	withdrawalNotifications: true,
+	securityAlerts: true,
 };
 
 const initialUIPreferences: UIPreferences = {
-  theme: "system",
-  timezone: "Africa/Lagos",
-  language: "en",
-  uiDensity: "normal",
-  sidebarCollapsed: false,
-  defaultPage: "/admin/dashboard",
-  tableColumns: {
-    id: true,
-    email: true,
-    status: true,
-    createdAt: true
-  },
-  dashboardWidgets: ["stats", "recentActivity", "metrics"]
+	theme: "system",
+	timezone: "Africa/Lagos",
+	language: "en",
+	uiDensity: "normal",
+	sidebarCollapsed: false,
+	defaultPage: "/admin/dashboard",
+	tableColumns: {
+		id: true,
+		email: true,
+		status: true,
+		createdAt: true,
+	},
+	dashboardWidgets: ["stats", "recentActivity", "metrics"],
 };
 
 const initialSecurityPreferences: SecurityPreferences = {
-  sessionTimeout: 120,
-  requireReauthForSensitiveActions: true,
-  loginNotifications: true
+	sessionTimeout: 120,
+	requireReauthForSensitiveActions: true,
+	loginNotifications: true,
 };
 
-export const useSettingsStore = create<SettingsState & SettingsActions>((set, get) => ({
-  // Initial state
-  profile: sampleProfile,
-  profileActivities: sampleActivities,
-  activeSessions: sampleSessions,
-  securityEvents: sampleSecurityEvents,
-  notifications: initialNotifications,
-  ui: initialUIPreferences,
-  security: initialSecurityPreferences,
-  loading: false,
-  error: null,
+export const useSettingsStore = create<SettingsState & SettingsActions>(
+	(set, get) => ({
+		// Initial state - empty until fetched
+		profile: initialProfile,
+		profileActivities: [],
+		activeSessions: [],
+		securityEvents: [],
+		notifications: initialNotifications,
+		ui: initialUIPreferences,
+		security: initialSecurityPreferences,
+		loading: false,
+		error: null,
 
-  // Actions
-  updateProfile: async (updates: Partial<AdminProfile>) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      set(state => ({
-        profile: { ...state.profile, ...updates },
-        loading: false
-      }));
-      
-      toast.success("Profile updated successfully");
-      
-      // Add activity log
-      set(state => ({
-        profileActivities: [
-          {
-            id: Date.now().toString(),
-            type: "PROFILE_UPDATE",
-            description: "Profile information updated",
-            timestamp: new Date().toISOString()
-          },
-          ...state.profileActivities
-        ]
-      }));
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to update profile" 
-      });
-      toast.error("Failed to update profile");
-    }
-  },
+		// ========== FETCH ACTIONS ==========
 
-  changePassword: async (currentPassword: string, newPassword: string) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      set({ loading: false });
-      toast.success("Password changed successfully");
-      
-      // Add activity log
-      set(state => ({
-        profileActivities: [
-          {
-            id: Date.now().toString(),
-            type: "PASSWORD_CHANGE",
-            description: "Password updated successfully",
-            timestamp: new Date().toISOString()
-          },
-          ...state.profileActivities
-        ]
-      }));
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to change password" 
-      });
-      toast.error("Failed to change password");
-    }
-  },
+		// Fetch all settings data on app initialization
+		fetchAllSettings: async () => {
+			set({ loading: true, error: null });
+			try {
+				await Promise.all([
+					get().fetchProfile(),
+					get().fetchProfileActivities(),
+					get().fetchActiveSessions(),
+					get().fetchSecurityEvents(),
+					get().fetchPreferences(),
+				]);
+				set({ loading: false });
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to load settings",
+				});
+			}
+		},
 
-  updateAvatar: async (avatar: File) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate file upload
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const avatarUrl = URL.createObjectURL(avatar);
-      set(state => ({
-        profile: { ...state.profile, avatar: avatarUrl },
-        loading: false
-      }));
-      
-      toast.success("Profile picture updated successfully");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to update profile picture" 
-      });
-      toast.error("Failed to update profile picture");
-    }
-  },
+		// Fetch user profile
+		fetchProfile: async () => {
+			set({ loading: true, error: null });
+			try {
+				const { data, error } = await admin.settings.getUserProfile();
 
-  updateNotifications: async (updates: Partial<NotificationPreferences>) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      set(state => ({
-        notifications: { ...state.notifications, ...updates },
-        loading: false
-      }));
-      
-      toast.success("Notification preferences updated");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to update notifications" 
-      });
-      toast.error("Failed to update notifications");
-    }
-  },
+				if (error) {
+					throw new Error(error);
+				}
 
-  updateUIPreferences: async (updates: Partial<UIPreferences>) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      set(state => ({
-        ui: { ...state.ui, ...updates },
-        loading: false
-      }));
-      
-      toast.success("UI preferences updated");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to update UI preferences" 
-      });
-      toast.error("Failed to update UI preferences");
-    }
-  },
+				if (data) {
+					// Transform API response to match AdminProfile type
+					const profile: AdminProfile = {
+						id: data.id?.toString() || "",
+						email: data.email || "",
+						firstName: data.firstName || "",
+						lastName: data.lastName || "",
+						phone: data.phone || "",
+						role: (data.role as any) || "SUPPORT",
+						status: (data.status as any) || "ACTIVE",
+						createdAt: data.createdAt || "",
+						lastLogin: data.lastLogin || "",
+						lastPasswordChange: data.lastPasswordChange || "",
+						avatar: data.avatar || "",
+					};
 
-  updateSecurityPreferences: async (updates: Partial<SecurityPreferences>) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      set(state => ({
-        security: { ...state.security, ...updates },
-        loading: false
-      }));
-      
-      toast.success("Security preferences updated");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to update security preferences" 
-      });
-      toast.error("Failed to update security preferences");
-    }
-  },
+					set({ profile, loading: false });
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to fetch profile",
+				});
+			}
+		},
 
-  terminateSession: async (sessionId: string) => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      set(state => ({
-        activeSessions: state.activeSessions.filter(session => session.id !== sessionId),
-        loading: false
-      }));
-      
-      toast.success("Session terminated successfully");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to terminate session" 
-      });
-      toast.error("Failed to terminate session");
-    }
-  },
+		// Fetch profile activities
+		fetchProfileActivities: async () => {
+			set({ loading: true, error: null });
+			try {
+				// TODO: Replace with actual API call when available
+				// For now, using sample data
+				await new Promise((resolve) => setTimeout(resolve, 300));
 
-  terminateAllOtherSessions: async () => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      set(state => ({
-        activeSessions: state.activeSessions.filter(session => session.isCurrent),
-        loading: false
-      }));
-      
-      toast.success("All other sessions terminated");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to terminate sessions" 
-      });
-      toast.error("Failed to terminate sessions");
-    }
-  },
+				const sampleActivities: ProfileActivity[] = [
+					{
+						id: "1",
+						type: "LOGIN",
+						description: "Successful login from Chrome on Windows",
+						timestamp: "2024-12-19T10:30:00Z",
+						ipAddress: "192.168.1.100",
+						location: "Lagos, Nigeria",
+					},
+					{
+						id: "2",
+						type: "PASSWORD_CHANGE",
+						description: "Password updated successfully",
+						timestamp: "2024-11-15T14:20:00Z",
+						ipAddress: "192.168.1.100",
+					},
+					{
+						id: "3",
+						type: "PROFILE_UPDATE",
+						description: "Profile information updated",
+						timestamp: "2024-10-20T09:15:00Z",
+					},
+				];
 
-  downloadPersonalData: async () => {
-    set({ loading: true, error: null });
-    
-    try {
-      // Simulate data export
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const data = get();
-      const exportData = {
-        profile: data.profile,
-        activities: data.profileActivities,
-        preferences: {
-          notifications: data.notifications,
-          ui: data.ui,
-          security: data.security
-        }
-      };
-      
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `quiika-personal-data-${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-      
-      set({ loading: false });
-      toast.success("Personal data downloaded successfully");
-    } catch (error: any) {
-      set({ 
-        loading: false, 
-        error: error.message || "Failed to download personal data" 
-      });
-      toast.error("Failed to download personal data");
-    }
-  },
+				set({ profileActivities: sampleActivities, loading: false });
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to fetch activities",
+				});
+			}
+		},
 
-  clearError: () => set({ error: null })
-}));
+		// Fetch active sessions
+		fetchActiveSessions: async () => {
+			set({ loading: true, error: null });
+			try {
+				console.log("Fetching sessions...");
+				const { data, error } = await session.getActiveSessions();
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					// Transform API response to match UserSession type
+					const sessions: UserSession[] = data.map(
+						(session: any) => ({
+							id: session.sessionId || "",
+							deviceName: session.deviceName || "Unknown Device",
+							deviceType:
+								(session.deviceType as
+									| "DESKTOP"
+									| "MOBILE"
+									| "TABLET") || "DESKTOP",
+							ipAddress: session.ipAddress || "",
+							location: session.location || "Unknown Location",
+							lastActive: session.lastActive || "",
+							isCurrent: session.current || false,
+							userAgent: session.userAgent || "",
+						})
+					);
+
+					console.log("Fetching sessions done.");
+					set({ activeSessions: sessions, loading: false });
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to fetch sessions",
+				});
+			}
+		},
+
+		// Fetch security events
+		fetchSecurityEvents: async () => {
+			set({ loading: true, error: null });
+			try {
+				// TODO: Replace with actual API call when available
+				// For now, using sample data
+				await new Promise((resolve) => setTimeout(resolve, 300));
+
+				const sampleSecurityEvents: SecurityEvent[] = [
+					{
+						id: "1",
+						type: "LOGIN_ATTEMPT",
+						description: "Successful login",
+						timestamp: "2024-12-19T10:30:00Z",
+						ipAddress: "192.168.1.100",
+						status: "SUCCESS",
+					},
+					{
+						id: "2",
+						type: "PASSWORD_CHANGE",
+						description: "Password changed",
+						timestamp: "2024-11-15T14:20:00Z",
+						status: "SUCCESS",
+					},
+					{
+						id: "3",
+						type: "SESSION_TERMINATED",
+						description: "Session terminated from unknown device",
+						timestamp: "2024-11-10T16:30:00Z",
+						ipAddress: "192.168.1.150",
+						status: "SUSPICIOUS",
+					},
+				];
+
+				set({ securityEvents: sampleSecurityEvents, loading: false });
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to fetch security events",
+				});
+			}
+		},
+
+		// Fetch all preferences
+		fetchPreferences: async () => {
+			set({ loading: true, error: null });
+			try {
+				const { data, error } = await admin.settings.getAllSettings();
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					// Transform API response to match our preference types
+					// Note: You may need to adjust this based on actual API response structure
+					const preferences = {
+						notifications:
+							data.notifications || initialNotifications,
+						ui: data.ui || initialUIPreferences,
+						security: data.security || initialSecurityPreferences,
+					};
+
+					set({
+						notifications: preferences.notifications,
+						ui: preferences.ui,
+						security: preferences.security,
+						loading: false,
+					});
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to fetch preferences",
+				});
+			}
+		},
+
+		// ========== UPDATE ACTIONS ==========
+
+		updateProfile: async (updates: Partial<AdminProfile>) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { data, error } = await admin.settings.updateUserProfile({
+					...updates,
+				});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					set((state) => ({
+						profile: { ...state.profile, ...updates },
+						loading: false,
+					}));
+
+					toast.success("Profile updated successfully");
+
+					// Refresh activities to show the update
+					get().fetchProfileActivities();
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to update profile",
+				});
+				toast.error("Failed to update profile");
+			}
+		},
+
+		changePassword: async (
+			currentPassword: string,
+			newPassword: string
+		) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { error } = await admin.settings.changePassword({
+					currentPassword,
+					newPassword,
+				});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				set({ loading: false });
+				toast.success("Password changed successfully");
+
+				// Refresh activities and security events
+				Promise.all([
+					get().fetchProfileActivities(),
+					get().fetchSecurityEvents(),
+					get().fetchProfile(), // to update lastPasswordChange
+				]);
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to change password",
+				});
+				toast.error("Failed to change password");
+			}
+		},
+
+		updateAvatar: async (avatar: File) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { data, error } = await admin.settings.uploadAvatar({
+					avatar,
+				});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					set((state) => ({
+						profile: { ...state.profile, avatar: data.avatarUrl },
+						loading: false,
+					}));
+
+					toast.success("Profile picture updated successfully");
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to update profile picture",
+				});
+				toast.error("Failed to update profile picture");
+			}
+		},
+
+		updateNotifications: async (
+			updates: Partial<NotificationPreferences>
+		) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { data, error } =
+					await admin.settings.updateNotificationPreferences({
+						notificationPreferencesDto: updates,
+					});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					set((state) => ({
+						notifications: { ...state.notifications, ...updates },
+						loading: false,
+					}));
+
+					toast.success("Notification preferences updated");
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to update notifications",
+				});
+				toast.error("Failed to update notifications");
+			}
+		},
+
+		updateUIPreferences: async (updates: Partial<UIPreferences>) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { data, error } =
+					await admin.settings.updateUIPreferences({
+						uIPreferencesDto: updates,
+					});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					set((state) => ({
+						ui: { ...state.ui, ...updates },
+						loading: false,
+					}));
+
+					toast.success("UI preferences updated");
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to update UI preferences",
+				});
+				toast.error("Failed to update UI preferences");
+			}
+		},
+
+		updateSecurityPreferences: async (
+			updates: Partial<SecurityPreferences>
+		) => {
+			set({ loading: true, error: null });
+
+			try {
+				const { data, error } =
+					await admin.settings.updateSecurityPreferences({
+						securityPreferencesDto: updates,
+					});
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				if (data) {
+					set((state) => ({
+						security: { ...state.security, ...updates },
+						loading: false,
+					}));
+
+					toast.success("Security preferences updated");
+				}
+			} catch (error: any) {
+				set({
+					loading: false,
+					error:
+						error.message ||
+						"Failed to update security preferences",
+				});
+				toast.error("Failed to update security preferences");
+			}
+		},
+
+		// Session management
+		terminateSession: async (sessionId: string) => {
+			set({ loading: true, error: null });
+
+			try {
+				console.log("revoking session");
+				const { error } = await session.revokeSession(sessionId);
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				set((state) => ({
+					activeSessions: state.activeSessions.filter(
+						(session) => session.sessionId !== sessionId
+					),
+					loading: false,
+				}));
+
+				toast.success("Session terminated successfully");
+
+				// Refresh security events
+				get().fetchSecurityEvents();
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to terminate session",
+				});
+				toast.error("Failed to terminate session");
+			}
+		},
+
+		terminateAllOtherSessions: async () => {
+			set({ loading: true, error: null });
+
+			try {
+				const { error } = await session.revokeOtherSessions();
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				set((state) => ({
+					activeSessions: state.activeSessions.filter(
+						(session) => session.current
+					),
+					loading: false,
+				}));
+
+				toast.success("All other sessions terminated");
+
+				// Refresh security events
+				get().fetchSecurityEvents();
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to terminate sessions",
+				});
+				toast.error("Failed to terminate sessions");
+			}
+		},
+
+		downloadPersonalData: async () => {
+			set({ loading: true, error: null });
+
+			try {
+				// TODO: Replace with actual API call when available
+				// For now, using client-side generation
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+
+				const data = get();
+				const exportData = {
+					profile: data.profile,
+					activities: data.profileActivities,
+					preferences: {
+						notifications: data.notifications,
+						ui: data.ui,
+						security: data.security,
+					},
+				};
+
+				const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+					type: "application/json",
+				});
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = `quiika-personal-data-${
+					new Date().toISOString().split("T")[0]
+				}.json`;
+				link.click();
+				URL.revokeObjectURL(url);
+
+				set({ loading: false });
+				toast.success("Personal data downloaded successfully");
+			} catch (error: any) {
+				set({
+					loading: false,
+					error: error.message || "Failed to download personal data",
+				});
+				toast.error("Failed to download personal data");
+			}
+		},
+
+		clearError: () => set({ error: null }),
+	})
+);

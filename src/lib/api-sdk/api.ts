@@ -23,6 +23,24 @@ import type { RequestArgs } from './base';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
+export interface AdminProfileResponse {
+    'id'?: string;
+    'email'?: string;
+    'firstName'?: string;
+    'lastName'?: string;
+    'phone'?: string;
+    'avatar'?: string;
+    'role'?: string;
+    'status'?: string;
+    'createdAt'?: string;
+    'lastLogin'?: string;
+    'lastPasswordChange'?: string;
+}
+export interface AllPreferencesResponse {
+    'notifications'?: NotificationPreferencesDto;
+    'ui'?: UIPreferencesDto;
+    'security'?: SecurityPreferencesDto;
+}
 export interface ApiKeyResponse {
     'challenge'?: string;
     'apiKey'?: string;
@@ -35,6 +53,8 @@ export interface AuditLogDto {
     'targetEntity'?: string;
     'targetEntityId'?: string;
     'details'?: string;
+    'userAgent'?: string;
+    'ipAddress'?: string;
 }
 
 export const AuditLogDtoActionTypeEnum = {
@@ -61,6 +81,10 @@ export interface BankDto {
      * Bank code
      */
     'code'?: string;
+}
+export interface ChangePasswordRequest {
+    'currentPassword': string;
+    'newPassword': string;
 }
 export interface ClaimAttemptDto {
     'id'?: number;
@@ -161,95 +185,128 @@ export interface MetricLong {
     'value'?: number;
     'growth'?: number;
 }
+export interface NotificationPreferencesDto {
+    'emailAlerts'?: boolean;
+    'systemAlerts'?: boolean;
+    'dailyDigest'?: boolean;
+    'withdrawalNotifications'?: boolean;
+    'securityAlerts'?: boolean;
+}
 export interface Page {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<any>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<any>;
     'empty'?: boolean;
 }
 export interface PageAuditLogDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<AuditLogDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<AuditLogDto>;
     'empty'?: boolean;
 }
 export interface PageClaimAttemptDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<ClaimAttemptDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<ClaimAttemptDto>;
+    'empty'?: boolean;
+}
+export interface PageProfileActivityResponse {
+    'totalElements'?: number;
+    'totalPages'?: number;
+    'pageable'?: PageableObject;
+    'first'?: boolean;
+    'last'?: boolean;
+    'sort'?: SortObject;
+    'number'?: number;
+    'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<ProfileActivityResponse>;
     'empty'?: boolean;
 }
 export interface PageQuidDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<QuidDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<QuidDto>;
+    'empty'?: boolean;
+}
+export interface PageSecurityEventResponse {
+    'totalElements'?: number;
+    'totalPages'?: number;
+    'pageable'?: PageableObject;
+    'first'?: boolean;
+    'last'?: boolean;
+    'sort'?: SortObject;
+    'number'?: number;
+    'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<SecurityEventResponse>;
     'empty'?: boolean;
 }
 export interface PageTransactionDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<TransactionDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<TransactionDto>;
     'empty'?: boolean;
 }
 export interface PageWinnerDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<WinnerDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<WinnerDto>;
     'empty'?: boolean;
 }
 export interface PageWithdrawalRequestDto {
     'totalElements'?: number;
     'totalPages'?: number;
     'pageable'?: PageableObject;
-    'sort'?: SortObject;
     'first'?: boolean;
     'last'?: boolean;
-    'size'?: number;
-    'content'?: Array<WithdrawalRequestDto>;
+    'sort'?: SortObject;
     'number'?: number;
     'numberOfElements'?: number;
+    'size'?: number;
+    'content'?: Array<WithdrawalRequestDto>;
     'empty'?: boolean;
 }
 export interface Pageable {
@@ -262,9 +319,28 @@ export interface PageableObject {
     'pageNumber'?: number;
     'pageSize'?: number;
     'sort'?: SortObject;
-    'offset'?: number;
     'unpaged'?: boolean;
+    'offset'?: number;
 }
+export interface ProfileActivityResponse {
+    'id'?: string;
+    'type'?: ProfileActivityResponseTypeEnum;
+    'description'?: string;
+    'timestamp'?: string;
+    'ipAddress'?: string;
+    'userAgent'?: string;
+    'location'?: string;
+}
+
+export const ProfileActivityResponseTypeEnum = {
+    Login: 'LOGIN',
+    PasswordChange: 'PASSWORD_CHANGE',
+    ProfileUpdate: 'PROFILE_UPDATE',
+    SecuritySettingChange: 'SECURITY_SETTING_CHANGE'
+} as const;
+
+export type ProfileActivityResponseTypeEnum = typeof ProfileActivityResponseTypeEnum[keyof typeof ProfileActivityResponseTypeEnum];
+
 export interface Quid {
     'id'?: number;
     'quid'?: string;
@@ -515,13 +591,43 @@ export interface RuleDto {
     'totalSplits'?: number;
     'totalAmount'?: number;
 }
+export interface SecurityEventResponse {
+    'id'?: string;
+    'type'?: SecurityEventResponseTypeEnum;
+    'description'?: string;
+    'timestamp'?: string;
+    'ipAddress'?: string;
+    'status'?: SecurityEventResponseStatusEnum;
+}
+
+export const SecurityEventResponseTypeEnum = {
+    PasswordChange: 'PASSWORD_CHANGE',
+    SessionTerminated: 'SESSION_TERMINATED',
+    ProfileUpdate: 'PROFILE_UPDATE',
+    LoginAttempt: 'LOGIN_ATTEMPT'
+} as const;
+
+export type SecurityEventResponseTypeEnum = typeof SecurityEventResponseTypeEnum[keyof typeof SecurityEventResponseTypeEnum];
+export const SecurityEventResponseStatusEnum = {
+    Success: 'SUCCESS',
+    Failed: 'FAILED',
+    Suspicious: 'SUSPICIOUS'
+} as const;
+
+export type SecurityEventResponseStatusEnum = typeof SecurityEventResponseStatusEnum[keyof typeof SecurityEventResponseStatusEnum];
+
+export interface SecurityPreferencesDto {
+    'sessionTimeout'?: number;
+    'requireReauthForSensitiveActions'?: boolean;
+    'loginNotifications'?: boolean;
+}
 export interface SessionCountResponse {
     'activeSessions'?: number;
 }
 export interface SortObject {
     'sorted'?: boolean;
-    'empty'?: boolean;
     'unsorted'?: boolean;
+    'empty'?: boolean;
 }
 export interface Split {
     'id'?: number;
@@ -630,6 +736,40 @@ export const TransactionDtoStatusEnum = {
 
 export type TransactionDtoStatusEnum = typeof TransactionDtoStatusEnum[keyof typeof TransactionDtoStatusEnum];
 
+export interface UIPreferencesDto {
+    'theme'?: UIPreferencesDtoThemeEnum;
+    'timezone'?: string;
+    'language'?: string;
+    'uiDensity'?: UIPreferencesDtoUiDensityEnum;
+    'sidebarCollapsed'?: boolean;
+    'defaultPage'?: string;
+    'tableColumns'?: { [key: string]: boolean; };
+    'dashboardWidgets'?: Array<string>;
+}
+
+export const UIPreferencesDtoThemeEnum = {
+    Light: 'light',
+    Dark: 'dark',
+    System: 'system'
+} as const;
+
+export type UIPreferencesDtoThemeEnum = typeof UIPreferencesDtoThemeEnum[keyof typeof UIPreferencesDtoThemeEnum];
+export const UIPreferencesDtoUiDensityEnum = {
+    Compact: 'compact',
+    Normal: 'normal',
+    Comfortable: 'comfortable'
+} as const;
+
+export type UIPreferencesDtoUiDensityEnum = typeof UIPreferencesDtoUiDensityEnum[keyof typeof UIPreferencesDtoUiDensityEnum];
+
+export interface UpdateAdminProfileRequest {
+    'firstName'?: string;
+    'lastName'?: string;
+    'phone'?: string;
+}
+export interface UploadAvatarRequest {
+    'avatar': File;
+}
 /**
  * User details for admin operations
  */
@@ -704,8 +844,10 @@ export interface UserSessionDetails {
     'email'?: string;
     'location'?: string;
     'deviceType'?: string;
+    'deviceName'?: string;
     'sessionDuration'?: number;
     'inactivityDuration'?: number;
+    'current'?: boolean;
 }
 /**
  * Status update action
@@ -2803,6 +2945,939 @@ export const GetQuidsStatusEnum = {
     Conflicted: 'CONFLICTED'
 } as const;
 export type GetQuidsStatusEnum = typeof GetQuidsStatusEnum[keyof typeof GetQuidsStatusEnum];
+
+
+/**
+ * AdminSettingsManagementApi - axios parameter creator
+ */
+export const AdminSettingsManagementApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Changes the password for the currently authenticated admin user.
+         * @summary Change user password
+         * @param {ChangePasswordRequest} changePasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changePassword: async (changePasswordRequest: ChangePasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'changePasswordRequest' is not null or undefined
+            assertParamExists('changePassword', 'changePasswordRequest', changePasswordRequest)
+            const localVarPath = `/admin/settings/change-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(changePasswordRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves a paginated list of activities for the currently authenticated user.
+         * @summary Get profile activities
+         * @param {Pageable} pageable 
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProfileActivities: async (pageable: Pageable, type?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pageable' is not null or undefined
+            assertParamExists('getProfileActivities', 'pageable', pageable)
+            const localVarPath = `/admin/settings/activities`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves a paginated list of security events for the currently authenticated user.
+         * @summary Get security events
+         * @param {Pageable} pageable 
+         * @param {string} [type] 
+         * @param {string} [status] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSecurityEvents: async (pageable: Pageable, type?: string, status?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pageable' is not null or undefined
+            assertParamExists('getSecurityEvents', 'pageable', pageable)
+            const localVarPath = `/admin/settings/security-events`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves all preferences for the currently authenticated user.
+         * @summary Get user preferences
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserPreferences: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/settings/preferences`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves the profile of the currently authenticated admin user.
+         * @summary Get user profile
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserProfile: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/settings/profile`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates notification preferences for the currently authenticated user.
+         * @summary Update notification preferences
+         * @param {NotificationPreferencesDto} notificationPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateNotificationPreferences: async (notificationPreferencesDto: NotificationPreferencesDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'notificationPreferencesDto' is not null or undefined
+            assertParamExists('updateNotificationPreferences', 'notificationPreferencesDto', notificationPreferencesDto)
+            const localVarPath = `/admin/settings/preferences/notifications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(notificationPreferencesDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates security preferences for the currently authenticated user.
+         * @summary Update security preferences
+         * @param {SecurityPreferencesDto} securityPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateSecurityPreferences: async (securityPreferencesDto: SecurityPreferencesDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'securityPreferencesDto' is not null or undefined
+            assertParamExists('updateSecurityPreferences', 'securityPreferencesDto', securityPreferencesDto)
+            const localVarPath = `/admin/settings/preferences/security`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(securityPreferencesDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates UI preferences for the currently authenticated user.
+         * @summary Update UI preferences
+         * @param {UIPreferencesDto} uIPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUIPreferences: async (uIPreferencesDto: UIPreferencesDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uIPreferencesDto' is not null or undefined
+            assertParamExists('updateUIPreferences', 'uIPreferencesDto', uIPreferencesDto)
+            const localVarPath = `/admin/settings/preferences/ui`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uIPreferencesDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates the profile of the currently authenticated admin user.
+         * @summary Update user profile
+         * @param {UpdateAdminProfileRequest} updateAdminProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile: async (updateAdminProfileRequest: UpdateAdminProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateAdminProfileRequest' is not null or undefined
+            assertParamExists('updateUserProfile', 'updateAdminProfileRequest', updateAdminProfileRequest)
+            const localVarPath = `/admin/settings/profile`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateAdminProfileRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Uploads or updates the profile picture for the currently authenticated user.
+         * @summary Upload profile picture
+         * @param {UploadAvatarRequest} [uploadAvatarRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAvatar: async (uploadAvatarRequest?: UploadAvatarRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/settings/avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadAvatarRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AdminSettingsManagementApi - functional programming interface
+ */
+export const AdminSettingsManagementApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AdminSettingsManagementApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Changes the password for the currently authenticated admin user.
+         * @summary Change user password
+         * @param {ChangePasswordRequest} changePasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async changePassword(changePasswordRequest: ChangePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: boolean; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.changePassword(changePasswordRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.changePassword']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieves a paginated list of activities for the currently authenticated user.
+         * @summary Get profile activities
+         * @param {Pageable} pageable 
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProfileActivities(pageable: Pageable, type?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PageProfileActivityResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProfileActivities(pageable, type, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.getProfileActivities']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieves a paginated list of security events for the currently authenticated user.
+         * @summary Get security events
+         * @param {Pageable} pageable 
+         * @param {string} [type] 
+         * @param {string} [status] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSecurityEvents(pageable: Pageable, type?: string, status?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PageSecurityEventResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSecurityEvents(pageable, type, status, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.getSecurityEvents']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieves all preferences for the currently authenticated user.
+         * @summary Get user preferences
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserPreferences(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AllPreferencesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserPreferences(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.getUserPreferences']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieves the profile of the currently authenticated admin user.
+         * @summary Get user profile
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserProfile(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AdminProfileResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserProfile(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.getUserProfile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates notification preferences for the currently authenticated user.
+         * @summary Update notification preferences
+         * @param {NotificationPreferencesDto} notificationPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateNotificationPreferences(notificationPreferencesDto: NotificationPreferencesDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NotificationPreferencesDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateNotificationPreferences(notificationPreferencesDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.updateNotificationPreferences']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates security preferences for the currently authenticated user.
+         * @summary Update security preferences
+         * @param {SecurityPreferencesDto} securityPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateSecurityPreferences(securityPreferencesDto: SecurityPreferencesDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SecurityPreferencesDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateSecurityPreferences(securityPreferencesDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.updateSecurityPreferences']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates UI preferences for the currently authenticated user.
+         * @summary Update UI preferences
+         * @param {UIPreferencesDto} uIPreferencesDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUIPreferences(uIPreferencesDto: UIPreferencesDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UIPreferencesDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUIPreferences(uIPreferencesDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.updateUIPreferences']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Updates the profile of the currently authenticated admin user.
+         * @summary Update user profile
+         * @param {UpdateAdminProfileRequest} updateAdminProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUserProfile(updateAdminProfileRequest: UpdateAdminProfileRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AdminProfileResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUserProfile(updateAdminProfileRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.updateUserProfile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Uploads or updates the profile picture for the currently authenticated user.
+         * @summary Upload profile picture
+         * @param {UploadAvatarRequest} [uploadAvatarRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadAvatar(uploadAvatarRequest?: UploadAvatarRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAvatar(uploadAvatarRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminSettingsManagementApi.uploadAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AdminSettingsManagementApi - factory interface
+ */
+export const AdminSettingsManagementApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AdminSettingsManagementApiFp(configuration)
+    return {
+        /**
+         * Changes the password for the currently authenticated admin user.
+         * @summary Change user password
+         * @param {AdminSettingsManagementApiChangePasswordRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changePassword(requestParameters: AdminSettingsManagementApiChangePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: boolean; }> {
+            return localVarFp.changePassword(requestParameters.changePasswordRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves a paginated list of activities for the currently authenticated user.
+         * @summary Get profile activities
+         * @param {AdminSettingsManagementApiGetProfileActivitiesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProfileActivities(requestParameters: AdminSettingsManagementApiGetProfileActivitiesRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageProfileActivityResponse> {
+            return localVarFp.getProfileActivities(requestParameters.pageable, requestParameters.type, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves a paginated list of security events for the currently authenticated user.
+         * @summary Get security events
+         * @param {AdminSettingsManagementApiGetSecurityEventsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSecurityEvents(requestParameters: AdminSettingsManagementApiGetSecurityEventsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageSecurityEventResponse> {
+            return localVarFp.getSecurityEvents(requestParameters.pageable, requestParameters.type, requestParameters.status, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves all preferences for the currently authenticated user.
+         * @summary Get user preferences
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserPreferences(options?: RawAxiosRequestConfig): AxiosPromise<AllPreferencesResponse> {
+            return localVarFp.getUserPreferences(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves the profile of the currently authenticated admin user.
+         * @summary Get user profile
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserProfile(options?: RawAxiosRequestConfig): AxiosPromise<AdminProfileResponse> {
+            return localVarFp.getUserProfile(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates notification preferences for the currently authenticated user.
+         * @summary Update notification preferences
+         * @param {AdminSettingsManagementApiUpdateNotificationPreferencesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateNotificationPreferences(requestParameters: AdminSettingsManagementApiUpdateNotificationPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationPreferencesDto> {
+            return localVarFp.updateNotificationPreferences(requestParameters.notificationPreferencesDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates security preferences for the currently authenticated user.
+         * @summary Update security preferences
+         * @param {AdminSettingsManagementApiUpdateSecurityPreferencesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateSecurityPreferences(requestParameters: AdminSettingsManagementApiUpdateSecurityPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<SecurityPreferencesDto> {
+            return localVarFp.updateSecurityPreferences(requestParameters.securityPreferencesDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates UI preferences for the currently authenticated user.
+         * @summary Update UI preferences
+         * @param {AdminSettingsManagementApiUpdateUIPreferencesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUIPreferences(requestParameters: AdminSettingsManagementApiUpdateUIPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<UIPreferencesDto> {
+            return localVarFp.updateUIPreferences(requestParameters.uIPreferencesDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates the profile of the currently authenticated admin user.
+         * @summary Update user profile
+         * @param {AdminSettingsManagementApiUpdateUserProfileRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile(requestParameters: AdminSettingsManagementApiUpdateUserProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<AdminProfileResponse> {
+            return localVarFp.updateUserProfile(requestParameters.updateAdminProfileRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Uploads or updates the profile picture for the currently authenticated user.
+         * @summary Upload profile picture
+         * @param {AdminSettingsManagementApiUploadAvatarRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAvatar(requestParameters: AdminSettingsManagementApiUploadAvatarRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: string; }> {
+            return localVarFp.uploadAvatar(requestParameters.uploadAvatarRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AdminSettingsManagementApi - interface
+ */
+export interface AdminSettingsManagementApiInterface {
+    /**
+     * Changes the password for the currently authenticated admin user.
+     * @summary Change user password
+     * @param {AdminSettingsManagementApiChangePasswordRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    changePassword(requestParameters: AdminSettingsManagementApiChangePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: boolean; }>;
+
+    /**
+     * Retrieves a paginated list of activities for the currently authenticated user.
+     * @summary Get profile activities
+     * @param {AdminSettingsManagementApiGetProfileActivitiesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getProfileActivities(requestParameters: AdminSettingsManagementApiGetProfileActivitiesRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageProfileActivityResponse>;
+
+    /**
+     * Retrieves a paginated list of security events for the currently authenticated user.
+     * @summary Get security events
+     * @param {AdminSettingsManagementApiGetSecurityEventsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSecurityEvents(requestParameters: AdminSettingsManagementApiGetSecurityEventsRequest, options?: RawAxiosRequestConfig): AxiosPromise<PageSecurityEventResponse>;
+
+    /**
+     * Retrieves all preferences for the currently authenticated user.
+     * @summary Get user preferences
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserPreferences(options?: RawAxiosRequestConfig): AxiosPromise<AllPreferencesResponse>;
+
+    /**
+     * Retrieves the profile of the currently authenticated admin user.
+     * @summary Get user profile
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserProfile(options?: RawAxiosRequestConfig): AxiosPromise<AdminProfileResponse>;
+
+    /**
+     * Updates notification preferences for the currently authenticated user.
+     * @summary Update notification preferences
+     * @param {AdminSettingsManagementApiUpdateNotificationPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateNotificationPreferences(requestParameters: AdminSettingsManagementApiUpdateNotificationPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<NotificationPreferencesDto>;
+
+    /**
+     * Updates security preferences for the currently authenticated user.
+     * @summary Update security preferences
+     * @param {AdminSettingsManagementApiUpdateSecurityPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateSecurityPreferences(requestParameters: AdminSettingsManagementApiUpdateSecurityPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<SecurityPreferencesDto>;
+
+    /**
+     * Updates UI preferences for the currently authenticated user.
+     * @summary Update UI preferences
+     * @param {AdminSettingsManagementApiUpdateUIPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateUIPreferences(requestParameters: AdminSettingsManagementApiUpdateUIPreferencesRequest, options?: RawAxiosRequestConfig): AxiosPromise<UIPreferencesDto>;
+
+    /**
+     * Updates the profile of the currently authenticated admin user.
+     * @summary Update user profile
+     * @param {AdminSettingsManagementApiUpdateUserProfileRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateUserProfile(requestParameters: AdminSettingsManagementApiUpdateUserProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<AdminProfileResponse>;
+
+    /**
+     * Uploads or updates the profile picture for the currently authenticated user.
+     * @summary Upload profile picture
+     * @param {AdminSettingsManagementApiUploadAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    uploadAvatar(requestParameters?: AdminSettingsManagementApiUploadAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: string; }>;
+
+}
+
+/**
+ * Request parameters for changePassword operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiChangePasswordRequest {
+    readonly changePasswordRequest: ChangePasswordRequest
+}
+
+/**
+ * Request parameters for getProfileActivities operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiGetProfileActivitiesRequest {
+    readonly pageable: Pageable
+
+    readonly type?: string
+}
+
+/**
+ * Request parameters for getSecurityEvents operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiGetSecurityEventsRequest {
+    readonly pageable: Pageable
+
+    readonly type?: string
+
+    readonly status?: string
+}
+
+/**
+ * Request parameters for updateNotificationPreferences operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiUpdateNotificationPreferencesRequest {
+    readonly notificationPreferencesDto: NotificationPreferencesDto
+}
+
+/**
+ * Request parameters for updateSecurityPreferences operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiUpdateSecurityPreferencesRequest {
+    readonly securityPreferencesDto: SecurityPreferencesDto
+}
+
+/**
+ * Request parameters for updateUIPreferences operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiUpdateUIPreferencesRequest {
+    readonly uIPreferencesDto: UIPreferencesDto
+}
+
+/**
+ * Request parameters for updateUserProfile operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiUpdateUserProfileRequest {
+    readonly updateAdminProfileRequest: UpdateAdminProfileRequest
+}
+
+/**
+ * Request parameters for uploadAvatar operation in AdminSettingsManagementApi.
+ */
+export interface AdminSettingsManagementApiUploadAvatarRequest {
+    readonly uploadAvatarRequest?: UploadAvatarRequest
+}
+
+/**
+ * AdminSettingsManagementApi - object-oriented interface
+ */
+export class AdminSettingsManagementApi extends BaseAPI implements AdminSettingsManagementApiInterface {
+    /**
+     * Changes the password for the currently authenticated admin user.
+     * @summary Change user password
+     * @param {AdminSettingsManagementApiChangePasswordRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public changePassword(requestParameters: AdminSettingsManagementApiChangePasswordRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).changePassword(requestParameters.changePasswordRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves a paginated list of activities for the currently authenticated user.
+     * @summary Get profile activities
+     * @param {AdminSettingsManagementApiGetProfileActivitiesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getProfileActivities(requestParameters: AdminSettingsManagementApiGetProfileActivitiesRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).getProfileActivities(requestParameters.pageable, requestParameters.type, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves a paginated list of security events for the currently authenticated user.
+     * @summary Get security events
+     * @param {AdminSettingsManagementApiGetSecurityEventsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getSecurityEvents(requestParameters: AdminSettingsManagementApiGetSecurityEventsRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).getSecurityEvents(requestParameters.pageable, requestParameters.type, requestParameters.status, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves all preferences for the currently authenticated user.
+     * @summary Get user preferences
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUserPreferences(options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).getUserPreferences(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves the profile of the currently authenticated admin user.
+     * @summary Get user profile
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUserProfile(options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).getUserProfile(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates notification preferences for the currently authenticated user.
+     * @summary Update notification preferences
+     * @param {AdminSettingsManagementApiUpdateNotificationPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateNotificationPreferences(requestParameters: AdminSettingsManagementApiUpdateNotificationPreferencesRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).updateNotificationPreferences(requestParameters.notificationPreferencesDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates security preferences for the currently authenticated user.
+     * @summary Update security preferences
+     * @param {AdminSettingsManagementApiUpdateSecurityPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateSecurityPreferences(requestParameters: AdminSettingsManagementApiUpdateSecurityPreferencesRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).updateSecurityPreferences(requestParameters.securityPreferencesDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates UI preferences for the currently authenticated user.
+     * @summary Update UI preferences
+     * @param {AdminSettingsManagementApiUpdateUIPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateUIPreferences(requestParameters: AdminSettingsManagementApiUpdateUIPreferencesRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).updateUIPreferences(requestParameters.uIPreferencesDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates the profile of the currently authenticated admin user.
+     * @summary Update user profile
+     * @param {AdminSettingsManagementApiUpdateUserProfileRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateUserProfile(requestParameters: AdminSettingsManagementApiUpdateUserProfileRequest, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).updateUserProfile(requestParameters.updateAdminProfileRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Uploads or updates the profile picture for the currently authenticated user.
+     * @summary Upload profile picture
+     * @param {AdminSettingsManagementApiUploadAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public uploadAvatar(requestParameters: AdminSettingsManagementApiUploadAvatarRequest = {}, options?: RawAxiosRequestConfig) {
+        return AdminSettingsManagementApiFp(this.configuration).uploadAvatar(requestParameters.uploadAvatarRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
 
 
 /**
@@ -5174,7 +6249,7 @@ export const PaymentWebhooksApiAxiosParamCreator = function (configuration?: Con
             assertParamExists('handleFlutterwaveWebhook', 'verifHash', verifHash)
             // verify required parameter 'body' is not null or undefined
             assertParamExists('handleFlutterwaveWebhook', 'body', body)
-            const localVarPath = `/api/webhooks/flutterwave`;
+            const localVarPath = `/webhooks/flutterwave`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5220,7 +6295,7 @@ export const PaymentWebhooksApiAxiosParamCreator = function (configuration?: Con
             assertParamExists('handlePaystackWebhook', 'xPaystackSignature', xPaystackSignature)
             // verify required parameter 'body' is not null or undefined
             assertParamExists('handlePaystackWebhook', 'body', body)
-            const localVarPath = `/api/webhooks/paystack`;
+            const localVarPath = `/webhooks/paystack`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6666,7 +7741,7 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getActiveSessions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/sessions/active`;
+            const localVarPath = `/sessions/active`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6700,7 +7775,7 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getSessionCount: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/sessions/count`;
+            const localVarPath = `/sessions/count`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6734,7 +7809,7 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getUserSessions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/sessions`;
+            const localVarPath = `/sessions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6768,7 +7843,7 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         revokeAllSessions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/auth/sessions/all`;
+            const localVarPath = `/sessions/all`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6798,14 +7873,11 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
         /**
          * 
          * @summary Revoke all other sessions except current one
-         * @param {string} authorization The Authorization header containing the current session\&#39;s JWT.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        revokeOtherSessions: async (authorization: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'authorization' is not null or undefined
-            assertParamExists('revokeOtherSessions', 'authorization', authorization)
-            const localVarPath = `/auth/sessions`;
+        revokeOtherSessions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/sessions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6823,9 +7895,6 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
 
 
     
-            if (authorization != null) {
-                localVarHeaderParameter['Authorization'] = String(authorization);
-            }
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -6845,7 +7914,7 @@ export const SessionManagementApiAxiosParamCreator = function (configuration?: C
         revokeSession: async (sessionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionId' is not null or undefined
             assertParamExists('revokeSession', 'sessionId', sessionId)
-            const localVarPath = `/auth/sessions/{sessionId}`
+            const localVarPath = `/sessions/{sessionId}`
                 .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6933,12 +8002,11 @@ export const SessionManagementApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Revoke all other sessions except current one
-         * @param {string} authorization The Authorization header containing the current session\&#39;s JWT.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async revokeOtherSessions(authorization: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.revokeOtherSessions(authorization, options);
+        async revokeOtherSessions(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.revokeOtherSessions(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['SessionManagementApi.revokeOtherSessions']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -7004,12 +8072,11 @@ export const SessionManagementApiFactory = function (configuration?: Configurati
         /**
          * 
          * @summary Revoke all other sessions except current one
-         * @param {SessionManagementApiRevokeOtherSessionsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        revokeOtherSessions(requestParameters: SessionManagementApiRevokeOtherSessionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.revokeOtherSessions(requestParameters.authorization, options).then((request) => request(axios, basePath));
+        revokeOtherSessions(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.revokeOtherSessions(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7063,11 +8130,10 @@ export interface SessionManagementApiInterface {
     /**
      * 
      * @summary Revoke all other sessions except current one
-     * @param {SessionManagementApiRevokeOtherSessionsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    revokeOtherSessions(requestParameters: SessionManagementApiRevokeOtherSessionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+    revokeOtherSessions(options?: RawAxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -7078,16 +8144,6 @@ export interface SessionManagementApiInterface {
      */
     revokeSession(requestParameters: SessionManagementApiRevokeSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
 
-}
-
-/**
- * Request parameters for revokeOtherSessions operation in SessionManagementApi.
- */
-export interface SessionManagementApiRevokeOtherSessionsRequest {
-    /**
-     * The Authorization header containing the current session\&#39;s JWT.
-     */
-    readonly authorization: string
 }
 
 /**
@@ -7147,12 +8203,11 @@ export class SessionManagementApi extends BaseAPI implements SessionManagementAp
     /**
      * 
      * @summary Revoke all other sessions except current one
-     * @param {SessionManagementApiRevokeOtherSessionsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public revokeOtherSessions(requestParameters: SessionManagementApiRevokeOtherSessionsRequest, options?: RawAxiosRequestConfig) {
-        return SessionManagementApiFp(this.configuration).revokeOtherSessions(requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
+    public revokeOtherSessions(options?: RawAxiosRequestConfig) {
+        return SessionManagementApiFp(this.configuration).revokeOtherSessions(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

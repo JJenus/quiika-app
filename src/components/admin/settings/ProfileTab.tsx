@@ -3,10 +3,9 @@ import { User, Mail, Phone, Calendar, Download, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Badge } from '@/components/ui/Badge';
 import { useSettingsStore } from '@/stores/useSettingsStore';
-import { formatDistanceToNow } from 'date-fns';
+import { safeFormatDistanceToNow, safeToLocaleDateString } from '@/utils/dateUtils';
 
 export const ProfileTab: React.FC = () => {
   const { 
@@ -160,7 +159,7 @@ export const ProfileTab: React.FC = () => {
                 )}
                 <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Member since {new Date(profile.createdAt).toLocaleDateString()}
+                  Member since {safeToLocaleDateString(profile.createdAt, 'Unknown date')}
                 </p>
               </div>
             </div>
@@ -274,7 +273,7 @@ export const ProfileTab: React.FC = () => {
                   <div className="flex-1 pb-4">
                     <p className="text-sm text-gray-900 dark:text-gray-100">{activity.description}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                      {safeFormatDistanceToNow(activity.timestamp, 'Some time ago')}
                     </p>
                     {activity.ipAddress && (
                       <p className="text-xs text-gray-500 dark:text-gray-500">IP: {activity.ipAddress}</p>
@@ -292,19 +291,19 @@ export const ProfileTab: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">Last Login</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {profile.lastLogin ? formatDistanceToNow(new Date(profile.lastLogin), { addSuffix: true }) : 'Never'}
+                  {safeFormatDistanceToNow(profile.lastLogin, 'Never')}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">Password Changed</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {profile.lastPasswordChange ? formatDistanceToNow(new Date(profile.lastPasswordChange), { addSuffix: true }) : 'Never'}
+                  {safeFormatDistanceToNow(profile.lastPasswordChange, 'Never')}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">Account Created</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {formatDistanceToNow(new Date(profile.createdAt), { addSuffix: true })}
+                  {safeFormatDistanceToNow(profile.createdAt, 'Unknown')}
                 </span>
               </div>
             </div>

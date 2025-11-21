@@ -17,6 +17,7 @@ const ENDPOINT_AUTH_STRATEGIES: Record<string, AuthStrategy> = {
 	// Bearer token endpoints (protected user/admin routes)
 	"/auth/": AuthStrategy.NONE,
 	"/admin/": AuthStrategy.BEARER_TOKEN,
+	"/sessions/": AuthStrategy.BEARER_TOKEN,
 	"/withdrawal": AuthStrategy.API_KEY,
 	"/quid/": AuthStrategy.API_KEY,
 	"/rules/": AuthStrategy.API_KEY,

@@ -13,8 +13,10 @@ Name | Type | Description | Notes
 **email** | **string** |  | [optional] [default to undefined]
 **location** | **string** |  | [optional] [default to undefined]
 **deviceType** | **string** |  | [optional] [default to undefined]
+**deviceName** | **string** |  | [optional] [default to undefined]
 **sessionDuration** | **number** |  | [optional] [default to undefined]
 **inactivityDuration** | **number** |  | [optional] [default to undefined]
+**current** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -30,8 +32,10 @@ const instance: UserSessionDetails = {
     email,
     location,
     deviceType,
+    deviceName,
     sessionDuration,
     inactivityDuration,
+    current,
 };
 ```
 

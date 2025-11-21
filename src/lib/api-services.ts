@@ -16,7 +16,9 @@ import {
 	AdminLoggingApi,
 	InviteUserApi,
 	DynamicAPIKeyApi,
-	AuditLogDto,
+	SessionManagementApi,
+	AdminSettingsManagementApi,
+
 	// Import types as needed
 	TransactionDto,
 	ResolveBank,
@@ -32,6 +34,13 @@ import {
 	Pageable,
 	InviteRequest,
 	EcdhCompleteRequest,
+	ChangePasswordRequest,
+	UpdateAdminProfileRequest,
+	AdminSettingsManagementApiUpdateNotificationPreferencesRequest,
+	AdminSettingsManagementApiUpdateSecurityPreferencesRequest,
+	AdminSettingsManagementApiUpdateUIPreferencesRequest,
+	AdminSettingsManagementApiUploadAvatarRequest,
+	UploadAvatarRequest,
 } from "./api-sdk";
 
 // Initialize API instances with our configured client
@@ -97,6 +106,17 @@ export const inviteUserApi = new InviteUserApi(
 	axiosInstance
 );
 export const dynamicApiKey = new DynamicAPIKeyApi(
+	config,
+	config.basePath,
+	axiosInstance
+);
+export const sessionApi = new SessionManagementApi(
+	config,
+	config.basePath,
+	axiosInstance
+);
+
+export const adminSettings = new AdminSettingsManagementApi(
 	config,
 	config.basePath,
 	axiosInstance
@@ -282,7 +302,7 @@ export const apiService = {
 				handleApiCall(
 					adminDashboardApi.getTransactionDashboardMetrics({ period })
 				),
-				
+
 			getWithdrawalMetrics: (period: GetDashboardTimeSeriesPeriodEnum) =>
 				handleApiCall(
 					adminDashboardApi.getWithdrawalDashboardMetrics({ period })
@@ -483,6 +503,77 @@ export const apiService = {
 					})
 				),
 		},
+
+		settings: {
+			getAllSettings: () =>
+				handleApiCall(adminSettings.getUserPreferences()),
+
+			getUserProfile: () => handleApiCall(adminSettings.getUserProfile()),
+
+			changePassword: (changePasswordRequest: ChangePasswordRequest) =>
+				handleApiCall(
+					adminSettings.changePassword({
+						changePasswordRequest,
+					})
+				),
+
+			updateUserProfile: (
+				updateAdminProfileRequest: UpdateAdminProfileRequest
+			) =>
+				handleApiCall(
+					adminSettings.updateUserProfile({
+						updateAdminProfileRequest,
+					})
+				),
+
+			updateNotificationPreferences: (
+				data: AdminSettingsManagementApiUpdateNotificationPreferencesRequest
+			) =>
+				handleApiCall(
+					adminSettings.updateNotificationPreferences({
+						...data,
+					})
+				),
+
+			updateSecurityPreferences: (
+				data: AdminSettingsManagementApiUpdateSecurityPreferencesRequest
+			) =>
+				handleApiCall(
+					adminSettings.updateSecurityPreferences({
+						...data,
+					})
+				),
+
+			updateUIPreferences: (
+				data: AdminSettingsManagementApiUpdateUIPreferencesRequest
+			) =>
+				handleApiCall(
+					adminSettings.updateUIPreferences({
+						...data,
+					})
+				),
+
+			uploadAvatar: (data: UploadAvatarRequest) =>
+				handleApiCall(
+					adminSettings.uploadAvatar({
+						uploadAvatarRequest: data,
+					})
+				),
+		},
+	},
+
+	session: {
+		getAllSessions: () => handleApiCall(sessionApi.getUserSessions()),
+
+		getActiveSessions: () => handleApiCall(sessionApi.getActiveSessions()),
+
+		revokeSession: (sessionId: string) =>
+			handleApiCall(sessionApi.revokeSession({ sessionId })),
+
+		revokeOtherSessions: () =>
+			handleApiCall(sessionApi.revokeOtherSessions()),
+
+		revokeAllSessions: () => handleApiCall(sessionApi.revokeAllSessions()),
 	},
 
 	apiKey: {
@@ -507,4 +598,5 @@ export const {
 	auth,
 	admin,
 	apiKey,
+	session,
 } = apiService;

@@ -1,3 +1,5 @@
+import { UserSessionDetails, NotificationPreferences, UIPreferences, SecurityPreferences } from "@/lib/api";
+
 export interface AdminProfile {
 	id: string;
 	email: string;
@@ -50,35 +52,35 @@ export interface SecurityEvent {
 	status: "SUCCESS" | "FAILED" | "SUSPICIOUS";
 }
 
-export interface NotificationPreferences {
-	emailAlerts: boolean;
-	systemAlerts: boolean;
-	dailyDigest: boolean;
-	withdrawalNotifications: boolean;
-	securityAlerts: boolean;
-}
+// export interface NotificationPreferences {
+// 	emailAlerts: boolean;
+// 	systemAlerts: boolean;
+// 	dailyDigest: boolean;
+// 	withdrawalNotifications: boolean;
+// 	securityAlerts: boolean;
+// }
 
-export interface UIPreferences {
-    theme: 'light' | 'dark' | 'system'; // This now syncs with useThemeStore
-    timezone: string;
-    language: string;
-    uiDensity: 'compact' | 'normal' | 'comfortable';
-    sidebarCollapsed: boolean; // This syncs with useUIStore
-    defaultPage: string;
-    tableColumns: Record<string, boolean>;
-    dashboardWidgets: string[];
-  }
+// export interface UIPreferences {
+//     theme: 'light' | 'dark' | 'system'; // This now syncs with useThemeStore
+//     timezone: string;
+//     language: string;
+//     uiDensity: 'compact' | 'normal' | 'comfortable';
+//     sidebarCollapsed: boolean; // This syncs with useUIStore
+//     defaultPage: string;
+//     tableColumns: Record<string, boolean>;
+//     dashboardWidgets: string[];
+//   }
 
-export interface SecurityPreferences {
-	sessionTimeout: number; // minutes
-	requireReauthForSensitiveActions: boolean;
-	loginNotifications: boolean;
-}
+// export interface SecurityPreferences {
+// 	sessionTimeout: number; // minutes
+// 	requireReauthForSensitiveActions: boolean;
+// 	loginNotifications: boolean;
+// }
 
 export interface SettingsState {
 	profile: AdminProfile;
 	profileActivities: ProfileActivity[];
-	activeSessions: UserSession[];
+	activeSessions: UserSessionDetails[];
 	securityEvents: SecurityEvent[];
 	notifications: NotificationPreferences;
 	ui: UIPreferences;
@@ -88,21 +90,23 @@ export interface SettingsState {
 }
 
 export interface SettingsActions {
+	// Fetch actions
+	fetchAllSettings: () => Promise<void>;
+	fetchProfile: () => Promise<void>;
+	fetchProfileActivities: () => Promise<void>;
+	fetchActiveSessions: () => Promise<void>;
+	fetchSecurityEvents: () => Promise<void>;
+	fetchPreferences: () => Promise<void>;
+	
+	// Update actions (existing)
 	updateProfile: (profile: Partial<AdminProfile>) => Promise<void>;
-	changePassword: (
-		currentPassword: string,
-		newPassword: string
-	) => Promise<void>;
+	changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 	updateAvatar: (avatar: File) => Promise<void>;
-	updateNotifications: (
-		notifications: Partial<NotificationPreferences>
-	) => Promise<void>;
+	updateNotifications: (notifications: Partial<NotificationPreferences>) => Promise<void>;
 	updateUIPreferences: (ui: Partial<UIPreferences>) => Promise<void>;
-	updateSecurityPreferences: (
-		security: Partial<SecurityPreferences>
-	) => Promise<void>;
+	updateSecurityPreferences: (security: Partial<SecurityPreferences>) => Promise<void>;
 	terminateSession: (sessionId: string) => Promise<void>;
 	terminateAllOtherSessions: () => Promise<void>;
 	downloadPersonalData: () => Promise<void>;
 	clearError: () => void;
-}
+  }

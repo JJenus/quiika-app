@@ -1,4 +1,4 @@
-# PageWithdrawalRequestDto
+# PageSecurityEventResponse
 
 
 ## Properties
@@ -14,15 +14,15 @@ Name | Type | Description | Notes
 **number** | **number** |  | [optional] [default to undefined]
 **numberOfElements** | **number** |  | [optional] [default to undefined]
 **size** | **number** |  | [optional] [default to undefined]
-**content** | [**Array&lt;WithdrawalRequestDto&gt;**](WithdrawalRequestDto.md) |  | [optional] [default to undefined]
+**content** | [**Array&lt;SecurityEventResponse&gt;**](SecurityEventResponse.md) |  | [optional] [default to undefined]
 **empty** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { PageWithdrawalRequestDto } from '@app/api-sdk';
+import { PageSecurityEventResponse } from '@app/api-sdk';
 
-const instance: PageWithdrawalRequestDto = {
+const instance: PageSecurityEventResponse = {
     totalElements,
     totalPages,
     pageable,

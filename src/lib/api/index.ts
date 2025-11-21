@@ -12,6 +12,7 @@ export {
 	payment,
 	auth,
 	admin,
+	session,
 } from "../api-services";
 
 // Type exports
@@ -38,5 +39,15 @@ export type {
 	TransactionDashboardMetricsDto as TransactionMetrics,
 	DashboardMetricsDto,
 	PageWithdrawalRequestDto,
-	WithdrawalRequestDto
+	WithdrawalRequestDto,
+	UserSessionDetails,
+	AdminSettingsManagementApiUpdateNotificationPreferencesRequest as UpdateNotificationPreferences,
+	AdminSettingsManagementApiUpdateSecurityPreferencesRequest as UpdateSecurityPreferences,
+	AdminSettingsManagementApiUpdateUIPreferencesRequest as UIPreferencesRequest,
+	ChangePasswordRequest,
+	UpdateAdminProfileRequest,
+	AdminSettingsManagementApiUploadAvatarRequest as UploadAvatarRequest,
+	NotificationPreferencesDto as NotificationPreferences,
+	UIPreferencesDto as UIPreferences,
+	SecurityPreferencesDto as SecurityPreferences
 } from "../api-sdk";

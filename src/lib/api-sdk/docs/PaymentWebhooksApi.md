@@ -4,8 +4,8 @@ All URIs are relative to *http://localhost:8080*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**handleFlutterwaveWebhook**](#handleflutterwavewebhook) | **POST** /api/webhooks/flutterwave | Handles Flutterwave webhook events|
-|[**handlePaystackWebhook**](#handlepaystackwebhook) | **POST** /api/webhooks/paystack | Handles Paystack webhook events|
+|[**handleFlutterwaveWebhook**](#handleflutterwavewebhook) | **POST** /webhooks/flutterwave | Handles Flutterwave webhook events|
+|[**handlePaystackWebhook**](#handlepaystackwebhook) | **POST** /webhooks/paystack | Handles Paystack webhook events|
 
 # **handleFlutterwaveWebhook**
 > handleFlutterwaveWebhook(body)

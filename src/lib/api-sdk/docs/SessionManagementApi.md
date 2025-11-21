@@ -4,12 +4,12 @@ All URIs are relative to *http://localhost:8080*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**getActiveSessions**](#getactivesessions) | **GET** /auth/sessions/active | Get active sessions for current user|
-|[**getSessionCount**](#getsessioncount) | **GET** /auth/sessions/count | Get active session count for current user|
-|[**getUserSessions**](#getusersessions) | **GET** /auth/sessions | Get all active sessions for current user|
-|[**revokeAllSessions**](#revokeallsessions) | **DELETE** /auth/sessions/all | Revoke all sessions for current user|
-|[**revokeOtherSessions**](#revokeothersessions) | **DELETE** /auth/sessions | Revoke all other sessions except current one|
-|[**revokeSession**](#revokesession) | **DELETE** /auth/sessions/{sessionId} | Revoke a specific session|
+|[**getActiveSessions**](#getactivesessions) | **GET** /sessions/active | Get active sessions for current user|
+|[**getSessionCount**](#getsessioncount) | **GET** /sessions/count | Get active session count for current user|
+|[**getUserSessions**](#getusersessions) | **GET** /sessions | Get all active sessions for current user|
+|[**revokeAllSessions**](#revokeallsessions) | **DELETE** /sessions/all | Revoke all sessions for current user|
+|[**revokeOtherSessions**](#revokeothersessions) | **DELETE** /sessions | Revoke all other sessions except current one|
+|[**revokeSession**](#revokesession) | **DELETE** /sessions/{sessionId} | Revoke a specific session|
 
 # **getActiveSessions**
 > Array<UserSessionDetails> getActiveSessions()
@@ -198,18 +198,11 @@ import {
 const configuration = new Configuration();
 const apiInstance = new SessionManagementApi(configuration);
 
-let authorization: string; //The Authorization header containing the current session\'s JWT. (default to undefined)
-
-const { status, data } = await apiInstance.revokeOtherSessions(
-    authorization
-);
+const { status, data } = await apiInstance.revokeOtherSessions();
 ```
 
 ### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **authorization** | [**string**] | The Authorization header containing the current session\&#39;s JWT. | defaults to undefined|
+This endpoint does not have any parameters.
 
 
 ### Return type

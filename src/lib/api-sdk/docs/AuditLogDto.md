@@ -12,6 +12,8 @@ Name | Type | Description | Notes
 **targetEntity** | **string** |  | [optional] [default to undefined]
 **targetEntityId** | **string** |  | [optional] [default to undefined]
 **details** | **string** |  | [optional] [default to undefined]
+**userAgent** | **string** |  | [optional] [default to undefined]
+**ipAddress** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -26,6 +28,8 @@ const instance: AuditLogDto = {
     targetEntity,
     targetEntityId,
     details,
+    userAgent,
+    ipAddress,
 };
 ```
 
